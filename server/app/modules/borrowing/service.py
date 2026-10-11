@@ -384,8 +384,16 @@ async def loan_view(db: AsyncSession, loan: Loan, viewer: User) -> dict[str, Any
     # rule 13: phone visible only for approved/active loans, only verified phones
     phone = other.phone if loan.status in ("approved", "active") and other.phone_verified_at else None
     today = today_tashkent()
+    from app.modules.messages.models import Conversation
+
+    conversation_id = await db.scalar(
+        select(Conversation.id).where(
+            Conversation.listing_id == loan.listing_id, Conversation.borrower_id == loan.borrower_id
+        )
+    )
     return {
         "id": loan.id,
+        "conversation_id": conversation_id,
         "status": loan.status,
         "role": "owner" if viewer.id == loan.owner_id else "borrower",
         "start": loan.start_date,

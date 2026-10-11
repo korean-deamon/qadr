@@ -1,4 +1,11 @@
-import { expect, test, type Page } from "@playwright/test"
+import { expect, test, type APIRequestContext, type Page } from "@playwright/test"
+
+/** A seeded listing by title (ids are random per seed). */
+async function listingId(request: APIRequestContext, q: string): Promise<string> {
+  const res = await request.get(`/api/v1/listings?q=${encodeURIComponent(q)}`)
+  const body = (await res.json()) as { items: { id: string }[] }
+  return body.items[0].id
+}
 
 /** Navigate and wait until React has hydrated, so clicks have handlers. */
 async function open(page: Page, url: string) {
@@ -8,7 +15,6 @@ async function open(page: Page, url: string) {
 
 const ROUTES = [
   ["/uz/explore", "Yaqindan toping"],
-  ["/uz/items/1", "4 kishilik chodir, Naturehike"],
   ["/uz/login", "Qaytganingizdan xursandmiz"],
   ["/uz/register", "Qoʻshnilaringizga qoʻshiling"],
   ["/uz/verify?email=someone@test.uz", "Emailingizni tekshiring"],
@@ -19,9 +25,15 @@ const ROUTES = [
 test.describe("signed-in pages render", () => {
   test.use({ storageState: "e2e/.auth/demo.json" })
   for (const [route, text] of [
-    ["/uz/dashboard", "Xayrli tong, Dilnoza"],
+    ["/uz/dashboard", "Dilnoza"],
     ["/uz/messages", "Xabarlar"],
     ["/uz/settings", "Sozlamalar"],
+    ["/uz/requests", "Soʻrovlar"],
+    ["/uz/borrowings", "Ijaralar"],
+    ["/uz/saved", "Saqlanganlar"],
+    ["/uz/notifications", "Bildirishnomalar"],
+    ["/uz/my-items", "Mening buyumlarim"],
+    ["/uz/items/new", "Buyum qoʻshish"],
   ] as const) {
     test(route, async ({ page }) => {
       const errors: string[] = []
@@ -47,14 +59,29 @@ test.describe("every main page renders", () => {
   }
 })
 
-test("saving an item animates and shows an undoable toast", async ({ page }) => {
+test("the item page shows real data", async ({ page, request }) => {
+  await open(page, `/uz/items/${await listingId(request, "Naturehike")}`)
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("4 kishilik chodir, Naturehike")
+  await expect(page.getByText("Sardor Rahimov").first()).toBeVisible()
+})
+
+test("visitors who save are sent to log in", async ({ page }) => {
   await open(page, "/en/explore")
+  await page.getByRole("button", { name: "Save" }).first().click()
+  await expect(page).toHaveURL(/\/en\/login\?next=/)
+})
+
+test("saving an item animates and shows an undoable toast", async ({ browser }) => {
+  const context = await browser.newContext({ storageState: "e2e/.auth/demo.json" })
+  const page = await context.newPage()
+  await open(page, "/en/explore?q=kayak")
   const save = page.getByRole("button", { name: "Save" }).first()
   await save.click()
   await expect(page.getByRole("button", { name: "Saved" }).first()).toHaveAttribute("aria-pressed", "true")
   await expect(page.getByText("Saved to your list")).toBeVisible()
   await page.getByRole("button", { name: "Undo" }).click()
   await expect(page.getByRole("button", { name: "Saved" })).toHaveCount(0)
+  await context.close()
 })
 
 test("explore search and empty state", async ({ page }) => {
@@ -64,12 +91,41 @@ test("explore search and empty state", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Nothing matches “zzzz” yet" })).toBeVisible()
 })
 
-test("item page: gallery switches photos and the request needs dates and terms", async ({ page }) => {
-  await open(page, "/en/items/1")
-  await page.getByRole("button", { name: "Photo 2 of 3" }).click()
-  await expect(page.getByRole("button", { name: "Photo 2 of 3" })).toHaveAttribute("aria-pressed", "true")
+test("item page: the request needs dates and terms", async ({ browser, request }) => {
+  const context = await browser.newContext({ storageState: "e2e/.auth/demo.json" })
+  const page = await context.newPage()
+  await open(page, `/en/items/${await listingId(request, "Yamaha")}`)
   await page.getByRole("button", { name: "Send request" }).click()
   await expect(page.locator("#request [role=alert]")).toHaveText("Choose start and end dates")
+  await context.close()
+})
+
+test("an owner declines an incoming request from the requests page", async ({ browser, request }) => {
+  test.skip(test.info().project.name !== "desktop", "one run is enough: it changes data")
+  // Timur asks for the mixer on a random far-off day (no clash with seeded loans)
+  const borrower = await browser.newContext()
+  const login = await borrower.request.post("/api/v1/auth/login", { data: { email: "timur@qadr.uz", password: "Demo12345!" } })
+  expect(login.ok()).toBeTruthy()
+  const csrf = (await borrower.cookies()).find((c) => c.name === "qadr_csrf")!.value
+  const day = new Date(Date.now() + (40 + Math.floor(Math.random() * 45)) * 86_400_000).toISOString().slice(0, 10)
+  const id = await listingId(request, "Planetar")
+  const res = await borrower.request.post(`/api/v1/listings/${id}/requests`, {
+    data: { start_date: day, end_date: day, message: "E2E request", accept_terms: true },
+    headers: { "x-csrf-token": csrf },
+  })
+  expect(res.status(), await res.text()).toBe(201)
+  const reqId = ((await res.json()) as { id: string }).id
+  await borrower.close()
+
+  const owner = await browser.newContext({ storageState: "e2e/.auth/demo.json" })
+  const page = await owner.newPage()
+  await open(page, "/en/requests")
+  const card = page.locator("li", { hasText: "E2E request" }).first()
+  await card.getByRole("button", { name: "Decline" }).click()
+  await expect(page.getByText("Request declined")).toBeVisible()
+  const check = await owner.request.get(`/api/v1/requests/${reqId}`)
+  expect(((await check.json()) as { status: string }).status).toBe("rejected")
+  await owner.close()
 })
 
 test("verify: a wrong code shows the API's localized error", async ({ page }) => {

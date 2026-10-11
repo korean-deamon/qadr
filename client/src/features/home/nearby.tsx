@@ -4,11 +4,12 @@ import { RevealText } from "@/components/motion/reveal-text"
 import { Reveal } from "@/components/motion/reveal"
 import { RevealItem } from "@/components/motion/reveal-item"
 import { Link } from "@/i18n/navigation"
-import { cardOf, listings } from "@/lib/mock"
+import type { ListingCardData } from "@/lib/api/types"
 
-export function Nearby() {
+export function Nearby({ listings, located }: { listings: ListingCardData[]; located: boolean }) {
   const t = useTranslations("home.nearby")
-  const [featured, ...rest] = listings.slice(0, 6).map(cardOf)
+  const [featured, ...rest] = listings
+  if (!featured) return null
 
   return (
     <section aria-labelledby="nearby-title" className="bg-sage/60">
@@ -16,7 +17,7 @@ export function Nearby() {
         <Reveal className="flex flex-wrap items-end justify-between gap-x-10 gap-y-4">
           <div>
             <RevealText as="h2" id="nearby-title" text={t("title")} className="text-title text-charcoal" />
-            <p className="mt-4 max-w-[46ch] text-body text-ink-soft">{t("lead")}</p>
+            <p className="mt-4 max-w-[46ch] text-body text-ink-soft">{located ? t("leadLocated") : t("lead")}</p>
           </div>
           <Link
             href="/explore"

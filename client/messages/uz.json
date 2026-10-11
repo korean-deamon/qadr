@@ -136,7 +136,8 @@
     "nearby": {
       "title": "Shu hafta yaqiningizda",
       "lead": "Shahar markazidan bir necha kilometr ichida yaqinda qoʻshilgan buyumlar.",
-      "viewAll": "Yaqindagi barcha buyumlar"
+      "viewAll": "Yaqindagi barcha buyumlar",
+      "leadLocated": "Sizga eng yaqin buyumlar."
     },
     "steps": {
       "title": "Qanday ishlaydi",
@@ -221,7 +222,11 @@
       "body": "10 km ichida chodirlar, oʻchoqlar va uxlash qoplari. Zomin sizni kutmoqda.",
       "cta": "Sayohat jihozlari"
     },
-    "results": "Natijalar"
+    "results": "Natijalar",
+    "pagination": "Sahifalar",
+    "previous": "Oldingi",
+    "next": "Keyingi",
+    "categoryLead": "{count, plural, other {# ta buyum}} ijaraga tayyor"
   },
   "listings": {
     "upToDays": "{days} kungacha",
@@ -252,7 +257,9 @@
       "similar": "Yaqinda yana",
       "photo": "{total} ta rasmdan {n}-si",
       "gallery": "Rasmlar",
-      "completedLabel": "marta ulashgan"
+      "completedLabel": "marta ulashgan",
+      "noRating": "Hali yoʻq",
+      "phoneVerified": "Telefon tasdiqlangan"
     },
     "request": {
       "title": "Olib turish",
@@ -274,7 +281,24 @@
       "nextMonth": "Keyingi oy",
       "selectStart": "Birinchi kunni tanlang",
       "selectEnd": "Endi oxirgi kunni tanlang",
-      "jump": "Sanalarni tanlash"
+      "jump": "Sanalarni tanlash",
+      "openChat": "Suhbatni ochish",
+      "messageLead": "{name}ga savol yozing. Javob bu yerda va xabarlar boʻlimida koʻrinadi.",
+      "send": "Yuborish",
+      "viewRequests": "Soʻrovlarimni koʻrish"
+    },
+    "newLender": "Yangi",
+    "owner": {
+      "title": "Bu sizning buyumingiz",
+      "liveNote": "Eʼlon faol: qoʻshnilar uni koʻrib, soʻrov yuborishi mumkin.",
+      "hiddenNote": "Eʼlon yashirilgan. Uni faqat siz koʻrasiz.",
+      "hiddenByAdmin": "Moderatsiya eʼlonni yashirdi: {reason}",
+      "edit": "Tahrirlash",
+      "requests": "Soʻrovlar",
+      "hide": "Vaqtincha yashirish",
+      "show": "Yana koʻrsatish",
+      "hiddenToast": "Eʼlon yashirildi",
+      "shown": "Eʼlon yana koʻrinadi"
     }
   },
   "borrowing": {
@@ -302,7 +326,32 @@
     "borrower": "Oluvchi: {name}",
     "pickup": "{when} olib ketasiz",
     "dueIn": "{when} qaytariladi",
-    "day": "{total} kundan {day}-kun"
+    "day": "{total} kundan {day}-kun",
+    "cancelRequest": "Soʻrovni bekor qilish",
+    "cancelledToast": "Soʻrov bekor qilindi",
+    "waiting": "{name} javobini kutmoqda",
+    "cancelConfirm": "Kelishuvni bekor qilasizmi?",
+    "loanCancelled": "Kelishuv bekor qilindi",
+    "cancel": "Bekor qilish",
+    "pickedUpToast": "Topshirildi deb belgilandi",
+    "handedOver": "Topshirdim",
+    "returnClaimedToast": "{name}ga xabar berildi. U qaytarishni tasdiqlaydi.",
+    "iReturned": "Qaytardim",
+    "borrowerSaysReturned": "{name} buyumni qaytarganini bildirdi. Tekshirib, tasdiqlang.",
+    "youRated": "Bahoyingiz:",
+    "reportNotReturned": "Qaytarilmadi deb xabar berish",
+    "message": "{name}ga yozish",
+    "rate": {
+      "open": "Baholash",
+      "title": "{name}ni baholang",
+      "lead": "Bahoyingiz boshqalarga ishonchli qoʻshnini topishga yordam beradi.",
+      "score": "Baho",
+      "stars": "{n} yulduz",
+      "comment": "Izoh (ixtiyoriy)",
+      "submit": "Bahoni yuborish",
+      "thanks": "Rahmat! Baho saqlandi.",
+      "pick": "Yulduzlar sonini tanlang."
+    }
   },
   "messages": {
     "title": "Xabarlar",
@@ -317,13 +366,24 @@
     "events": {
       "requested": "Olib turish soʻrovi yuborildi",
       "approved": "Soʻrov tasdiqlandi: telefon raqamlari endi koʻrinadi",
-      "pickedUp": "Buyum olib ketildi"
+      "pickedUp": "Buyum olib ketildi",
+      "rejected": "Soʻrov rad etildi",
+      "cancelled": "Bekor qilindi",
+      "returned": "Buyum qaytarildi"
     },
     "today": "Bugun",
-    "yesterday": "Kecha"
+    "yesterday": "Kecha",
+    "none": "Hali xabarlar yoʻq",
+    "deletedUser": "Oʻchirilgan foydalanuvchi",
+    "delete": "Suhbatni oʻchirish",
+    "deleteConfirm": "Suhbat faqat siz uchun oʻchiriladi. Davom etasizmi?",
+    "older": "Oldingi xabarlar",
+    "retry": "Yuborilmadi. Qayta urinish",
+    "report": "Shikoyat",
+    "closed": "Bu eʼlon oʻchirilgan, yangi xabar yuborib boʻlmaydi.",
+    "manageLoan": "Kelishuvni boshqarish"
   },
   "dashboard": {
-    "greeting": "Xayrli tong, {name}",
     "lead": "Bugun buyumlaringiz bilan nimalar boʻlayotgani.",
     "nav": {
       "overview": "Umumiy",
@@ -349,9 +409,19 @@
     },
     "itemStatus": {
       "available": "Boʻsh",
-      "onLoan": "Foydalanishda"
+      "onLoan": "Foydalanishda",
+      "hidden": "Yashirilgan",
+      "hiddenByAdmin": "Moderatsiyada",
+      "requests": "{count, plural, other {# ta soʻrov}}"
     },
-    "emptyIncoming": "Yangi soʻrovlar yoʻq. Kelsa, xabar beramiz."
+    "emptyIncoming": "Yangi soʻrovlar yoʻq. Kelsa, xabar beramiz.",
+    "greetings": {
+      "morning": "Xayrli tong, {name}",
+      "afternoon": "Xayrli kun, {name}",
+      "evening": "Xayrli kech, {name}"
+    },
+    "seeAll": "Hammasi",
+    "emptyItems": "Hali buyum qoʻshmagansiz. Javonda turgan narsani qoʻshnilarga bering."
   },
   "auth": {
     "email": "Email",
@@ -417,11 +487,43 @@
   "notifications": {
     "title": "Bildirishnomalar",
     "markAllRead": "Hammasini oʻqilgan deb belgilash",
-    "requestReceived": "{name} “{item}” uchun soʻrov yubordi",
-    "requestApproved": "{name} “{item}” boʻyicha soʻrovingizni tasdiqladi",
-    "returnDue": "{name} “{item}”ni ertaga qaytaradi",
-    "newMessage": "{name}dan yangi xabar",
-    "ratingReceived": "{name} sizga 5 yulduz qoʻydi"
+    "types": {
+      "request_received": "{actor} “{item}”ni olmoqchi: {dates}",
+      "request_approved": "{actor} “{item}” boʻyicha soʻrovingizni tasdiqladi. Endi telefon raqamlari koʻrinadi.",
+      "request_rejected": "“{item}” boʻyicha soʻrovingiz rad etildi",
+      "request_cancelled": "{actor} “{item}” boʻyicha soʻrovni bekor qildi",
+      "request_expired": "“{item}” boʻyicha soʻrov muddati oʻtdi",
+      "loan_picked_up": "“{item}” olib ketildi. {due} gacha qaytaring.",
+      "loan_returned": "“{item}” qaytarildi. {actor}ni baholang.",
+      "loan_return_claimed": "{actor} “{item}”ni qaytarganini bildirdi. Tasdiqlang.",
+      "loan_cancelled": "“{item}” boʻyicha kelishuv bekor qilindi",
+      "return_due_tomorrow": "“{item}” ertaga qaytarilishi kerak",
+      "return_due_today": "“{item}” bugun qaytarilishi kerak",
+      "rating_received": "{actor} sizni {score} yulduz bilan baholadi",
+      "new_message": "{actor}dan yangi xabar",
+      "moderation_message": "Moderatsiyadan xabar: {text}",
+      "account_warned": "Moderatsiya ogohlantirish berdi: {reason}",
+      "account_restricted": "Hisobingiz {until} gacha cheklandi: {reason}",
+      "account_unrestricted": "Hisobingizdagi cheklov olib tashlandi",
+      "listing_hidden": "“{item}” moderatsiya tomonidan yashirildi: {reason}",
+      "listing_removed": "“{item}” moderatsiya tomonidan oʻchirildi: {reason}",
+      "listing_unhidden": "“{item}” yana koʻrinadi",
+      "report_resolved": "Shikoyatingiz koʻrib chiqildi: {reason}",
+      "telegram_linked": "Telegram ulandi, {phone} tasdiqlandi",
+      "generic": "Yangi bildirishnoma"
+    },
+    "toast": {
+      "message": "Yangi xabar",
+      "open": "Ochish"
+    },
+    "lead": "Soʻrovlar, qaytarishlar va moderatsiya xabarlari.",
+    "empty": "Hozircha bildirishnoma yoʻq",
+    "emptyBody": "Kimdir soʻrov yuborsa yoki buyum qaytarilsa, shu yerda koʻrasiz.",
+    "unreadOnly": "Faqat oʻqilmaganlar",
+    "all": "Hammasi",
+    "loadMore": "Yana koʻrsatish",
+    "allRead": "Hammasi oʻqildi",
+    "unreadCount": "{count, plural, other {# ta oʻqilmagan}}"
   },
   "validation": {
     "required": "Bu maydonni toʻldiring",
@@ -547,5 +649,157 @@
     "deleteConfirm": "Tasdiqlash uchun parolingizni kiriting",
     "delete": "Hisobimni oʻchirish",
     "deleted": "Hisobingiz oʻchirildi."
+  },
+  "location": {
+    "ask": "Joylashuvimni ishlatish",
+    "on": "Masofa koʻrsatilmoqda",
+    "off": "Joylashuvni oʻchirish",
+    "denied": "Joylashuvga ruxsat berilmadi",
+    "hint": "Masofani koʻrish uchun joylashuvingizga ruxsat bering. Aniq manzilingiz saqlanmaydi."
+  },
+  "report": {
+    "open": "Shikoyat qilish",
+    "title": "Shikoyat yuborish",
+    "lead": "Moderatorlar har bir shikoyatni koʻrib chiqadi. Siz haqingizdagi maʼlumot boshqa tomonga koʻrsatilmaydi.",
+    "reason": "Sabab",
+    "pickReason": "Sababni tanlang.",
+    "details": "Tafsilotlar (ixtiyoriy)",
+    "detailsPlaceholder": "Nima boʻlganini qisqacha yozing",
+    "submit": "Shikoyatni yuborish",
+    "sent": "Shikoyat yuborildi",
+    "sentBody": "Rahmat. Moderatorlar tez orada koʻrib chiqadi.",
+    "reasons": {
+      "not_returned": "Qaytarilmadi",
+      "damaged": "Shikastlangan",
+      "no_show": "Kelmadi",
+      "fraud": "Firibgarlik",
+      "inappropriate": "Nomaqbul kontent",
+      "harassment": "Haqorat",
+      "spam": "Spam",
+      "other": "Boshqa"
+    }
+  },
+  "requests": {
+    "title": "Soʻrovlar",
+    "incoming": "Menga kelgan",
+    "outgoing": "Men yuborgan",
+    "incomingLead": "Buyumlaringizni olmoqchi boʻlgan qoʻshnilar. 48 soat ichida javob bering, aks holda soʻrov muddati oʻtadi.",
+    "outgoingLead": "Siz yuborgan soʻrovlar va ularning holati.",
+    "pending": "Javob kutilmoqda",
+    "history": "Tarix",
+    "incomingEmpty": "Hali soʻrov yoʻq",
+    "incomingEmptyBody": "Buyum qoʻshing, qoʻshnilar soʻrov yuborganda shu yerda koʻrasiz.",
+    "incomingEmptyAction": "Buyum qoʻshish",
+    "outgoingEmpty": "Siz hali hech narsa soʻramadingiz",
+    "outgoingEmptyBody": "Kerakli narsani toping va egasiga soʻrov yuboring.",
+    "outgoingEmptyAction": "Buyumlarni koʻrish"
+  },
+  "loans": {
+    "title": "Ijaralar",
+    "borrowing": "Men olganlar",
+    "lending": "Men berganlar",
+    "borrowingLead": "Siz olgan buyumlar: qachon olish va qachon qaytarish kerak.",
+    "lendingLead": "Qoʻshnilarga bergan buyumlaringiz.",
+    "current": "Hozirgi",
+    "past": "Tugaganlar",
+    "borrowingEmpty": "Hozircha hech narsa olmadingiz",
+    "borrowingEmptyBody": "Soʻrovingiz tasdiqlangach, kelishuv shu yerda paydo boʻladi.",
+    "borrowingEmptyAction": "Buyumlarni koʻrish",
+    "lendingEmpty": "Hali hech narsa bermadingiz",
+    "lendingEmptyBody": "Soʻrovni tasdiqlaganingizda kelishuv shu yerda koʻrinadi.",
+    "lendingEmptyAction": "Buyum qoʻshish"
+  },
+  "saved": {
+    "title": "Saqlanganlar",
+    "lead": "Keyinroq soʻrash uchun belgilagan buyumlaringiz.",
+    "empty": "Hali hech narsa saqlanmagan",
+    "emptyBody": "Buyum kartochkasidagi yurakchani bosing, u shu yerda paydo boʻladi.",
+    "emptyAction": "Buyumlarni koʻrish"
+  },
+  "myItems": {
+    "title": "Mening buyumlarim",
+    "lead": "Eʼlonlaringiz, ularning holati va soʻrovlar.",
+    "empty": "Hali buyum yoʻq",
+    "viewRequests": "Soʻrovlarni koʻrish"
+  },
+  "listingForm": {
+    "newTitle": "Buyum qoʻshish",
+    "newLead": "Bir necha daqiqa: rasm, qisqa tavsif va shartlaringiz. Qoʻshnilar soʻrov yuborganda xabar beramiz.",
+    "editTitle": "Buyumni tahrirlash",
+    "sections": {
+      "photos": "Rasmlar",
+      "photosLead": "Yorugʻ joyda, butun buyumni koʻrsating. Birinchi rasm muqova boʻladi.",
+      "about": "Bu nima?",
+      "terms": "Shartlaringiz",
+      "termsLead": "Necha kunga berasiz va nimaga eʼtibor berish kerak.",
+      "place": "Qayerdan olish mumkin",
+      "placeLead": "Faqat tuman koʻrsatiladi. Aniq manzilni soʻrovni tasdiqlagach oʻzingiz aytasiz."
+    },
+    "title": "Nomi",
+    "titlePlaceholder": "Masalan, Bosch drel, 4 kishilik chodir",
+    "description": "Tavsif",
+    "descriptionPlaceholder": "Holati, toʻplamda nima bor, qanday ishlatish kerak",
+    "category": "Turkum",
+    "condition": "Holati",
+    "maxDays": "Eng uzogʻi necha kunga",
+    "days": "{days, plural, other {# kun}}",
+    "fewer": "Kamroq kun",
+    "more": "Koʻproq kun",
+    "rules": "Qoidalar (ixtiyoriy)",
+    "rulePlaceholder": "Masalan, quruq va toza qaytaring",
+    "addRule": "Qoʻshish",
+    "removeRule": "Qoidani olib tashlash",
+    "area": "Tuman",
+    "areaPlaceholder": "Masalan, Chilonzor",
+    "useLocation": "Hozirgi joylashuvni olish nuqtasi qilish",
+    "locationSet": "Joylashuv saqlandi",
+    "locationUpdate": "Joylashuvni yangilash",
+    "locationNote": "Faqat masofani hisoblash uchun. Hech kimga koʻrsatilmaydi.",
+    "locationDenied": "Joylashuvga ruxsat berilmadi",
+    "publish": "Eʼlon qilish",
+    "save": "Saqlash",
+    "uploading": "Rasmlar yuklanmoqda…",
+    "waitUploads": "Rasmlar yuklanishini kuting.",
+    "published": "Buyum eʼlon qilindi",
+    "saved": "Oʻzgarishlar saqlandi",
+    "someUploadsFailed": "{count, plural, other {# ta rasm}} yuklanmadi. Qayta urinib koʻring.",
+    "delete": "Eʼlonni oʻchirish",
+    "deleteConfirm": "Eʼlon butunlay oʻchiriladi. Kutilayotgan soʻrovlar bekor qilinadi. Davom etasizmi?",
+    "deleted": "Eʼlon oʻchirildi",
+    "errors": {
+      "title": "Kamida 3 ta belgi yozing",
+      "description": "Kamida 10 ta belgi yozing",
+      "category": "Turkumni tanlang",
+      "condition": "Holatini tanlang",
+      "photos": "Kamida bitta rasm qoʻshing",
+      "terms": "Koʻpi bilan {max} ta qoida",
+      "invalid": "Tekshirib koʻring"
+    },
+    "photos": {
+      "add": "Rasm qoʻshish",
+      "addMore": "Yana qoʻshish",
+      "cover": "Muqova",
+      "photo": "Rasm {n}",
+      "remove": "{n}-rasmni olib tashlash",
+      "uploading": "Yuklanmoqda",
+      "retry": "Qayta urinish",
+      "hint": "JPEG, PNG yoki WebP, har biri 8 MB gacha, koʻpi bilan {max} ta.",
+      "type": "Faqat JPEG, PNG yoki WebP.",
+      "size": "Rasm 8 MB dan katta.",
+      "max": "Koʻpi bilan {max} ta rasm."
+    }
+  },
+  "profile": {
+    "memberSince": "{date} dan beri aʼzo",
+    "emailVerified": "Email tasdiqlangan",
+    "phoneVerified": "Telefon tasdiqlangan",
+    "rating": "Reyting",
+    "reviews": "{count, plural, other {# ta baho}}",
+    "completed": "Tugagan ijaralar",
+    "items": "{name}ning buyumlari",
+    "noItems": "Hozircha faol eʼlon yoʻq.",
+    "reviewsTitle": "Baholar",
+    "noReviews": "Hali baho yoʻq.",
+    "stars": "{n} yulduz"
   }
 }

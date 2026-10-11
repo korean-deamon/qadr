@@ -4,7 +4,7 @@ import { Compass, House, MessageCircle, Plus, UserRound, type LucideIcon } from 
 import { useTranslations } from "next-intl"
 import { Link, usePathname } from "@/i18n/navigation"
 import { useSession } from "@/components/session/session-provider"
-import { isAuthRoute, isPending } from "@/lib/routes"
+import { isAuthRoute } from "@/lib/routes"
 import { cn } from "@/lib/utils"
 
 type Item = {
@@ -73,7 +73,6 @@ export function BottomNav() {
             <li key={key}>
               <Link
                 href={href}
-                prefetch={isPending(href) ? false : undefined}
                 aria-current={active ? "page" : undefined}
                 className={cn(
                   "relative flex h-full flex-col items-center justify-center gap-1 text-[0.6875rem] font-medium transition-[color,transform] duration-200 active:scale-95",

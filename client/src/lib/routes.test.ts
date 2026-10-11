@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { isAppRoute, isAuthRoute, isPending } from "./routes"
+import { isAppRoute, isAuthRoute, isProtectedRoute } from "./routes"
 
 describe("route families", () => {
   it("recognises auth and app surfaces", () => {
@@ -8,9 +8,10 @@ describe("route families", () => {
     expect(isAppRoute("/messages/c1")).toBe(true)
     expect(isAppRoute("/explore")).toBe(false)
   })
-  it("marks later-phase routes as pending (not prefetched)", () => {
-    expect(isPending("/items/new")).toBe(true)
-    expect(isPending("/categories/tools?x=1")).toBe(true)
-    expect(isPending("/items/1")).toBe(false)
+  it("protects owner-only listing pages but not the public item page", () => {
+    expect(isProtectedRoute("/items/new")).toBe(true)
+    expect(isProtectedRoute("/items/abc/edit")).toBe(true)
+    expect(isProtectedRoute("/items/abc")).toBe(false)
+    expect(isProtectedRoute("/users/abc")).toBe(false)
   })
 })

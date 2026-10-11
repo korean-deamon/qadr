@@ -1,5 +1,6 @@
 import "server-only"
 
+import { cache } from "react"
 import { cookies } from "next/headers"
 import type { Me } from "./types"
 
@@ -48,7 +49,7 @@ export async function apiOrNull<T>(path: string, init?: RequestInit): Promise<T 
 }
 
 /** The signed-in user, or null for visitors / expired sessions. */
-export async function getMe(): Promise<Me | null> {
+export const getMe = cache(async (): Promise<Me | null> => {
   const jar = await cookies()
   if (!jar.get("qadr_access")) return null
   try {
@@ -57,7 +58,7 @@ export async function getMe(): Promise<Me | null> {
     if (e instanceof ServerApiError && (e.status === 401 || e.status === 403)) return null
     throw e
   }
-}
+})
 
 /** Rounded browser location, set by the client only after the user granted geolocation. */
 export async function getLocation(): Promise<{ lat: number; lng: number } | null> {

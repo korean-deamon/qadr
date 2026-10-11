@@ -6,6 +6,7 @@ from sqlalchemy import or_, select
 
 from app.core.deps import DB, CurrentUser, csrf_protect
 from app.core.errors import not_found
+from app.core.time import now_utc
 from app.modules.borrowing import service
 from app.modules.loans.models import Loan
 
@@ -31,7 +32,31 @@ async def list_loans(
     elif status != "all":
         q = q.where(Loan.status == status)
     rows = (await db.scalars(q.order_by(Loan.start_date.asc()).limit(200))).all()
-    return [await service.loan_view(db, loan, user) for loan in rows]
+    from app.modules.ratings.models import Rating
+    from app.modules.ratings.router import RATING_WINDOW
+
+    rated = dict(
+        (
+            await db.execute(
+                select(Rating.loan_id, Rating.score).where(
+                    Rating.rater_id == user.id, Rating.loan_id.in_([r.id for r in rows])
+                )
+            )
+        ).all()
+    )
+    now = now_utc()
+    out = []
+    for loan in rows:
+        view = await service.loan_view(db, loan, user)
+        view["my_rating"] = rated.get(loan.id)
+        view["can_rate"] = (
+            loan.status == "returned"
+            and loan.returned_at is not None
+            and loan.id not in rated
+            and now - loan.returned_at <= RATING_WINDOW
+        )
+        out.append(view)
+    return out
 
 
 @router.get("/{loan_id}")

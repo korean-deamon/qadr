@@ -1,25 +1,47 @@
 "use client"
 
 import { Heart } from "lucide-react"
-import { useTranslations } from "next-intl"
+import { useLocale, useTranslations } from "next-intl"
 import { useState, type CSSProperties } from "react"
+import { useSession } from "@/components/session/session-provider"
+import { useRouter } from "@/i18n/navigation"
+import { api } from "@/lib/api/client"
+import { useApiError } from "@/lib/api/errors"
 import { notify as toast } from "@/lib/notify"
 import { cn } from "@/lib/utils"
 
 const BURST = Array.from({ length: 7 }, (_, i) => `${(i / 7) * 360}deg`)
 
-/** Local toggle for now; wired to POST/DELETE /listings/{id}/save in Phase 3. */
-export function SaveButton({ className, title }: { className?: string; title?: string }) {
+/** Save/unsave a listing (POST/DELETE /listings/{id}/save). Visitors are sent to login. */
+export function SaveButton({ className, title, listingId, initialSaved = false }: { className?: string; title?: string; listingId: string; initialSaved?: boolean }) {
   const t = useTranslations("listings")
-  const [saved, setSaved] = useState(false)
+  const locale = useLocale()
+  const router = useRouter()
+  const apiError = useApiError()
+  const { me } = useSession()
+  const [saved, setSaved] = useState(initialSaved)
   const [burstKey, setBurstKey] = useState(0)
 
+  const set = async (value: boolean) => {
+    setSaved(value) // optimistic
+    try {
+      await api(`/listings/${listingId}/save`, { method: value ? "POST" : "DELETE" })
+    } catch (e) {
+      setSaved(!value)
+      toast(apiError(e))
+    }
+  }
+
   const toggle = () => {
+    if (!me) {
+      router.push({ pathname: "/login", query: { next: `/${locale}/items/${listingId}` } })
+      return
+    }
     const next = !saved
-    setSaved(next)
+    void set(next)
     if (next) {
       setBurstKey((k) => k + 1)
-      toast(t("savedToast"), { description: title, action: { label: t("undo"), onClick: () => setSaved(false) } })
+      toast(t("savedToast"), { description: title, action: { label: t("undo"), onClick: () => void set(false) } })
     }
   }
 

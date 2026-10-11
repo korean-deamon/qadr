@@ -4,10 +4,10 @@ import { RevealText } from "@/components/motion/reveal-text"
 import { Reveal } from "@/components/motion/reveal"
 import { RevealItem } from "@/components/motion/reveal-item"
 import { Link } from "@/i18n/navigation"
-import { categories } from "@/lib/mock"
+import type { Category } from "@/lib/api/types"
 
 /** Categories as a typographic index rather than an icon grid. */
-export function CategoryIndex() {
+export function CategoryIndex({ categories }: { categories: Category[] }) {
   const t = useTranslations("home.categories")
 
   return (
@@ -26,14 +26,14 @@ export function CategoryIndex() {
 
         <Reveal as="ol" stagger className="grid sm:grid-cols-2 sm:gap-x-10 lg:col-span-8">
           {categories.map((c) => (
-            <RevealItem as="li" key={c.key} className="border-b border-line">
+            <RevealItem as="li" key={c.slug} className="border-b border-line">
               <Link
-                href={{ pathname: "/explore", query: { category: c.slug } }}
+                href={`/categories/${c.slug}`}
                 className="group flex items-center gap-4 py-4 md:py-5"
               >
                 <span className="relative size-14 shrink-0 overflow-hidden rounded-xl bg-sage md:size-16">
                   <Image
-                    src={c.image}
+                    src={`/images/${c.image ?? "tools-wall"}.jpg`}
                     alt=""
                     fill
                     sizes="64px"
@@ -41,7 +41,7 @@ export function CategoryIndex() {
                   />
                 </span>
                 <span className="font-display text-[1.5rem] leading-tight text-charcoal transition-[color,translate] duration-500 ease-[var(--ease-qadr)] group-hover:translate-x-1 group-hover:text-forest md:text-[1.75rem]">
-                  {t(`items.${c.key}`)}
+                  {c.name}
                 </span>
                 <span className="ml-auto text-meta whitespace-nowrap text-ink-soft tabular-nums">
                   {t("count", { count: c.count })}

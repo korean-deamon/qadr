@@ -74,6 +74,7 @@ export type ListingDetail = {
   my_request: { id: string; status: string; start: string; end: string } | null
   conversation_id: string | null
   moderation_reason: string | null
+  has_coordinates?: boolean | null
   created_at: string
 }
 
@@ -119,6 +120,7 @@ export type BorrowRequestView = {
 
 export type LoanView = {
   id: string
+  conversation_id: string | null
   status: LoanStatus
   role: "owner" | "borrower"
   start: string
@@ -131,6 +133,7 @@ export type LoanView = {
   listing: { id: string; title: string; image: string | null; area: string }
   with: { id: string; name: string; phone: string | null }
   my_rating?: number | null
+  can_rate?: boolean
 }
 
 export type NotificationItem = {

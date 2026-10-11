@@ -27,6 +27,3 @@ export function safeNext(next: string | null | undefined, locale: string): strin
 }
 export const isAppRoute = (pathname: string) => matches(pathname, APP_ROUTES)
 
-/** Linked from the UI but built in later phases; not prefetched until they exist. */
-export const PENDING_ROUTES = ["/items/new", "/notifications", "/requests", "/my-items", "/borrowings", "/saved", "/settings", "/categories", "/users"]
-export const isPending = (href: string) => matches(href.split("?")[0], PENDING_ROUTES)

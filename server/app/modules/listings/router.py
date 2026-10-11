@@ -201,6 +201,7 @@ async def get_listing(
         "my_request": my_request,
         "conversation_id": conversation_id,
         "moderation_reason": listing.moderation_reason if (is_owner or is_admin) else None,
+        "has_coordinates": listing.latitude is not None if is_owner else None,
         "created_at": listing.created_at,
         "updated_at": listing.updated_at,
     }

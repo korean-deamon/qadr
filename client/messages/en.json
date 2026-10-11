@@ -136,7 +136,8 @@
     "nearby": {
       "title": "Near you this week",
       "lead": "Recently listed within a few kilometres of the city centre.",
-      "viewAll": "See everything nearby"
+      "viewAll": "See everything nearby",
+      "leadLocated": "The closest things to you."
     },
     "steps": {
       "title": "How borrowing works",
@@ -221,7 +222,11 @@
       "body": "Tents, stoves and sleeping bags within 10 km. Zaamin is waiting.",
       "cta": "See camping gear"
     },
-    "results": "Results"
+    "results": "Results",
+    "pagination": "Pages",
+    "previous": "Previous",
+    "next": "Next",
+    "categoryLead": "{count, plural, one {# thing} other {# things}} ready to borrow"
   },
   "listings": {
     "upToDays": "{days, plural, one {Up to # day} other {Up to # days}}",
@@ -252,7 +257,9 @@
       "similar": "More nearby",
       "photo": "Photo {n} of {total}",
       "gallery": "Photos",
-      "completedLabel": "completed loans"
+      "completedLabel": "completed loans",
+      "noRating": "None yet",
+      "phoneVerified": "Phone verified"
     },
     "request": {
       "title": "Borrow this",
@@ -274,7 +281,24 @@
       "nextMonth": "Next month",
       "selectStart": "Pick the first day",
       "selectEnd": "Now pick the last day",
-      "jump": "Choose dates"
+      "jump": "Choose dates",
+      "openChat": "Open the conversation",
+      "messageLead": "Ask {name} anything. Replies appear in your messages.",
+      "send": "Send",
+      "viewRequests": "See my requests"
+    },
+    "newLender": "New lender",
+    "owner": {
+      "title": "This is your item",
+      "liveNote": "Live: neighbours can see it and send requests.",
+      "hiddenNote": "Hidden. Only you can see it.",
+      "hiddenByAdmin": "Moderation hid this item: {reason}",
+      "edit": "Edit item",
+      "requests": "Requests",
+      "hide": "Hide for now",
+      "show": "Show again",
+      "hiddenToast": "Item hidden",
+      "shown": "Item is visible again"
     }
   },
   "borrowing": {
@@ -302,7 +326,32 @@
     "borrower": "Borrower: {name}",
     "pickup": "Pick up {when}",
     "dueIn": "Due back {when}",
-    "day": "Day {day} of {total}"
+    "day": "Day {day} of {total}",
+    "cancelRequest": "Cancel request",
+    "cancelledToast": "Request cancelled",
+    "waiting": "Waiting for {name} to reply",
+    "cancelConfirm": "Cancel this loan?",
+    "loanCancelled": "Loan cancelled",
+    "cancel": "Cancel",
+    "pickedUpToast": "Marked as handed over",
+    "handedOver": "Handed over",
+    "returnClaimedToast": "We've told {name}. They'll confirm the return.",
+    "iReturned": "I returned it",
+    "borrowerSaysReturned": "{name} says it's back. Check it and confirm.",
+    "youRated": "You rated:",
+    "reportNotReturned": "Report not returned",
+    "message": "Message {name}",
+    "rate": {
+      "open": "Rate",
+      "title": "Rate {name}",
+      "lead": "Your rating helps others find neighbours they can trust.",
+      "score": "Score",
+      "stars": "{n} out of 5",
+      "comment": "Comment (optional)",
+      "submit": "Send rating",
+      "thanks": "Thanks! Rating saved.",
+      "pick": "Choose how many stars."
+    }
   },
   "messages": {
     "title": "Messages",
@@ -317,13 +366,24 @@
     "events": {
       "requested": "Borrow request sent",
       "approved": "Request approved: phone numbers are now visible",
-      "pickedUp": "Item picked up"
+      "pickedUp": "Item picked up",
+      "rejected": "Request declined",
+      "cancelled": "Cancelled",
+      "returned": "Item returned"
     },
     "today": "Today",
-    "yesterday": "Yesterday"
+    "yesterday": "Yesterday",
+    "none": "No messages yet",
+    "deletedUser": "Deleted user",
+    "delete": "Delete conversation",
+    "deleteConfirm": "This removes the conversation for you only. Continue?",
+    "older": "Earlier messages",
+    "retry": "Not sent. Retry",
+    "report": "Report",
+    "closed": "This item was removed, so new messages can't be sent.",
+    "manageLoan": "Manage loan"
   },
   "dashboard": {
-    "greeting": "Good morning, {name}",
     "lead": "Here is what's happening with your things today.",
     "nav": {
       "overview": "Overview",
@@ -349,9 +409,19 @@
     },
     "itemStatus": {
       "available": "Available",
-      "onLoan": "On loan"
+      "onLoan": "On loan",
+      "hidden": "Hidden",
+      "hiddenByAdmin": "Hidden by moderation",
+      "requests": "{count, plural, one {# request} other {# requests}}"
     },
-    "emptyIncoming": "No new requests. We'll let you know."
+    "emptyIncoming": "No new requests. We'll let you know.",
+    "greetings": {
+      "morning": "Good morning, {name}",
+      "afternoon": "Good afternoon, {name}",
+      "evening": "Good evening, {name}"
+    },
+    "seeAll": "See all",
+    "emptyItems": "You haven't listed anything yet. Share something that sits idle on your shelf."
   },
   "auth": {
     "email": "Email",
@@ -417,11 +487,43 @@
   "notifications": {
     "title": "Notifications",
     "markAllRead": "Mark all as read",
-    "requestReceived": "{name} wants to borrow {item}",
-    "requestApproved": "{name} approved your request for {item}",
-    "returnDue": "{name} returns {item} tomorrow",
-    "newMessage": "New message from {name}",
-    "ratingReceived": "{name} rated you 5 stars"
+    "types": {
+      "request_received": "{actor} wants to borrow “{item}”: {dates}",
+      "request_approved": "{actor} approved your request for “{item}”. You can now see each other's phone numbers.",
+      "request_rejected": "Your request for “{item}” was declined",
+      "request_cancelled": "{actor} cancelled the request for “{item}”",
+      "request_expired": "The request for “{item}” expired",
+      "loan_picked_up": "“{item}” was picked up. Return it by {due}.",
+      "loan_returned": "“{item}” was returned. Rate {actor}.",
+      "loan_return_claimed": "{actor} says “{item}” was returned. Please confirm.",
+      "loan_cancelled": "The loan of “{item}” was cancelled",
+      "return_due_tomorrow": "“{item}” is due back tomorrow",
+      "return_due_today": "“{item}” is due back today",
+      "rating_received": "{actor} rated you {score} out of 5",
+      "new_message": "New message from {actor}",
+      "moderation_message": "Message from moderation: {text}",
+      "account_warned": "Moderation issued a warning: {reason}",
+      "account_restricted": "Your account is restricted until {until}: {reason}",
+      "account_unrestricted": "The restriction on your account was lifted",
+      "listing_hidden": "“{item}” was hidden by moderation: {reason}",
+      "listing_removed": "“{item}” was removed by moderation: {reason}",
+      "listing_unhidden": "“{item}” is visible again",
+      "report_resolved": "Your report was reviewed: {reason}",
+      "telegram_linked": "Telegram connected, {phone} verified",
+      "generic": "New notification"
+    },
+    "toast": {
+      "message": "New message",
+      "open": "Open"
+    },
+    "lead": "Requests, returns and messages from moderation.",
+    "empty": "Nothing here yet",
+    "emptyBody": "When someone sends a request or returns something, you'll see it here.",
+    "unreadOnly": "Unread only",
+    "all": "All",
+    "loadMore": "Show older",
+    "allRead": "All caught up",
+    "unreadCount": "{count, plural, one {# unread} other {# unread}}"
   },
   "validation": {
     "required": "Fill in this field",
@@ -547,5 +649,157 @@
     "deleteConfirm": "Enter your password to confirm",
     "delete": "Delete my account",
     "deleted": "Your account has been deleted."
+  },
+  "location": {
+    "ask": "Use my location",
+    "on": "Showing distance",
+    "off": "Turn off location",
+    "denied": "Location access was denied",
+    "hint": "Allow location to see distances. Your exact position is never stored."
+  },
+  "report": {
+    "open": "Report",
+    "title": "Send a report",
+    "lead": "Moderators review every report. The other person won't see who sent it.",
+    "reason": "Reason",
+    "pickReason": "Choose a reason.",
+    "details": "Details (optional)",
+    "detailsPlaceholder": "Briefly describe what happened",
+    "submit": "Send report",
+    "sent": "Report sent",
+    "sentBody": "Thank you. A moderator will look at it soon.",
+    "reasons": {
+      "not_returned": "Not returned",
+      "damaged": "Damaged",
+      "no_show": "Didn't show up",
+      "fraud": "Fraud",
+      "inappropriate": "Inappropriate content",
+      "harassment": "Harassment",
+      "spam": "Spam",
+      "other": "Other"
+    }
+  },
+  "requests": {
+    "title": "Requests",
+    "incoming": "For my items",
+    "outgoing": "I sent",
+    "incomingLead": "Neighbours who want to borrow your things. Reply within 48 hours or the request expires.",
+    "outgoingLead": "Requests you've sent and where they stand.",
+    "pending": "Waiting for an answer",
+    "history": "History",
+    "incomingEmpty": "No requests yet",
+    "incomingEmptyBody": "List something, and requests from neighbours will show up here.",
+    "incomingEmptyAction": "List an item",
+    "outgoingEmpty": "You haven't asked for anything yet",
+    "outgoingEmptyBody": "Find what you need and send the owner a request.",
+    "outgoingEmptyAction": "Browse items"
+  },
+  "loans": {
+    "title": "Loans",
+    "borrowing": "Borrowing",
+    "lending": "Lending",
+    "borrowingLead": "Things you're borrowing: when to pick up and when to bring back.",
+    "lendingLead": "Your things out with neighbours.",
+    "current": "Now",
+    "past": "Finished",
+    "borrowingEmpty": "You're not borrowing anything yet",
+    "borrowingEmptyBody": "Once a request is approved, the loan shows up here.",
+    "borrowingEmptyAction": "Browse items",
+    "lendingEmpty": "You haven't lent anything yet",
+    "lendingEmptyBody": "When you approve a request, the loan shows up here.",
+    "lendingEmptyAction": "List an item"
+  },
+  "saved": {
+    "title": "Saved",
+    "lead": "Things you've marked to ask for later.",
+    "empty": "Nothing saved yet",
+    "emptyBody": "Tap the heart on any item and it will appear here.",
+    "emptyAction": "Browse items"
+  },
+  "myItems": {
+    "title": "My items",
+    "lead": "Your listings, their status and requests.",
+    "empty": "No items yet",
+    "viewRequests": "See requests"
+  },
+  "listingForm": {
+    "newTitle": "List an item",
+    "newLead": "A couple of minutes: photos, a short description and your terms. We'll tell you when a neighbour asks.",
+    "editTitle": "Edit item",
+    "sections": {
+      "photos": "Photos",
+      "photosLead": "Good light, the whole thing in frame. The first photo is the cover.",
+      "about": "What is it?",
+      "terms": "Your terms",
+      "termsLead": "How long you lend it for and what to look out for.",
+      "place": "Where to pick it up",
+      "placeLead": "Only the area is shown. You share the exact spot after approving a request."
+    },
+    "title": "Title",
+    "titlePlaceholder": "For example, Bosch drill, 4-person tent",
+    "description": "Description",
+    "descriptionPlaceholder": "Condition, what's included, how to use it",
+    "category": "Category",
+    "condition": "Condition",
+    "maxDays": "Lend for up to",
+    "days": "{days, plural, one {# day} other {# days}}",
+    "fewer": "Fewer days",
+    "more": "More days",
+    "rules": "House rules (optional)",
+    "rulePlaceholder": "For example, return it dry and clean",
+    "addRule": "Add",
+    "removeRule": "Remove rule",
+    "area": "Area",
+    "areaPlaceholder": "For example, Chilonzor",
+    "useLocation": "Use my current location as the pickup point",
+    "locationSet": "Location saved",
+    "locationUpdate": "Update location",
+    "locationNote": "Only used to work out distance. Never shown to anyone.",
+    "locationDenied": "Location access was denied",
+    "publish": "Publish",
+    "save": "Save changes",
+    "uploading": "Uploading photos…",
+    "waitUploads": "Wait for the photos to finish uploading.",
+    "published": "Your item is live",
+    "saved": "Changes saved",
+    "someUploadsFailed": "{count, plural, one {# photo} other {# photos}} didn't upload. Try again here.",
+    "delete": "Delete listing",
+    "deleteConfirm": "This deletes the listing and cancels pending requests. Continue?",
+    "deleted": "Listing deleted",
+    "errors": {
+      "title": "Use at least 3 characters",
+      "description": "Use at least 10 characters",
+      "category": "Choose a category",
+      "condition": "Choose the condition",
+      "photos": "Add at least one photo",
+      "terms": "Up to {max} rules",
+      "invalid": "Check this field"
+    },
+    "photos": {
+      "add": "Add photos",
+      "addMore": "Add more",
+      "cover": "Cover",
+      "photo": "Photo {n}",
+      "remove": "Remove photo {n}",
+      "uploading": "Uploading",
+      "retry": "Retry",
+      "hint": "JPEG, PNG or WebP, up to 8 MB each, {max} at most.",
+      "type": "Only JPEG, PNG or WebP.",
+      "size": "That photo is over 8 MB.",
+      "max": "{max} photos at most."
+    }
+  },
+  "profile": {
+    "memberSince": "Member since {date}",
+    "emailVerified": "Email verified",
+    "phoneVerified": "Phone verified",
+    "rating": "Rating",
+    "reviews": "{count, plural, one {# review} other {# reviews}}",
+    "completed": "Completed loans",
+    "items": "{name}'s things",
+    "noItems": "No active listings right now.",
+    "reviewsTitle": "Reviews",
+    "noReviews": "No reviews yet.",
+    "stars": "{n} out of 5"
   }
 }

@@ -1,46 +1,71 @@
 "use client"
 
-import { Check, Loader2, MessageCircle } from "lucide-react"
+import { Check, Loader2 } from "lucide-react"
 import { useTranslations } from "next-intl"
-import { useDates } from "@/lib/i18n/use-dates"
-import { useId, useState } from "react"
-import { notify as toast } from "@/lib/notify"
+import { useMemo, useId, useState } from "react"
 import { Magnetic } from "@/components/motion/magnetic"
+import { useSession } from "@/components/session/session-provider"
 import { Button } from "@/components/ui/button"
-import { Link } from "@/i18n/navigation"
+import { Link, usePathname, useRouter } from "@/i18n/navigation"
+import { api, ApiError } from "@/lib/api/client"
+import { useApiError } from "@/lib/api/errors"
+import { parseDay, toDay } from "@/lib/dates"
+import { useDates } from "@/lib/i18n/use-dates"
+import { notify as toast } from "@/lib/notify"
 import { cn } from "@/lib/utils"
 import { BookingCalendar, type Range } from "./booking-calendar"
+import { MessageOwner } from "./message-owner"
 
 type Props = {
-  today: Date
-  booked: [Date, Date][]
+  listingId: string
+  today: string
+  booked: { start: string; end: string }[]
   maxDays: number
   ownerName: string
   terms: string[]
+  myRequest: { id: string; status: string; start: string; end: string } | null
+  conversationId: string | null
 }
 
-export function RequestPanel({ today, booked, maxDays, ownerName, terms }: Props) {
+export function RequestPanel({ listingId, today, booked, maxDays, ownerName, terms, myRequest, conversationId }: Props) {
   const t = useTranslations("listings.request")
   const tv = useTranslations("validation")
+  const apiError = useApiError()
+  const { me } = useSession()
+  const router = useRouter()
+  const pathname = usePathname()
   const dates = useDates()
   const ids = { msg: useId(), terms: useId(), err: useId() }
+  const todayDate = useMemo(() => parseDay(today), [today])
+  const bookedDates = useMemo(() => booked.map((b) => [parseDay(b.start), parseDay(b.end)] as [Date, Date]), [booked])
   const [range, setRange] = useState<Range>({ start: null, end: null })
+  const [message, setMessage] = useState("")
   const [accepted, setAccepted] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [state, setState] = useState<"idle" | "sending" | "sent">("idle")
+  const [state, setState] = useState<"idle" | "sending" | "sent">(myRequest?.status === "pending" ? "sent" : "idle")
+  const sentRange = myRequest?.status === "pending" && state === "sent" && !range.start ? [parseDay(myRequest.start), parseDay(myRequest.end)] as const : null
 
   const days = range.start && range.end ? Math.round((range.end.getTime() - range.start.getTime()) / 86_400_000) + 1 : 0
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!me) return router.push({ pathname: "/login", query: { next: pathname } })
     if (!range.start || !range.end) return setError(tv("dates"))
     if (!accepted) return setError(tv("terms"))
     setError(null)
     setState("sending")
-    window.setTimeout(() => {
+    try {
+      await api(`/listings/${listingId}/requests`, {
+        json: { start_date: toDay(range.start), end_date: toDay(range.end), message: message.trim() || null, accept_terms: true },
+      })
       setState("sent")
       toast(t("sentTitle"), { description: t("sentBody", { name: ownerName }) })
-    }, 900)
+      router.refresh()
+    } catch (err) {
+      setState("idle")
+      if (err instanceof ApiError && err.code === "DATES_UNAVAILABLE") router.refresh()
+      setError(apiError(err))
+    }
   }
 
   return (
@@ -62,13 +87,23 @@ export function RequestPanel({ today, booked, maxDays, ownerName, terms }: Props
               <p className="mt-4 rounded-full bg-sage px-4 py-1.5 text-meta font-medium text-forest">
                 {dates.range(range.start, range.end)}
               </p>
+            ) : sentRange ? (
+              <p className="mt-4 rounded-full bg-sage px-4 py-1.5 text-meta font-medium text-forest">
+                {dates.range(sentRange[0], sentRange[1])}
+              </p>
             ) : null}
+            <div className="mt-6 w-full space-y-3">
+              <Button asChild variant="ghost" className="w-full">
+                <Link href="/requests?tab=outgoing">{t("viewRequests")}</Link>
+              </Button>
+              <MessageOwner listingId={listingId} conversationId={conversationId} ownerName={ownerName} />
+            </div>
           </div>
         ) : (
           <form onSubmit={submit} noValidate className="mt-6 space-y-6">
             <BookingCalendar
-              today={today}
-              booked={booked}
+              today={todayDate}
+              booked={bookedDates}
               maxDays={maxDays}
               value={range}
               onChange={(r) => {
@@ -98,6 +133,9 @@ export function RequestPanel({ today, booked, maxDays, ownerName, terms }: Props
               <textarea
                 id={ids.msg}
                 rows={3}
+                maxLength={1000}
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
                 placeholder={t("messagePlaceholder")}
                 className="mt-2 w-full resize-none rounded-2xl border border-line bg-white px-4 py-3 text-body text-charcoal transition-[border-color,box-shadow] placeholder:text-ink-soft focus:border-forest/50 focus:shadow-soft focus:outline-none"
               />
@@ -142,12 +180,7 @@ export function RequestPanel({ today, booked, maxDays, ownerName, terms }: Props
                   {t("submit")}
                 </Button>
               </Magnetic>
-              <Button asChild variant="outline" size="lg" className="w-full">
-                <Link href="/messages/c1">
-                  <MessageCircle aria-hidden="true" />
-                  {t("messageOwner")}
-                </Link>
-              </Button>
+              <MessageOwner listingId={listingId} conversationId={conversationId} ownerName={ownerName} />
             </div>
           </form>
         )}

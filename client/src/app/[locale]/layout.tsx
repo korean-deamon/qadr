@@ -4,6 +4,7 @@ import { getLocale, getTranslations } from "next-intl/server"
 import { ArchClipDefs } from "@/components/branding/motifs"
 import { HydrationMarker } from "@/components/hydration-marker"
 import { ClientMessages } from "@/components/i18n/client-messages"
+import { RealtimeProvider } from "@/components/realtime/realtime-provider"
 import { SessionProvider } from "@/components/session/session-provider"
 import { getMe } from "@/lib/api/server"
 import { BottomNav } from "@/components/layout/bottom-nav"
@@ -66,6 +67,7 @@ export default async function LocaleLayout({ children }: LayoutProps<"/[locale]"
         <ArchClipDefs />
         <ClientMessages>
           <SessionProvider initialMe={me}>
+          <RealtimeProvider>
           <SmoothScroll />
           <Header />
           {children}
@@ -73,6 +75,7 @@ export default async function LocaleLayout({ children }: LayoutProps<"/[locale]"
           <LazyToaster />
           <Cursor />
           <HydrationMarker />
+          </RealtimeProvider>
           </SessionProvider>
         </ClientMessages>
       </body>

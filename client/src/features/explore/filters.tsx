@@ -5,14 +5,14 @@ import { useLocale, useTranslations } from "next-intl"
 import { Dialog } from "radix-ui"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import type { Condition } from "@/lib/mock"
-import type { SearchParams } from "@/lib/mock/search"
+import { LocationButton } from "@/components/location/location-button"
+import type { Condition, SearchParams } from "@/lib/search"
 
 const DISTANCES = [1, 3, 5, 10]
 const CONDITIONS: Condition[] = ["new", "good", "used"]
 
 /** GET form: filters work without JavaScript; on mobile it lives in a bottom sheet. */
-function FilterForm({ params, id }: { params: SearchParams; id: string }) {
+function FilterForm({ params, id, located }: { params: SearchParams; id: string; located: boolean }) {
   const t = useTranslations()
   const locale = useLocale()
   return (
@@ -20,10 +20,13 @@ function FilterForm({ params, id }: { params: SearchParams; id: string }) {
       {params.q ? <input type="hidden" name="q" value={params.q} /> : null}
       {params.category ? <input type="hidden" name="category" value={params.category} /> : null}
       {params.sort ? <input type="hidden" name="sort" value={params.sort} /> : null}
+      {params.area ? <input type="hidden" name="area" value={params.area} /> : null}
 
       <fieldset>
         <legend className="font-display text-[1.25rem] text-charcoal">{t("explore.distance")}</legend>
-        <div className="mt-3 grid grid-cols-2 gap-2">
+        {located ? null : <p className="mt-2 text-meta text-ink-soft">{t("location.hint")}</p>}
+        <LocationButton active={located} className="mt-3" />
+        <div className={located ? "mt-3 grid grid-cols-2 gap-2" : "hidden"}>
           {DISTANCES.map((km) => (
             <label key={km} className="relative">
               <input type="radio" name="km" value={km} defaultChecked={params.km === km} className="peer sr-only" />
@@ -50,19 +53,19 @@ function FilterForm({ params, id }: { params: SearchParams; id: string }) {
 
       <label className="flex cursor-pointer items-center justify-between gap-4 text-caption text-charcoal">
         {t("explore.availableNow")}
-        <input type="checkbox" name="available" value="1" className="peer sr-only" />
+        <input type="checkbox" name="available" value="1" defaultChecked={params.available} className="peer sr-only" />
         <span aria-hidden="true" className="relative h-6 w-11 shrink-0 rounded-full bg-line transition-colors peer-checked:bg-forest peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-forest after:absolute after:top-0.5 after:left-0.5 after:size-5 after:rounded-full after:bg-white after:shadow-soft after:transition-transform after:duration-300 after:ease-[var(--ease-qadr)] peer-checked:after:translate-x-5" />
       </label>
     </form>
   )
 }
 
-export function FiltersSidebar({ params }: { params: SearchParams }) {
+export function FiltersSidebar({ params, located }: { params: SearchParams; located: boolean }) {
   const t = useTranslations("explore")
   return (
     <div className="rounded-3xl border border-line bg-white p-6">
       <h2 className="sr-only">{t("filters")}</h2>
-      <FilterForm params={params} id="filters-desktop" />
+      <FilterForm params={params} id="filters-desktop" located={located} />
       <div className="mt-8 flex items-center justify-between gap-3">
         <a href="?" className="text-caption font-medium text-ink-soft underline-offset-4 hover:text-forest hover:underline">{t("reset")}</a>
         <Button type="submit" form="filters-desktop" size="sm">{t("apply")}</Button>
@@ -71,7 +74,7 @@ export function FiltersSidebar({ params }: { params: SearchParams }) {
   )
 }
 
-export function FiltersSheet({ params, active }: { params: SearchParams; active: number }) {
+export function FiltersSheet({ params, active, located }: { params: SearchParams; active: number; located: boolean }) {
   const t = useTranslations()
   const [open, setOpen] = useState(false)
   return (
@@ -99,7 +102,7 @@ export function FiltersSheet({ params, active }: { params: SearchParams; active:
             </Dialog.Close>
           </div>
           <Dialog.Description className="sr-only">{t("explore.filters")}</Dialog.Description>
-          <FilterForm params={params} id="filters-mobile" />
+          <FilterForm params={params} id="filters-mobile" located={located} />
           <div className="sticky bottom-0 mt-8 flex items-center gap-3 bg-ivory pt-3">
             <a href="?" className="px-2 text-caption font-medium text-ink-soft">{t("explore.reset")}</a>
             <Button type="submit" form="filters-mobile" className="flex-1">{t("explore.apply")}</Button>
