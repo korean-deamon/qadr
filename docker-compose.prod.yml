@@ -1,0 +1,151 @@
+# Qadr — production stack.
+#
+#   cp .env.example .env.production   # fill in real values (see README)
+#   docker compose -f docker-compose.prod.yml --env-file .env.production up -d --build
+#
+# Only the proxy publishes ports (80/443). Postgres, Redis, the API, workers
+# and the bot are reachable only on the compose network. Secrets come from the env file
+# at runtime and are never baked into images.
+name: qadr-prod
+
+x-server-env: &server-env
+  APP_ENV: production
+  DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+  REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/0
+  CELERY_BROKER_URL: redis://:${REDIS_PASSWORD}@redis:6379/1
+  COOKIE_SECURE: ${COOKIE_SECURE:-true}
+  TRUSTED_PROXY_HOPS: "1"
+  RATE_LIMIT_MULTIPLIER: "1"
+  MEDIA_ROOT: /app/media
+
+x-server: &server
+  image: ${IMAGE_PREFIX:-qadr}-server:${IMAGE_TAG:-latest}
+  build: { context: ./server, target: api }
+  env_file: ${ENV_FILE:-.env.production}
+  environment: *server-env
+  restart: unless-stopped
+  depends_on:
+    db: { condition: service_healthy }
+    redis: { condition: service_healthy }
+    migrate: { condition: service_completed_successfully }
+  logging: &logging
+    driver: json-file
+    options: { max-size: "20m", max-file: "5" }
+
+services:
+  db:
+    image: postgres:17.6-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+    logging: *logging
+
+  redis:
+    image: redis:7.4-alpine
+    command: ["sh", "-c", "exec redis-server --appendonly yes --requirepass \"$$REDIS_PASSWORD\""]
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    volumes: [redisdata:/data]
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a \"$$REDIS_PASSWORD\" --no-auth-warning ping | grep -q PONG"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+    logging: *logging
+
+  # One-off: apply migrations before anything else starts. Set SEED_DEMO=true
+  # to load demo data (idempotent) — for staging, not for a real launch.
+  migrate:
+    image: ${IMAGE_PREFIX:-qadr}-server:${IMAGE_TAG:-latest}
+    build: { context: ./server, target: api }
+    env_file: ${ENV_FILE:-.env.production}
+    environment: *server-env
+    command: ["sh", "-c", "alembic upgrade head && if [ \"$${SEED_DEMO:-false}\" = true ]; then python -m app.seed; fi"]
+    volumes: [media:/app/media]
+    depends_on:
+      db: { condition: service_healthy }
+      redis: { condition: service_healthy }
+    restart: "no"
+    logging: *logging
+
+  api:
+    <<: *server
+    volumes: [media:/app/media]
+
+  worker:
+    <<: *server
+    command: ["celery", "-A", "app.tasks.celery_app", "worker", "--loglevel=INFO", "--concurrency=4"]
+    healthcheck:
+      test: ["CMD-SHELL", "celery -A app.tasks.celery_app inspect ping -d celery@$$HOSTNAME --timeout 5 | grep -q pong"]
+      interval: 30s
+      timeout: 15s
+      start_period: 20s
+      retries: 5
+
+  beat:
+    <<: *server
+    command: ["celery", "-A", "app.tasks.celery_app", "beat", "--loglevel=INFO", "-s", "/tmp/celerybeat-schedule"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import os,sys,time,glob; f=glob.glob('/tmp/celerybeat-schedule*'); sys.exit(0 if f and time.time()-max(map(os.path.getmtime,f))<400 else 1)"]
+      interval: 60s
+      timeout: 5s
+      start_period: 30s
+      retries: 3
+
+  bot:
+    <<: *server
+    image: ${IMAGE_PREFIX:-qadr}-bot:${IMAGE_TAG:-latest}
+    build: { context: ./server, target: bot }
+
+  frontend:
+    image: ${IMAGE_PREFIX:-qadr}-web:${IMAGE_TAG:-latest}
+    build:
+      context: ./client
+      args:
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
+        API_INTERNAL_URL: http://api:8000
+    environment:
+      API_INTERNAL_URL: http://api:8000
+    depends_on:
+      api: { condition: service_healthy }
+    restart: unless-stopped
+    logging: *logging
+
+  proxy:
+    image: caddy:2.10-alpine
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:-:80}
+    ports:
+      - "${HTTP_PORT:-80}:80"
+      - "${HTTPS_PORT:-443}:443"
+      - "${HTTPS_PORT:-443}:443/udp"
+    volumes:
+      - ./infra/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      frontend: { condition: service_healthy }
+      api: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:2019/config/"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    logging: *logging
+
+volumes:
+  pgdata:
+  redisdata:
+  media:
+  caddy_data:
+  caddy_config:

@@ -31,7 +31,7 @@ def _send_smtp(to: str, subject: str, body: str) -> None:
     with smtplib.SMTP(settings.smtp_host, settings.smtp_port, timeout=10) as smtp:
         if settings.email_api_key:
             smtp.starttls()
-            smtp.login("apikey", settings.email_api_key)
+            smtp.login(settings.smtp_username, settings.email_api_key)
         smtp.send_message(msg)
 
 

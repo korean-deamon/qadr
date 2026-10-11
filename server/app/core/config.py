@@ -40,6 +40,7 @@ class Settings(BaseSettings):
     email_from: str = "Qadr <no-reply@qadr.uz>"
     smtp_host: str = "localhost"
     smtp_port: int = 1025
+    smtp_username: str = "apikey"  # SendGrid/Brevo-style relays log in with a fixed user + API key
 
     default_locale: str = "uz"
     supported_locales: str = "uz,ru,en"
@@ -54,6 +55,8 @@ class Settings(BaseSettings):
     # Multiplies every rate-limit budget (1 in production; higher locally so repeated
     # e2e runs from one IP don't lock you out). Never set below 1.
     rate_limit_multiplier: int = Field(default=1, ge=1, le=100)
+    # Reverse proxies in front of the API whose X-Forwarded-For we trust (0 = none)
+    trusted_proxy_hops: int = Field(default=0, ge=0, le=5)
 
     # Run Celery tasks inline (tests / single-process dev)
     celery_eager: bool = False

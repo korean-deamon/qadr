@@ -710,18 +710,34 @@ actions additionally require a fresh login within the last 12 hours.
 
 ---
 
-## 24. Current implementation status (v3.2)
+## 24. Current implementation status (updated 2026-10-12)
 
-- **Backend:** not started. No API, database, Docker, Celery or bot yet.
-- **Frontend:** design pass complete with **static mock data**
-  (`client/src/lib/mock`). Every page below is mock-only:
-  home, explore (search/filter over mock listings), item detail (calendar,
-  request panel), messages list and thread, dashboard, login, register,
-  verify, forgot-password, reset-password. Forms validate and simulate
-  success; nothing is persisted.
-- **Not built yet:** `/items/new`, `/items/[id]/edit`, `/my-items`,
-  `/requests`, `/borrowings`, `/saved`, `/notifications`, `/settings`,
-  `/categories/[slug]` (category links currently open explore with a filter),
-  `/users/[id]`, all `/admin/**` pages, Telegram linking UI.
-- **Route protection:** not active yet; mock "signed-in" pages are publicly
-  reachable until Phase 2.
+- **Backend:** complete. FastAPI modular monolith with PostgreSQL 17 (booking
+  overlap enforced by a `btree_gist` exclusion constraint), Redis, Celery
+  worker and beat (transactional outbox, OTP and notification delivery,
+  request expiry, return reminders, cleanup), and an aiogram Telegram bot
+  (polling in dev, webhook in prod). Auth: email OTP, rotating refresh tokens
+  with reuse detection, CSRF, rate limits. Real-time runs over WebSocket
+  through Redis pub/sub.
+- **Frontend:** every page runs on real data with no mocks: home, explore,
+  `/categories/[slug]`, item detail, `/users/[id]`, the auth pages, dashboard,
+  messages (live), `/requests`, `/borrowings`, `/saved`, `/notifications`,
+  `/my-items`, `/items/new`, `/items/[id]/edit`, `/settings` (including Telegram
+  linking) and `/admin/**` (overview, reports, report detail with the audited
+  conversation viewer, users, listings, audit log).
+- **Route protection:** active in three layers: proxy, server layout and API dependencies.
+- **Docker:** `docker-compose.yml` (dev, with Mailpit) and
+  `docker-compose.prod.yml` (Caddy with automatic HTTPS). Images are
+  multi-stage, non-root and contain no secrets.
+- **Decisions taken during the build** (beyond §10.1):
+  - Cache Components are off: personalised pages render per request.
+  - Uploads always go through the API, which validates them and creates WebP
+    variants or signs the Cloudinary upload.
+  - Admin writes require a login within the last 12 hours.
+  - `TRUSTED_PROXY_HOPS` controls how `X-Forwarded-For` is trusted for rate
+    limits. `RATE_LIMIT_MULTIPLIER` is for local testing only.
+  - Borrowing locks the listing row before the request row, so concurrent
+    approvals cannot deadlock.
+  - Pydantic is pinned to 2.13 because aiogram requires it.
+  - The owner's confirmation of a return is final. A borrower's "I returned
+    it" only notifies the owner.

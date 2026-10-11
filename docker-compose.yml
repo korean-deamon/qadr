@@ -1,8 +1,42 @@
+# Qadr — development stack.
+#
+#   docker compose up --build        → everything at http://localhost:8080
+#                                       OTP and other emails at http://localhost:8025
+#   docker compose up db redis mailpit → only infrastructure, for `uv run` + `npm run dev`
+#
+# Host ports are bound to 127.0.0.1 and chosen not to clash with other local
+# Postgres/Redis containers (5433, 6380). Secrets come from .env (never committed).
 name: qadr
+
+x-server-env: &server-env
+  APP_ENV: development
+  DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+  REDIS_URL: redis://redis:6379/0
+  CELERY_BROKER_URL: redis://redis:6379/1
+  FRONTEND_URL: http://localhost:8080
+  CORS_ORIGINS: http://localhost:8080
+  COOKIE_SECURE: "false"
+  TRUSTED_PROXY_HOPS: "1"
+  EMAIL_PROVIDER: smtp
+  EMAIL_API_KEY: ""
+  SMTP_HOST: mailpit
+  SMTP_PORT: "1025"
+  MEDIA_ROOT: /app/media
+
+x-server: &server
+  image: qadr-server:dev
+  build: { context: ./server, target: api }
+  env_file: .env
+  environment: *server-env
+  restart: unless-stopped
+  depends_on:
+    db: { condition: service_healthy }
+    redis: { condition: service_healthy }
+    migrate: { condition: service_completed_successfully }
 
 services:
   db:
-    image: postgres:17-alpine
+    image: postgres:17.6-alpine
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -16,6 +50,7 @@ services:
       interval: 5s
       timeout: 3s
       retries: 20
+    restart: unless-stopped
 
   redis:
     image: redis:7.4-alpine
@@ -27,11 +62,99 @@ services:
       interval: 5s
       timeout: 3s
       retries: 20
+    restart: unless-stopped
 
   mailpit:
     image: axllent/mailpit:v1.27
     ports: ["127.0.0.1:8025:8025", "127.0.0.1:1025:1025"]
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8025/livez"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  # One-off: schema migrations, then demo data (idempotent: skipped if present)
+  migrate:
+    image: qadr-server:dev
+    build: { context: ./server, target: api }
+    env_file: .env
+    environment: *server-env
+    command: ["sh", "-c", "alembic upgrade head && python -m app.seed"]
+    # dev: uploads live in ./server/media, shared with `uv run`; write as your host user
+    user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
+    volumes: ["./server/media:/app/media"]
+    depends_on:
+      db: { condition: service_healthy }
+      redis: { condition: service_healthy }
+    restart: "no"
+
+  api:
+    <<: *server
+    user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
+    volumes: ["./server/media:/app/media"]
+
+  worker:
+    <<: *server
+    command: ["celery", "-A", "app.tasks.celery_app", "worker", "--loglevel=INFO", "--concurrency=2"]
+    healthcheck:
+      test: ["CMD-SHELL", "celery -A app.tasks.celery_app inspect ping -d celery@$$HOSTNAME --timeout 5 | grep -q pong"]
+      interval: 30s
+      timeout: 15s
+      start_period: 20s
+      retries: 5
+
+  beat:
+    <<: *server
+    command: ["celery", "-A", "app.tasks.celery_app", "beat", "--loglevel=INFO", "-s", "/tmp/celerybeat-schedule"]
+    healthcheck:
+      # beat touches its schedule file as it ticks
+      test: ["CMD", "python", "-c", "import os,sys,time,glob; f=glob.glob('/tmp/celerybeat-schedule*'); sys.exit(0 if f and time.time()-max(map(os.path.getmtime,f))<400 else 1)"]
+      interval: 60s
+      timeout: 5s
+      start_period: 30s
+      retries: 3
+
+  bot:
+    <<: *server
+    image: qadr-bot:dev
+    build: { context: ./server, target: bot }
+    # Without TELEGRAM_BOT_TOKEN the bot only serves its health check.
+
+  frontend:
+    image: qadr-web:dev
+    build:
+      context: ./client
+      args:
+        NEXT_PUBLIC_SITE_URL: http://localhost:8080
+        API_INTERNAL_URL: http://api:8000
+    environment:
+      API_INTERNAL_URL: http://api:8000
+    depends_on:
+      api: { condition: service_healthy }
+    restart: unless-stopped
+
+  proxy:
+    image: caddy:2.10-alpine
+    environment:
+      SITE_ADDRESS: ":80"
+    ports: ["127.0.0.1:8080:80"]
+    volumes:
+      - ./infra/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      frontend: { condition: service_healthy }
+      api: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:80/api/v1/health"]
+      interval: 15s
+      timeout: 4s
+      retries: 5
+    restart: unless-stopped
 
 volumes:
   pgdata:
   redisdata:
+  caddy_data:
+  caddy_config:

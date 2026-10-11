@@ -60,7 +60,13 @@ async def reset(limit: Limit, key: str) -> None:
 
 
 def client_ip(request: Request) -> str:
+    """The caller's IP. X-Forwarded-For is only trusted for the configured number of
+    proxy hops in front of us (Caddy = 1), counted from the right, so clients can't
+    spoof it to dodge rate limits."""
+    hops = settings.trusted_proxy_hops
     fwd = request.headers.get("x-forwarded-for")
-    if fwd:
-        return fwd.split(",")[0].strip()
+    if hops and fwd:
+        parts = [p.strip() for p in fwd.split(",") if p.strip()]
+        if len(parts) >= hops:
+            return parts[-hops]
     return request.client.host if request.client else "unknown"

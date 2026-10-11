@@ -1,0 +1,45 @@
+# Qadr reverse proxy.
+# SITE_ADDRESS: a domain (e.g. qadr.uz) gets automatic HTTPS from Let's Encrypt;
+# ":80" serves plain HTTP (local runs of the production stack).
+{
+	servers {
+		trusted_proxies static private_ranges
+	}
+}
+
+{$SITE_ADDRESS::80} {
+	encode zstd gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=(self)"
+		X-Frame-Options "DENY"
+		-Server
+	}
+
+	# Uploads are limited to 8 MB per photo by the API; allow some headroom.
+	request_body {
+		max_size 10MB
+	}
+
+	# API, media and the WebSocket go straight to FastAPI
+	handle /api/* {
+		reverse_proxy api:8000
+	}
+
+	# Telegram webhook (production) and bot health
+	handle /tg/* {
+		reverse_proxy bot:8081
+	}
+
+	handle {
+		reverse_proxy frontend:3000
+	}
+
+	log {
+		output stdout
+		format json
+	}
+}

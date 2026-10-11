@@ -271,7 +271,7 @@ async def reset_password(db: AsyncSession, email: str, code: str, password: str)
 
 def me(user: User) -> dict[str, object]:
     now = now_utc()
-    prompt = not user.phone_verified_at and (
+    prompt = settings.telegram_enabled and not user.phone_verified_at and (
         user.telegram_prompt_dismissed_at is None or user.telegram_prompt_dismissed_at < now - TELEGRAM_PROMPT_SNOOZE
     )
     return {
