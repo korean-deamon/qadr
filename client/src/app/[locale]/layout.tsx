@@ -4,6 +4,8 @@ import { getLocale, getTranslations } from "next-intl/server"
 import { ArchClipDefs } from "@/components/branding/motifs"
 import { HydrationMarker } from "@/components/hydration-marker"
 import { ClientMessages } from "@/components/i18n/client-messages"
+import { SessionProvider } from "@/components/session/session-provider"
+import { getMe } from "@/lib/api/server"
 import { BottomNav } from "@/components/layout/bottom-nav"
 import { Header } from "@/components/layout/header"
 import { Cursor } from "@/components/motion/cursor"
@@ -50,6 +52,7 @@ export const viewport: Viewport = {
 export default async function LocaleLayout({ children }: LayoutProps<"/[locale]">) {
   const locale = await getLocale()
   const t = await getTranslations("common")
+  const me = await getMe()
 
   return (
     <html lang={locale} className={`${display.variable} ${sans.variable}`}>
@@ -62,14 +65,15 @@ export default async function LocaleLayout({ children }: LayoutProps<"/[locale]"
         </a>
         <ArchClipDefs />
         <ClientMessages>
+          <SessionProvider initialMe={me}>
           <SmoothScroll />
           <Header />
           {children}
-          {/* static mock counts until Phase 5 wires real unread state */}
-          <BottomNav unreadMessages={2} unreadNotifications={3} />
+          <BottomNav />
           <LazyToaster />
           <Cursor />
           <HydrationMarker />
+          </SessionProvider>
         </ClientMessages>
       </body>
     </html>

@@ -89,4 +89,12 @@ export function AuthHeading({ title, lead }: { title: string; lead: ReactNode })
   )
 }
 
-export const wait = (ms: number) => new Promise((r) => setTimeout(r, ms))
+/** Form-level error (API errors), announced to screen readers. */
+export function FormAlert({ message }: { message?: string }) {
+  if (!message) return null
+  return (
+    <p key={message} role="alert" className="animate-in-up rounded-2xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-caption font-medium text-destructive">
+      {message}
+    </p>
+  )
+}

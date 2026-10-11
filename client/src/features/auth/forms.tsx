@@ -1,13 +1,20 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useTranslations } from "next-intl"
+import { useLocale, useTranslations } from "next-intl"
+import { useRouter as useNextRouter, useSearchParams } from "next/navigation"
+import { useState } from "react"
 import { useForm, useWatch } from "react-hook-form"
 import { notify as toast } from "@/lib/notify"
 import { z } from "zod/mini"
+import { useSession } from "@/components/session/session-provider"
 import { Link, useRouter } from "@/i18n/navigation"
+import { api, ApiError } from "@/lib/api/client"
+import { useApiError } from "@/lib/api/errors"
+import type { Me } from "@/lib/api/types"
+import { safeNext } from "@/lib/routes"
 import { cn } from "@/lib/utils"
-import { AuthHeading, Field, PasswordField, SubmitButton, wait } from "./fields"
+import { AuthHeading, Field, FormAlert, PasswordField, SubmitButton } from "./fields"
 
 function useSchemas() {
   const v = useTranslations("validation")
@@ -20,7 +27,12 @@ function useSchemas() {
 
 export function LoginForm() {
   const t = useTranslations("auth")
-  const router = useRouter()
+  const locale = useLocale()
+  const next = useSearchParams().get("next")
+  const { setMe } = useSession()
+  const nav = useNextRouter()
+  const apiError = useApiError()
+  const [error, setError] = useState<string>()
   const { v, email } = useSchemas()
   const schema = z.object({ email, password: z.string().check(z.minLength(1, v("required"))) })
   const { register, handleSubmit, formState } = useForm<z.infer<typeof schema>>({ resolver: zodResolver(schema) })
@@ -31,12 +43,25 @@ export function LoginForm() {
       <form
         noValidate
         className="space-y-5"
-        onSubmit={handleSubmit(async () => {
-          await wait(700)
-          toast(t("login.done"))
-          router.push("/dashboard")
+        onSubmit={handleSubmit(async (data) => {
+          setError(undefined)
+          try {
+            const me = await api<Me>("/auth/login", { json: data, redirectOn401: false, retry: false })
+            setMe(me)
+            toast(t("login.done"))
+            // replace + refresh so every server component renders with the new session
+            nav.replace(safeNext(next, me.preferred_locale ?? locale))
+            nav.refresh()
+          } catch (e) {
+            if (e instanceof ApiError && e.code === "EMAIL_NOT_VERIFIED") {
+              nav.push(`/${locale}/verify?email=${encodeURIComponent(data.email)}${next ? `&next=${encodeURIComponent(next)}` : ""}`)
+              return
+            }
+            setError(apiError(e))
+          }
         })}
       >
+        <FormAlert message={error} />
         <Field label={t("email")} type="email" autoComplete="email" inputMode="email" error={formState.errors.email?.message} {...register("email")} />
         <div>
           <PasswordField label={t("password")} autoComplete="current-password" error={formState.errors.password?.message} {...register("password")} />
@@ -48,7 +73,7 @@ export function LoginForm() {
       </form>
       <p className="mt-8 text-center text-caption text-ink-soft">
         {t("login.noAccount")}{" "}
-        <Link href="/register" className="font-medium text-forest underline decoration-forest/30 underline-offset-4 hover:decoration-forest">{t("login.create")}</Link>
+        <Link href={next ? { pathname: "/register", query: { next } } : "/register"} className="font-medium text-forest underline decoration-forest/30 underline-offset-4 hover:decoration-forest">{t("login.create")}</Link>
       </p>
     </>
   )
@@ -90,7 +115,11 @@ function StrengthMeter({ value }: { value: string }) {
 
 export function RegisterForm() {
   const t = useTranslations("auth")
+  const locale = useLocale()
   const router = useRouter()
+  const next = useSearchParams().get("next")
+  const apiError = useApiError()
+  const [error, setError] = useState<string>()
   const { v, email, password } = useSchemas()
   const schema = z.object({ name: z.string().check(z.trim(), z.minLength(2, v("nameMin"))), email, password })
   const { register, handleSubmit, formState, control } = useForm<z.infer<typeof schema>>({ resolver: zodResolver(schema) })
@@ -103,11 +132,20 @@ export function RegisterForm() {
         noValidate
         className="space-y-5"
         onSubmit={handleSubmit(async (data) => {
-          await wait(800)
-          toast(t("register.done"))
-          router.push({ pathname: "/verify", query: { email: data.email } })
+          setError(undefined)
+          try {
+            await api("/auth/register", {
+              json: { email: data.email, password: data.password, display_name: data.name, locale },
+              redirectOn401: false,
+            })
+            toast(t("register.done"))
+            router.push({ pathname: "/verify", query: { email: data.email.trim().toLowerCase(), ...(next ? { next } : {}) } })
+          } catch (e) {
+            setError(apiError(e))
+          }
         })}
       >
+        <FormAlert message={error} />
         <Field label={t("register.name")} autoComplete="name" error={formState.errors.name?.message} {...register("name")} />
         <Field label={t("email")} type="email" autoComplete="email" inputMode="email" error={formState.errors.email?.message} {...register("email")} />
         <div>
@@ -130,6 +168,8 @@ export function RegisterForm() {
 export function ForgotForm() {
   const t = useTranslations("auth")
   const router = useRouter()
+  const apiError = useApiError()
+  const [error, setError] = useState<string>()
   const { email } = useSchemas()
   const schema = z.object({ email })
   const { register, handleSubmit, formState } = useForm<z.infer<typeof schema>>({ resolver: zodResolver(schema) })
@@ -139,12 +179,18 @@ export function ForgotForm() {
       <form
         noValidate
         className="space-y-5"
-        onSubmit={handleSubmit(async () => {
-          await wait(700)
-          toast(t("forgot.done"))
-          router.push("/reset-password")
+        onSubmit={handleSubmit(async (data) => {
+          setError(undefined)
+          try {
+            await api("/auth/forgot-password", { json: data, redirectOn401: false })
+            toast(t("forgot.done"))
+            router.push({ pathname: "/reset-password", query: { email: data.email.trim().toLowerCase() } })
+          } catch (e) {
+            setError(apiError(e))
+          }
         })}
       >
+        <FormAlert message={error} />
         <Field label={t("email")} type="email" autoComplete="email" inputMode="email" error={formState.errors.email?.message} {...register("email")} />
         <SubmitButton pending={formState.isSubmitting}>{t("forgot.submit")}</SubmitButton>
       </form>
@@ -158,23 +204,36 @@ export function ForgotForm() {
 export function ResetForm() {
   const t = useTranslations("auth")
   const router = useRouter()
-  const { v, password } = useSchemas()
+  const initialEmail = useSearchParams().get("email") ?? ""
+  const apiError = useApiError()
+  const [error, setError] = useState<string>()
+  const { v, email, password } = useSchemas()
   const schema = z
-    .object({ code: z.string().check(z.regex(/^\d{6}$/, v("code"))), password, confirm: z.string() })
+    .object({ email, code: z.string().check(z.regex(/^\d{6}$/, v("code"))), password, confirm: z.string() })
     .check(z.refine((d) => d.password === d.confirm, { path: ["confirm"], message: v("passwordMatch") }))
-  const { register, handleSubmit, formState } = useForm<z.infer<typeof schema>>({ resolver: zodResolver(schema) })
+  const { register, handleSubmit, formState } = useForm<z.infer<typeof schema>>({
+    resolver: zodResolver(schema),
+    defaultValues: { email: initialEmail },
+  })
   return (
     <>
       <AuthHeading title={t("reset.title")} lead={t("reset.lead")} />
       <form
         noValidate
         className="space-y-5"
-        onSubmit={handleSubmit(async () => {
-          await wait(700)
-          toast(t("reset.done"))
-          router.push("/login")
+        onSubmit={handleSubmit(async (data) => {
+          setError(undefined)
+          try {
+            await api("/auth/reset-password", { json: { email: data.email, code: data.code, password: data.password }, redirectOn401: false })
+            toast(t("reset.done"))
+            router.push("/login")
+          } catch (e) {
+            setError(apiError(e))
+          }
         })}
       >
+        <FormAlert message={error} />
+        <Field label={t("email")} type="email" autoComplete="email" inputMode="email" error={formState.errors.email?.message} {...register("email")} className={initialEmail ? "hidden" : undefined} />
         <Field label={t("reset.code")} inputMode="numeric" autoComplete="one-time-code" maxLength={6} error={formState.errors.code?.message} {...register("code")} className="[&_input]:font-display [&_input]:text-[1.25rem] [&_input]:tracking-[0.4em]" />
         <PasswordField label={t("reset.newPassword")} autoComplete="new-password" error={formState.errors.password?.message} {...register("password")} />
         <PasswordField label={t("reset.confirm")} autoComplete="new-password" error={formState.errors.confirm?.message} {...register("confirm")} />

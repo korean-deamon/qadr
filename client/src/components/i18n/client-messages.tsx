@@ -3,7 +3,7 @@ import { getMessages } from "next-intl/server"
 import type { ReactNode } from "react"
 
 /** Namespaces every page's client components need (header, bottom nav, cards). */
-const BASE = ["common", "navigation", "listings"]
+const BASE = ["common", "navigation", "listings", "account", "apiErrors"]
 
 type Tree = Record<string, unknown>
 

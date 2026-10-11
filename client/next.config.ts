@@ -2,9 +2,14 @@ import type { NextConfig } from "next"
 import { withCn } from "cn/next"
 import createNextIntlPlugin from "next-intl/plugin"
 
+const API = process.env.API_INTERNAL_URL ?? "http://localhost:8000"
+
 const nextConfig: NextConfig = {
-  cacheComponents: true,
-  partialPrefetching: true,
+  output: "standalone",
+  // Same-origin API in development (in Docker, Caddy routes /api before Next)
+  async rewrites() {
+    return [{ source: "/api/v1/:path*", destination: `${API}/api/v1/:path*` }]
+  },
   turbopack: {
     rules: {
       "*.css": {
@@ -18,6 +23,8 @@ const nextConfig: NextConfig = {
     // Fewer candidate widths keep every srcset (and the RSC payload) short
     deviceSizes: [640, 828, 1080, 1440, 1920],
     imageSizes: [64, 128, 256, 384],
+    localPatterns: [{ pathname: "/api/v1/media/**" }, { pathname: "/images/**" }, { pathname: "/icons/**" }, { pathname: "/_next/static/media/**" }],
+    remotePatterns: [{ protocol: "https", hostname: "res.cloudinary.com" }],
   },
 }
 

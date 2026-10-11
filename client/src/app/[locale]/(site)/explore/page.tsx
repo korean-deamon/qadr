@@ -16,9 +16,6 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: t("title"), alternates: alternatesFor("/explore") }
 }
 
-// Depends on the query string: render once, fully, per request (no streamed holes = no layout shift).
-export const instant = false
-
 export default async function ExplorePage({ searchParams }: PageProps<"/[locale]/explore">) {
   const t = await getTranslations("explore")
   const raw = await searchParams

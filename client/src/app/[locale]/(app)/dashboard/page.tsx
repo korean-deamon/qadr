@@ -7,6 +7,7 @@ import { PageTransition } from "@/components/motion/page-transition"
 import { RevealText } from "@/components/motion/reveal-text"
 import { Avatar } from "@/components/ui/avatar"
 import { DashboardNav } from "@/features/dashboard/dashboard-nav"
+import { TelegramPrompt } from "@/features/settings/telegram-prompt"
 import { Activity, BorrowingLoans, IncomingRequests, LendingLoans, MyItems } from "@/features/dashboard/sections"
 import {
   borrowingLoans,
@@ -44,7 +45,7 @@ export default async function DashboardPage() {
 
   return (
     <PageTransition>
-      <ClientMessages ns={["dashboard", "borrowing", "notifications", "messages"]}>
+      <ClientMessages ns={["dashboard", "borrowing", "notifications", "messages", "telegram"]}>
       <div className="container-qadr grid grid-cols-1 gap-8 py-8 *:min-w-0 lg:grid-cols-[14rem_1fr] lg:gap-12 lg:py-12 xl:grid-cols-[14rem_1fr_20rem]">
         <aside className="lg:sticky lg:top-[calc(var(--header-height)+3rem)] lg:self-start">
           <div className="mb-6 hidden items-center gap-3 lg:flex">
@@ -58,6 +59,7 @@ export default async function DashboardPage() {
         </aside>
 
         <div className="min-w-0 space-y-12">
+          <TelegramPrompt />
           <header className="relative isolate overflow-hidden rounded-[1.75rem] bg-forest px-6 py-8 text-ivory md:px-10 md:py-10">
             <GirihPattern className="absolute inset-0 -z-10 h-full w-full text-ivory opacity-[0.07]" size={88} />
             <RevealText as="h1" trigger="load" text={t("greeting", { name: first })} className="text-title text-ivory" />

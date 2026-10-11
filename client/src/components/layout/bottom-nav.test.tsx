@@ -4,6 +4,11 @@ import { renderWithIntl } from "@/test/intl"
 import { BottomNav } from "./bottom-nav"
 
 const pathname = vi.hoisted(() => ({ current: "/" }))
+const session = vi.hoisted(() => ({
+  me: { id: "u1" } as unknown,
+  counters: { unread_messages: 0, unread_notifications: 0, pending_requests: 0 },
+}))
+vi.mock("@/components/session/session-provider", () => ({ useSession: () => session }))
 vi.mock("@/i18n/navigation", () => ({
   usePathname: () => pathname.current,
   Link: ({ href, children, ...rest }: { href: string; children: React.ReactNode }) => (
@@ -12,6 +17,13 @@ vi.mock("@/i18n/navigation", () => ({
 }))
 
 describe("BottomNav", () => {
+  it("sends visitors to login from Profile", () => {
+    session.me = null
+    renderWithIntl(<BottomNav />)
+    expect(screen.getByRole("link", { name: /Profile/ })).toHaveAttribute("href", "/login")
+    session.me = { id: "u1" }
+  })
+
   it("renders the five SPEC destinations", () => {
     renderWithIntl(<BottomNav />)
     const nav = screen.getByRole("navigation", { name: "App navigation" })
@@ -29,13 +41,15 @@ describe("BottomNav", () => {
   })
 
   it("shows unread badges with an accessible count and caps at 9+", () => {
-    renderWithIntl(<BottomNav unreadMessages={3} unreadNotifications={14} />)
+    session.counters = { unread_messages: 3, unread_notifications: 10, pending_requests: 4 }
+    renderWithIntl(<BottomNav />)
     expect(screen.getByText("3 unread")).toBeInTheDocument()
     expect(screen.getByText("9+")).toBeInTheDocument()
     expect(screen.getByText("14 unread")).toBeInTheDocument()
   })
 
   it("hides badges when there is nothing unread", () => {
+    session.counters = { unread_messages: 0, unread_notifications: 0, pending_requests: 0 }
     renderWithIntl(<BottomNav />)
     expect(screen.queryByText(/unread/)).not.toBeInTheDocument()
   })

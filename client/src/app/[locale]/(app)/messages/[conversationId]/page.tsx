@@ -6,8 +6,6 @@ export function generateStaticParams() {
   return conversations.map((c) => ({ conversationId: c.id }))
 }
 
-export const instant = false
-
 export default async function ConversationPage({ params }: PageProps<"/[locale]/messages/[conversationId]">) {
   const c = conversationById((await params).conversationId)
   if (!c) notFound()

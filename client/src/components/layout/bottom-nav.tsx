@@ -3,6 +3,7 @@
 import { Compass, House, MessageCircle, Plus, UserRound, type LucideIcon } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { Link, usePathname } from "@/i18n/navigation"
+import { useSession } from "@/components/session/session-provider"
 import { isAuthRoute, isPending } from "@/lib/routes"
 import { cn } from "@/lib/utils"
 
@@ -13,21 +14,22 @@ type Item = {
   badge?: number
 }
 
-export type BottomNavProps = { unreadMessages?: number; unreadNotifications?: number }
-
 /**
  * App-style bottom navigation below `md` (SPEC §3 Mobile). Fixed, respects
  * the safe-area inset; <main> reserves matching space via `pb-bottom-nav`.
  */
-export function BottomNav({ unreadMessages = 0, unreadNotifications = 0 }: BottomNavProps) {
+export function BottomNav() {
   const t = useTranslations("navigation")
+  const { me, counters } = useSession()
+  const unreadMessages = counters.unread_messages
+  const unreadNotifications = counters.unread_notifications + counters.pending_requests
   const pathname = usePathname()
   const items: Item[] = [
     { key: "home", href: "/", icon: House },
     { key: "explore", href: "/explore", icon: Compass },
     { key: "add", href: "/items/new", icon: Plus },
     { key: "messages", href: "/messages", icon: MessageCircle, badge: unreadMessages },
-    { key: "profile", href: "/dashboard", icon: UserRound, badge: unreadNotifications },
+    { key: "profile", href: me ? "/dashboard" : "/login", icon: UserRound, badge: unreadNotifications },
   ]
   if (isAuthRoute(pathname)) return null
   const isActive = (href: string) =>

@@ -29,9 +29,6 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/items/[i
 
 const offset = (d: number) => new Date(MOCK_NOW.getTime() + d * 86_400_000)
 
-// Every item is prerendered via generateStaticParams; render it inline (no streamed boundary).
-export const instant = false
-
 export default async function ItemPage({ params }: PageProps<"/[locale]/items/[id]">) {
   const { id } = await params
   const listing = listingById(id)

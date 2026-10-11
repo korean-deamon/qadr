@@ -9,15 +9,29 @@ async function open(page: Page, url: string) {
 const ROUTES = [
   ["/uz/explore", "Yaqindan toping"],
   ["/uz/items/1", "4 kishilik chodir, Naturehike"],
-  ["/uz/messages", "Xabarlar"],
-  ["/uz/messages/c1", "Sardor Rahimov"],
-  ["/uz/dashboard", "Xayrli tong, Dilnoza"],
   ["/uz/login", "Qaytganingizdan xursandmiz"],
   ["/uz/register", "Qoʻshnilaringizga qoʻshiling"],
-  ["/uz/verify", "Emailingizni tekshiring"],
+  ["/uz/verify?email=someone@test.uz", "Emailingizni tekshiring"],
   ["/uz/forgot-password", "Parolni tiklash"],
   ["/uz/reset-password", "Yangi parol oʻylab toping"],
 ] as const
+
+test.describe("signed-in pages render", () => {
+  test.use({ storageState: "e2e/.auth/demo.json" })
+  for (const [route, text] of [
+    ["/uz/dashboard", "Xayrli tong, Dilnoza"],
+    ["/uz/messages", "Xabarlar"],
+    ["/uz/settings", "Sozlamalar"],
+  ] as const) {
+    test(route, async ({ page }) => {
+      const errors: string[] = []
+      page.on("pageerror", (e) => errors.push(e.message))
+      await page.goto(route)
+      await expect(page.getByText(text, { exact: false }).filter({ visible: true }).first()).toBeVisible()
+      expect(errors).toEqual([])
+    })
+  }
+})
 
 test.describe("every main page renders", () => {
   for (const [route, text] of ROUTES) {
@@ -58,12 +72,12 @@ test("item page: gallery switches photos and the request needs dates and terms",
   await expect(page.locator("#request [role=alert]")).toHaveText("Choose start and end dates")
 })
 
-test("verify: a wrong code shows a localized error", async ({ page }) => {
-  await open(page, "/uz/verify?email=test@mail.uz")
+test("verify: a wrong code shows the API's localized error", async ({ page }) => {
+  await open(page, "/uz/verify?email=nobody-e2e@test.uz")
   await page.getByRole("textbox", { name: "1-raqam" }).click()
-  await page.keyboard.type("000000")
+  await page.keyboard.type("123456")
   await page.getByRole("button", { name: "Tasdiqlash" }).click()
-  await expect(page.locator("#otp-error")).toHaveText("Kod notoʻgʻri. Qayta urinib koʻring.")
+  await expect(page.locator("#otp-error")).toContainText("Kod notoʻgʻri. Qayta urinib koʻring.")
 })
 
 test("register validates fields with localized messages", async ({ page }) => {

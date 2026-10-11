@@ -3,7 +3,9 @@
 import { useLocale, useTranslations } from "next-intl"
 import { useSearchParams } from "next/navigation"
 import { Suspense } from "react"
+import { useSession } from "@/components/session/session-provider"
 import { Link, usePathname } from "@/i18n/navigation"
+import { api } from "@/lib/api/client"
 import { LOCALE_COOKIE, LOCALE_COOKIE_MAX_AGE, routing } from "@/i18n/routing"
 import { cn } from "@/lib/utils"
 
@@ -18,6 +20,7 @@ function Switcher({ className }: { className?: string }) {
   const locale = useLocale()
   const pathname = usePathname()
   const search = useSearchParams()
+  const { me } = useSession()
   const query = Object.fromEntries(search.entries())
 
   return (
@@ -34,7 +37,11 @@ function Switcher({ className }: { className?: string }) {
                 hrefLang={l}
                 aria-current={active ? "true" : undefined}
                 title={t(`locales.${l}`)}
-                onClick={() => rememberLocale(l)}
+                onClick={() => {
+                  rememberLocale(l)
+                  // signed-in: the profile locale wins and drives emails/Telegram (SPEC §4)
+                  if (me) void api("/users/me", { method: "PATCH", json: { preferred_locale: l } }).catch(() => {})
+                }}
                 className={cn(
                   "block rounded-full px-2.5 py-1 text-meta font-medium transition-colors duration-200",
                   active ? "bg-forest text-ivory" : "text-ink-soft hover:text-forest",

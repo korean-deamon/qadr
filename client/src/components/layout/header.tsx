@@ -1,12 +1,13 @@
 "use client"
 
-import { Bell } from "lucide-react"
+import { Bell, MessageCircle } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { useEffect, useState } from "react"
 import { Logo } from "@/components/branding/logo"
 import { Magnetic } from "@/components/motion/magnetic"
 import { LocaleSwitcher } from "@/components/navigation/locale-switcher"
-import { Avatar } from "@/components/ui/avatar"
+import { useSession } from "@/components/session/session-provider"
+import { AccountMenu } from "./account-menu"
 import { Link, usePathname } from "@/i18n/navigation"
 import { isAppRoute, isAuthRoute } from "@/lib/routes"
 import { cn } from "@/lib/utils"
@@ -18,6 +19,7 @@ import { cn } from "@/lib/utils"
 export function Header() {
   const t = useTranslations("navigation")
   const pathname = usePathname()
+  const { me, counters } = useSession()
   const [hidden, setHidden] = useState(false)
   const [scrolled, setScrolled] = useState(false)
 
@@ -42,7 +44,7 @@ export function Header() {
 
   if (isAuthRoute(pathname)) return null
   const app = isAppRoute(pathname)
-  const links = app
+  const links = me
     ? [
         { href: "/explore", label: t("explore") },
         { href: "/dashboard", label: t("dashboard") },
@@ -84,20 +86,31 @@ export function Header() {
 
         <div className="ml-auto flex items-center gap-3 lg:gap-5">
           <LocaleSwitcher />
-          {app ? (
+          {me ? (
             <>
               <Link
+                href="/messages"
+                aria-label={t("messages")}
+                className="relative hidden size-10 items-center justify-center rounded-full text-charcoal transition-colors hover:bg-sage hover:text-forest md:flex"
+              >
+                <MessageCircle className="size-5" strokeWidth={1.7} aria-hidden="true" />
+                {counters.unread_messages ? (
+                  <span className="absolute top-1 right-0.5 min-w-[1.125rem] rounded-full bg-forest px-1 text-center text-[0.625rem] leading-[1.125rem] font-semibold text-ivory ring-2 ring-ivory">
+                    {counters.unread_messages > 9 ? "9+" : counters.unread_messages}
+                  </span>
+                ) : null}
+              </Link>
+              <Link
                 href="/notifications"
-                prefetch={false}
                 aria-label={t("notifications")}
                 className="relative hidden size-10 items-center justify-center rounded-full text-charcoal transition-colors hover:bg-sage hover:text-forest md:flex"
               >
                 <Bell className="size-5" strokeWidth={1.7} aria-hidden="true" />
-                <span className="absolute top-2 right-2.5 size-2 rounded-full bg-ochre ring-2 ring-ivory" aria-hidden="true" />
+                {counters.unread_notifications ? (
+                  <span className="absolute top-2 right-2.5 size-2 rounded-full bg-ochre ring-2 ring-ivory" aria-hidden="true" />
+                ) : null}
               </Link>
-              <Link href="/dashboard" aria-label={t("profile")} className="hidden rounded-full md:block">
-                <Avatar name="Dilnoza Karimova" />
-              </Link>
+              <AccountMenu />
             </>
           ) : (
             <Link

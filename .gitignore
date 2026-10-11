@@ -21,3 +21,7 @@ docs/screenshots/
 
 # local scratch space
 .scratch/
+
+# server runtime data
+server/media/
+server/celerybeat-schedule*

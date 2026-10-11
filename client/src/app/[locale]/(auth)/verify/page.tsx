@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
-import { getTranslations } from "next-intl/server"
+import { getLocale, getTranslations } from "next-intl/server"
+import { redirect } from "@/i18n/navigation"
 import { PageTransition } from "@/components/motion/page-transition"
 import { OtpForm } from "@/features/auth/otp-form"
 
@@ -8,11 +9,10 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: t("title") }
 }
 
-export const instant = false
-
 export default async function VerifyPage({ searchParams }: PageProps<"/[locale]/verify">) {
   const raw = (await searchParams).email
-  const email = typeof raw === "string" && raw.includes("@") ? raw.slice(0, 120) : "dilnoza@mail.uz"
+  if (typeof raw !== "string" || !raw.includes("@")) redirect({ href: "/register", locale: await getLocale() })
+  const email = (raw as string).slice(0, 120)
   return (
     <PageTransition>
       <div>
