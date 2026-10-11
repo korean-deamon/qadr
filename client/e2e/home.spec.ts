@@ -1,21 +1,29 @@
 import { expect, test } from "@playwright/test"
 
 test.describe("homepage", () => {
-  test.describe("locale detection on /", () => {
-    for (const [browserLocale, expected] of [
-      ["uz-UZ", "uz"],
-      ["ru-RU", "ru"],
-      ["de-DE", "uz"], // unsupported language falls back to the Uzbek default
-    ] as const) {
+  test.describe("default locale", () => {
+    for (const browserLocale of ["ru-RU", "en-US", "uz-UZ"]) {
       test.describe(browserLocale, () => {
         test.use({ locale: browserLocale })
-        test(`redirects to /${expected}`, async ({ page }) => {
+        test("always lands on /uz, whatever the browser language", async ({ page }) => {
           await page.goto("/")
-          await expect(page).toHaveURL(new RegExp(`/${expected}$`))
-          await expect(page.locator("html")).toHaveAttribute("lang", expected)
+          await expect(page).toHaveURL(/\/uz$/)
+          await expect(page.locator("html")).toHaveAttribute("lang", "uz")
         })
       })
     }
+  })
+
+  test("remembers an explicitly chosen language in a cookie", async ({ page, context }) => {
+    await page.goto("/uz")
+    await page.getByRole("link", { name: "Русский" }).click()
+    await expect(page).toHaveURL(/\/ru$/)
+    const cookie = (await context.cookies()).find((c) => c.name === "QADR_LOCALE")
+    expect(cookie?.value).toBe("ru")
+    await page.goto("/")
+    await expect(page).toHaveURL(/\/ru$/)
+    await page.goto("/explore")
+    await expect(page).toHaveURL(/\/ru\/explore$/)
   })
 
   for (const [locale, title] of [
@@ -92,11 +100,13 @@ test.describe("mobile bottom navigation", () => {
 test.describe("reduced motion", () => {
   test.use({ reducedMotion: "reduce" })
 
-  test("disables Lenis and shows content without scroll reveals", async ({ page }) => {
+  test("disables Lenis and shows content without waiting for reveals", async ({ page }) => {
     await page.goto("/en")
     await expect(page.locator("html")).not.toHaveClass(/lenis/)
-    const cta = page.getByRole("heading", { name: /drill in your cupboard/ })
-    await expect(cta).toBeVisible()
-    expect(await cta.evaluate((el) => getComputedStyle(el.closest("section")!.querySelector("div div")!).opacity)).toBe("1")
+    const heading = page.getByRole("heading", { name: /drill in your cupboard/ })
+    await heading.scrollIntoViewIfNeeded()
+    const word = heading.locator(".reveal-inner").first()
+    await expect(word).toHaveCSS("opacity", "1")
+    await expect(word).toHaveCSS("transform", "none")
   })
 })

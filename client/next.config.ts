@@ -1,4 +1,5 @@
 import type { NextConfig } from "next"
+import { withCn } from "cn/next"
 import createNextIntlPlugin from "next-intl/plugin"
 
 const nextConfig: NextConfig = {
@@ -14,9 +15,21 @@ const nextConfig: NextConfig = {
   },
   images: {
     formats: ["image/avif", "image/webp"],
+    // Fewer candidate widths keep every srcset (and the RSC payload) short
+    deviceSizes: [640, 828, 1080, 1440, 1920],
+    imageSizes: [64, 128, 256, 384],
   },
 }
 
-const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts")
+const withNextIntl = createNextIntlPlugin({
+  requestConfig: "./src/i18n/request.ts",
+  // ICU messages compiled at build time: no message parser in the client bundle
+  experimental: { messages: { path: "./messages", format: "json", locales: "infer", precompile: true } },
+})
 
-export default withNextIntl(nextConfig)
+// Project-fitted class-merge tables (~8 KB instead of the full default config)
+export default withCn(withNextIntl(nextConfig), {
+  content: ["src/**/*.{ts,tsx}"],
+  out: "src/lib/cn-tables.ts",
+  css: "src/app/globals.css",
+})

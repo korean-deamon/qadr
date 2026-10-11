@@ -2,7 +2,9 @@ import { BadgeCheck, Phone, Star } from "lucide-react"
 import Image from "next/image"
 import { useTranslations } from "next-intl"
 import { GirihPattern } from "@/components/branding/motifs"
-import { Reveal, RevealItem } from "@/components/motion/reveal"
+import { RevealText } from "@/components/motion/reveal-text"
+import { Reveal } from "@/components/motion/reveal"
+import { RevealItem } from "@/components/motion/reveal-item"
 import drill from "../../../public/images/hero-drill.jpg"
 
 export function Trust() {
@@ -33,9 +35,11 @@ export function Trust() {
           <div className="flex flex-col justify-center lg:col-span-7">
             <Reveal>
               <blockquote>
-                <p className="font-display text-[clamp(1.75rem,1.3rem+1.8vw,2.875rem)] leading-[1.15] tracking-[-0.01em] text-balance">
-                  “{t("quote")}”
-                </p>
+                <RevealText
+                  as="p"
+                  text={`“${t("quote")}”`}
+                  className="font-display text-[clamp(1.75rem,1.3rem+1.8vw,2.875rem)] leading-[1.15] tracking-[-0.01em] text-balance"
+                />
                 <footer className="mt-6 text-body text-sage">
                   <cite className="not-italic">
                     <span className="font-semibold text-ivory">{t("author")}</span>, {t("authorRole")}

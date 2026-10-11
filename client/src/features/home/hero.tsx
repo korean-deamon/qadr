@@ -2,6 +2,8 @@ import Image from "next/image"
 import { getTranslations } from "next-intl/server"
 import { ArchOutline, GirihPattern } from "@/components/branding/motifs"
 import { Parallax } from "@/components/motion/parallax"
+import { RevealText } from "@/components/motion/reveal-text"
+import { HeroVisual } from "./hero-3d/hero-visual"
 import tentView from "../../../public/images/tent-view.jpg"
 import { HeroSearch } from "./hero-search"
 
@@ -14,13 +16,14 @@ export async function Hero() {
     <section aria-labelledby="hero-title" className="relative isolate overflow-hidden">
       <div className="container-qadr grid items-center gap-y-12 pt-10 pb-16 md:pt-14 lg:grid-cols-12 lg:gap-x-10 lg:pt-16 lg:pb-24">
         <div className="lg:col-span-7 lg:pr-6">
-          <h1
+          <RevealText
+            as="h1"
             id="hero-title"
-            className="animate-rise max-w-[11ch] text-display text-forest"
-            style={delay(60)}
-          >
-            {t("title")}
-          </h1>
+            text={t("title")}
+            trigger="load"
+            delay={80}
+            className="max-w-[11ch] text-display text-forest"
+          />
           <p className="animate-rise mt-7 max-w-[38ch] text-lead text-ink-soft" style={delay(180)}>
             {t("lead")}
           </p>
@@ -30,6 +33,7 @@ export async function Hero() {
         </div>
 
         <figure className="relative mx-auto w-full max-w-[26rem] lg:col-span-5 lg:max-w-none lg:pl-4">
+          <HeroVisual photo={tentView.src}>
           {/* girih panel sits behind the arch, offset like a ganch wall behind a portal */}
           <div
             aria-hidden="true"
@@ -47,7 +51,8 @@ export async function Hero() {
                 src={tentView}
                 alt={t("imageAlt")}
                 fill
-                priority
+                loading="eager"
+                fetchPriority="high"
                 placeholder="blur"
                 sizes="(min-width: 1024px) 36vw, (min-width: 640px) 26rem, 90vw"
                 className="object-cover object-[50%_62%]"
@@ -55,6 +60,7 @@ export async function Hero() {
             </Parallax>
             <ArchOutline className="-inset-3 h-[calc(100%+1.5rem)] w-[calc(100%+1.5rem)] text-forest/35" />
           </div>
+          </HeroVisual>
           <figcaption
             className="animate-rise relative mt-8 flex max-w-xs gap-3 text-caption text-ink-soft lg:ml-2"
             style={delay(520)}

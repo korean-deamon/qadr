@@ -4,8 +4,12 @@ import { useLocale, useTranslations } from "next-intl"
 import { useSearchParams } from "next/navigation"
 import { Suspense } from "react"
 import { Link, usePathname } from "@/i18n/navigation"
-import { routing } from "@/i18n/routing"
+import { LOCALE_COOKIE, LOCALE_COOKIE_MAX_AGE, routing } from "@/i18n/routing"
 import { cn } from "@/lib/utils"
+
+function rememberLocale(locale: string) {
+  document.cookie = `${LOCALE_COOKIE}=${locale}; path=/; max-age=${LOCALE_COOKIE_MAX_AGE}; samesite=lax`
+}
 
 const SHORT = { uz: "Oʻz", ru: "Рус", en: "Eng" } as const
 
@@ -30,6 +34,7 @@ function Switcher({ className }: { className?: string }) {
                 hrefLang={l}
                 aria-current={active ? "true" : undefined}
                 title={t(`locales.${l}`)}
+                onClick={() => rememberLocale(l)}
                 className={cn(
                   "block rounded-full px-2.5 py-1 text-meta font-medium transition-colors duration-200",
                   active ? "bg-forest text-ivory" : "text-ink-soft hover:text-forest",

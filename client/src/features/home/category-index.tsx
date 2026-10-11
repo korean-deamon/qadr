@@ -1,8 +1,10 @@
 import Image from "next/image"
 import { useTranslations } from "next-intl"
-import { Reveal, RevealItem } from "@/components/motion/reveal"
+import { RevealText } from "@/components/motion/reveal-text"
+import { Reveal } from "@/components/motion/reveal"
+import { RevealItem } from "@/components/motion/reveal-item"
 import { Link } from "@/i18n/navigation"
-import { categories } from "./data"
+import { categories } from "@/lib/mock"
 
 /** Categories as a typographic index rather than an icon grid. */
 export function CategoryIndex() {
@@ -12,7 +14,7 @@ export function CategoryIndex() {
     <section id="categories" aria-labelledby="categories-title" className="scroll-mt-24 border-t border-line">
       <div className="container-qadr grid gap-10 py-20 lg:grid-cols-12 lg:gap-10 lg:py-28">
         <Reveal className="lg:sticky lg:top-28 lg:col-span-4 lg:self-start">
-          <h2 id="categories-title" className="text-title text-charcoal">{t("title")}</h2>
+          <RevealText as="h2" id="categories-title" text={t("title")} className="text-title text-charcoal" />
           <p className="mt-5 max-w-[34ch] text-body text-ink-soft">{t("lead")}</p>
           <Link
             href="/explore"
@@ -26,7 +28,7 @@ export function CategoryIndex() {
           {categories.map((c) => (
             <RevealItem as="li" key={c.key} className="border-b border-line">
               <Link
-                href={`/categories/${c.slug}`}
+                href={{ pathname: "/explore", query: { category: c.slug } }}
                 className="group flex items-center gap-4 py-4 md:py-5"
               >
                 <span className="relative size-14 shrink-0 overflow-hidden rounded-xl bg-sage md:size-16">

@@ -1,23 +1,28 @@
 import type { Metadata, Viewport } from "next"
 import { Brygada_1918, Onest } from "next/font/google"
-import { NextIntlClientProvider } from "next-intl"
 import { getLocale, getTranslations } from "next-intl/server"
 import { ArchClipDefs } from "@/components/branding/motifs"
+import { HydrationMarker } from "@/components/hydration-marker"
+import { ClientMessages } from "@/components/i18n/client-messages"
 import { BottomNav } from "@/components/layout/bottom-nav"
-import { Footer } from "@/components/layout/footer"
 import { Header } from "@/components/layout/header"
+import { Cursor } from "@/components/motion/cursor"
+import { LazyToaster } from "@/components/ui/lazy-toaster"
 import { SmoothScroll } from "@/components/motion/smooth-scroll"
 import { routing } from "@/i18n/routing"
+import { SITE_URL } from "@/lib/i18n/alternates"
 import "../globals.css"
 
 // Glyph coverage (Latin, Cyrillic, Uzbek Cyrillic, ʻ U+02BB) verified with fontTools.
+// `subsets` = what gets preloaded. Only "latin" (which includes ʻ U+02BB) is
+// preloaded; Cyrillic and Latin Extended still load on demand via unicode-range.
 const display = Brygada_1918({
-  subsets: ["latin", "latin-ext", "cyrillic"],
+  subsets: ["latin"],
   variable: "--font-brygada",
   display: "swap",
 })
 const sans = Onest({
-  subsets: ["latin", "latin-ext", "cyrillic", "cyrillic-ext"],
+  subsets: ["latin"],
   variable: "--font-onest",
   display: "swap",
 })
@@ -32,9 +37,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: { default: t("title"), template: "%s · Qadr" },
     description: t("description"),
-    alternates: {
-      languages: Object.fromEntries(routing.locales.map((l) => [l, `/${l}`])),
-    },
+    metadataBase: SITE_URL,
     openGraph: { siteName: "Qadr", locale, type: "website" },
   }
 }
@@ -50,7 +53,7 @@ export default async function LocaleLayout({ children }: LayoutProps<"/[locale]"
 
   return (
     <html lang={locale} className={`${display.variable} ${sans.variable}`}>
-      <body className="flex min-h-dvh flex-col pb-bottom-nav md:pb-0">
+      <body className="min-h-dvh">
         <a
           href="#main"
           className="sr-only z-50 rounded-full bg-forest px-4 py-2 text-ivory focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
@@ -58,15 +61,16 @@ export default async function LocaleLayout({ children }: LayoutProps<"/[locale]"
           {t("skipToContent")}
         </a>
         <ArchClipDefs />
-        <NextIntlClientProvider>
+        <ClientMessages>
           <SmoothScroll />
           <Header />
-          <main id="main" className="flex-1 pt-[var(--header-height)]">
-            {children}
-          </main>
-          <Footer />
-          <BottomNav />
-        </NextIntlClientProvider>
+          {children}
+          {/* static mock counts until Phase 5 wires real unread state */}
+          <BottomNav unreadMessages={2} unreadNotifications={3} />
+          <LazyToaster />
+          <Cursor />
+          <HydrationMarker />
+        </ClientMessages>
       </body>
     </html>
   )

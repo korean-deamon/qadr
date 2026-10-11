@@ -1,17 +1,24 @@
 "use client"
 
-import Lenis from "lenis"
+import type Lenis from "lenis"
 import { useEffect } from "react"
 
-/** Lenis smooth scrolling; never runs when the user prefers reduced motion. */
+/**
+ * Lenis smooth scrolling for wheel/trackpad users. Never runs when the user
+ * prefers reduced motion, nor on touch devices (native momentum is better and
+ * we avoid a permanent requestAnimationFrame loop on phones).
+ */
 export function SmoothScroll() {
   useEffect(() => {
-    const query = window.matchMedia("(prefers-reduced-motion: reduce)")
+    const query = window.matchMedia("(prefers-reduced-motion: reduce), (hover: none), (pointer: coarse)")
     let lenis: Lenis | null = null
 
-    const start = () => {
+    let cancelled = false
+    const start = async () => {
       if (query.matches || lenis) return
-      lenis = new Lenis({
+      const { default: LenisCtor } = await import("lenis")
+      if (cancelled || query.matches || lenis) return
+      lenis = new LenisCtor({
         autoRaf: true,
         lerp: 0.11,
         anchors: { offset: -80 },
@@ -22,11 +29,12 @@ export function SmoothScroll() {
       lenis?.destroy()
       lenis = null
     }
-    const onChange = () => (query.matches ? stop() : start())
+    const onChange = () => (query.matches ? stop() : void start())
 
-    start()
+    void start()
     query.addEventListener("change", onChange)
     return () => {
+      cancelled = true
       query.removeEventListener("change", onChange)
       stop()
     }

@@ -1,0 +1,185 @@
+"use client"
+
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useTranslations } from "next-intl"
+import { useForm, useWatch } from "react-hook-form"
+import { notify as toast } from "@/lib/notify"
+import { z } from "zod/mini"
+import { Link, useRouter } from "@/i18n/navigation"
+import { cn } from "@/lib/utils"
+import { AuthHeading, Field, PasswordField, SubmitButton, wait } from "./fields"
+
+function useSchemas() {
+  const v = useTranslations("validation")
+  const email = z.pipe(z.string().check(z.trim(), z.minLength(1, v("required"))), z.email(v("email")))
+  const password = z.string().check(z.minLength(8, v("passwordMin")))
+  return { v, email, password }
+}
+
+/* ------------------------------------------------------------------ */
+
+export function LoginForm() {
+  const t = useTranslations("auth")
+  const router = useRouter()
+  const { v, email } = useSchemas()
+  const schema = z.object({ email, password: z.string().check(z.minLength(1, v("required"))) })
+  const { register, handleSubmit, formState } = useForm<z.infer<typeof schema>>({ resolver: zodResolver(schema) })
+
+  return (
+    <>
+      <AuthHeading title={t("login.title")} lead={t("login.lead")} />
+      <form
+        noValidate
+        className="space-y-5"
+        onSubmit={handleSubmit(async () => {
+          await wait(700)
+          toast(t("login.done"))
+          router.push("/dashboard")
+        })}
+      >
+        <Field label={t("email")} type="email" autoComplete="email" inputMode="email" error={formState.errors.email?.message} {...register("email")} />
+        <div>
+          <PasswordField label={t("password")} autoComplete="current-password" error={formState.errors.password?.message} {...register("password")} />
+          <div className="mt-2 text-right">
+            <Link href="/forgot-password" className="text-meta font-medium text-forest underline-offset-4 hover:underline">{t("login.forgot")}</Link>
+          </div>
+        </div>
+        <SubmitButton pending={formState.isSubmitting}>{t("login.submit")}</SubmitButton>
+      </form>
+      <p className="mt-8 text-center text-caption text-ink-soft">
+        {t("login.noAccount")}{" "}
+        <Link href="/register" className="font-medium text-forest underline decoration-forest/30 underline-offset-4 hover:decoration-forest">{t("login.create")}</Link>
+      </p>
+    </>
+  )
+}
+
+/* ------------------------------------------------------------------ */
+
+function strength(pw: string) {
+  let s = 0
+  if (pw.length >= 8) s++
+  if (pw.length >= 12) s++
+  if (/[A-ZА-ЯЁ]/.test(pw) && /[a-zа-яё]/.test(pw)) s++
+  if (/\d/.test(pw) && /[^\p{L}\d]/u.test(pw)) s++
+  return Math.min(4, s)
+}
+
+function StrengthMeter({ value }: { value: string }) {
+  const t = useTranslations("auth.strength")
+  const score = strength(value)
+  const levels = ["weak", "weak", "fair", "good", "strong"] as const
+  const tone = ["bg-destructive", "bg-destructive", "bg-ochre", "bg-forest", "bg-forest"][score]
+  if (!value) return null
+  return (
+    <div className="mt-2.5" aria-live="polite">
+      <div className="grid grid-cols-4 gap-1.5" aria-hidden="true">
+        {[1, 2, 3, 4].map((i) => (
+          <span key={i} className="h-1 overflow-hidden rounded-full bg-sage">
+            <span
+              className={cn("block h-full rounded-full transition-[width,background-color] duration-400 ease-[var(--ease-qadr)]", tone)}
+              style={{ width: i <= Math.max(score, 1) ? "100%" : "0%" }}
+            />
+          </span>
+        ))}
+      </div>
+      <p className="mt-1.5 text-meta text-ink-soft">{t("label", { level: t(levels[score]) })}</p>
+    </div>
+  )
+}
+
+export function RegisterForm() {
+  const t = useTranslations("auth")
+  const router = useRouter()
+  const { v, email, password } = useSchemas()
+  const schema = z.object({ name: z.string().check(z.trim(), z.minLength(2, v("nameMin"))), email, password })
+  const { register, handleSubmit, formState, control } = useForm<z.infer<typeof schema>>({ resolver: zodResolver(schema) })
+  const pw = useWatch({ control, name: "password" })
+
+  return (
+    <>
+      <AuthHeading title={t("register.title")} lead={t("register.lead")} />
+      <form
+        noValidate
+        className="space-y-5"
+        onSubmit={handleSubmit(async (data) => {
+          await wait(800)
+          toast(t("register.done"))
+          router.push({ pathname: "/verify", query: { email: data.email } })
+        })}
+      >
+        <Field label={t("register.name")} autoComplete="name" error={formState.errors.name?.message} {...register("name")} />
+        <Field label={t("email")} type="email" autoComplete="email" inputMode="email" error={formState.errors.email?.message} {...register("email")} />
+        <div>
+          <PasswordField label={t("password")} autoComplete="new-password" hint={t("register.passwordHint")} error={formState.errors.password?.message} {...register("password")} />
+          <StrengthMeter value={pw ?? ""} />
+        </div>
+        <p className="text-meta text-ink-soft">{t("register.agree")}</p>
+        <SubmitButton pending={formState.isSubmitting}>{t("register.submit")}</SubmitButton>
+      </form>
+      <p className="mt-8 text-center text-caption text-ink-soft">
+        {t("register.haveAccount")}{" "}
+        <Link href="/login" className="font-medium text-forest underline decoration-forest/30 underline-offset-4 hover:decoration-forest">{t("login.submit")}</Link>
+      </p>
+    </>
+  )
+}
+
+/* ------------------------------------------------------------------ */
+
+export function ForgotForm() {
+  const t = useTranslations("auth")
+  const router = useRouter()
+  const { email } = useSchemas()
+  const schema = z.object({ email })
+  const { register, handleSubmit, formState } = useForm<z.infer<typeof schema>>({ resolver: zodResolver(schema) })
+  return (
+    <>
+      <AuthHeading title={t("forgot.title")} lead={t("forgot.lead")} />
+      <form
+        noValidate
+        className="space-y-5"
+        onSubmit={handleSubmit(async () => {
+          await wait(700)
+          toast(t("forgot.done"))
+          router.push("/reset-password")
+        })}
+      >
+        <Field label={t("email")} type="email" autoComplete="email" inputMode="email" error={formState.errors.email?.message} {...register("email")} />
+        <SubmitButton pending={formState.isSubmitting}>{t("forgot.submit")}</SubmitButton>
+      </form>
+      <p className="mt-8 text-center text-caption">
+        <Link href="/login" className="font-medium text-forest underline decoration-forest/30 underline-offset-4 hover:decoration-forest">{t("forgot.back")}</Link>
+      </p>
+    </>
+  )
+}
+
+export function ResetForm() {
+  const t = useTranslations("auth")
+  const router = useRouter()
+  const { v, password } = useSchemas()
+  const schema = z
+    .object({ code: z.string().check(z.regex(/^\d{6}$/, v("code"))), password, confirm: z.string() })
+    .check(z.refine((d) => d.password === d.confirm, { path: ["confirm"], message: v("passwordMatch") }))
+  const { register, handleSubmit, formState } = useForm<z.infer<typeof schema>>({ resolver: zodResolver(schema) })
+  return (
+    <>
+      <AuthHeading title={t("reset.title")} lead={t("reset.lead")} />
+      <form
+        noValidate
+        className="space-y-5"
+        onSubmit={handleSubmit(async () => {
+          await wait(700)
+          toast(t("reset.done"))
+          router.push("/login")
+        })}
+      >
+        <Field label={t("reset.code")} inputMode="numeric" autoComplete="one-time-code" maxLength={6} error={formState.errors.code?.message} {...register("code")} className="[&_input]:font-display [&_input]:text-[1.25rem] [&_input]:tracking-[0.4em]" />
+        <PasswordField label={t("reset.newPassword")} autoComplete="new-password" error={formState.errors.password?.message} {...register("password")} />
+        <PasswordField label={t("reset.confirm")} autoComplete="new-password" error={formState.errors.confirm?.message} {...register("confirm")} />
+        <SubmitButton pending={formState.isSubmitting}>{t("reset.submit")}</SubmitButton>
+      </form>
+    </>
+  )
+}

@@ -17,14 +17,14 @@ export function Logo({ variant = "mark", className, priority }: LogoProps) {
       <Image
         src={full}
         alt="Qadr"
-        priority={priority}
+        loading={priority ? "eager" : undefined}
         className={cn("h-auto w-28", className)}
       />
     )
   }
   return (
     <span className={cn("inline-flex items-center gap-2.5", className)}>
-      <Image src={mark} alt="" priority={priority} className="size-9 shrink-0" />
+      <Image src={mark} alt="" loading={priority ? "eager" : undefined} className="size-9 shrink-0" />
       <span className="font-display text-[1.625rem] leading-none font-medium tracking-[-0.01em] text-forest">
         Qadr
       </span>

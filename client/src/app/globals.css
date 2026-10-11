@@ -252,3 +252,189 @@ html.lenis body {
 @utility animate-unveil {
   animation: qadr-unveil 1400ms var(--ease-qadr) both;
 }
+
+/* Word reveal (RevealText). Hidden state applies only when JS runs and motion is allowed. */
+.reveal-word {
+  display: inline-block;
+  overflow: clip;
+  overflow-clip-margin: 0.2em;
+  vertical-align: top;
+  padding-bottom: 0.14em;
+  margin-bottom: -0.14em;
+}
+.reveal-inner {
+  display: inline-block;
+  transition:
+    transform 1000ms var(--ease-qadr),
+    opacity 700ms var(--ease-qadr);
+  transition-delay: calc(var(--reveal-delay, 0ms) + var(--i, 0) * 55ms);
+}
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  .reveal-text:not([data-inview]) .reveal-inner {
+    transform: translateY(108%);
+    opacity: 0;
+  }
+}
+
+/* Skeleton shimmer */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+}
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    100deg,
+    transparent 20%,
+    color-mix(in oklab, var(--qadr-white) 65%, transparent) 50%,
+    transparent 80%
+  );
+  animation: qadr-shimmer 1.6s var(--ease-qadr) infinite;
+}
+@keyframes qadr-shimmer {
+  to {
+    transform: translateX(100%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .skeleton::after {
+    display: none;
+  }
+}
+
+/* Scroll reveal (Reveal / RevealItem): CSS only, hidden state needs JS + motion allowed */
+.reveal,
+.reveal-item {
+  transition:
+    opacity 700ms var(--ease-qadr),
+    transform 900ms var(--ease-qadr);
+}
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  .reveal:not([data-stagger]):not([data-inview]),
+  .reveal[data-stagger]:not([data-inview]) > .reveal-item {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+}
+.reveal[data-stagger] > .reveal-item:nth-child(2) { transition-delay: 70ms; }
+.reveal[data-stagger] > .reveal-item:nth-child(3) { transition-delay: 140ms; }
+.reveal[data-stagger] > .reveal-item:nth-child(4) { transition-delay: 210ms; }
+.reveal[data-stagger] > .reveal-item:nth-child(5) { transition-delay: 280ms; }
+.reveal[data-stagger] > .reveal-item:nth-child(6) { transition-delay: 350ms; }
+.reveal[data-stagger] > .reveal-item:nth-child(n + 7) { transition-delay: 420ms; }
+
+/* Load-time word reveal: pure CSS, so LCP never waits for hydration */
+@media (prefers-reduced-motion: no-preference) {
+  .reveal-text[data-trigger="load"] .reveal-inner {
+    animation: qadr-word 1000ms var(--ease-qadr) both;
+    animation-delay: calc(var(--reveal-delay, 0ms) + var(--i, 0) * 55ms);
+  }
+}
+@keyframes qadr-word {
+  from {
+    transform: translateY(108%);
+    opacity: 0;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* CSS micro-interactions (no JS animation library on the critical path) */
+/* ------------------------------------------------------------------ */
+@keyframes qadr-pop {
+  0% { transform: scale(0.4); }
+  55% { transform: scale(1.25); }
+  100% { transform: scale(1); }
+}
+@keyframes qadr-burst {
+  from { transform: translate(-50%, -50%) rotate(var(--a)) translateY(0) scale(1); opacity: 1; }
+  to { transform: translate(-50%, -50%) rotate(var(--a)) translateY(-22px) scale(0.4); opacity: 0; }
+}
+@keyframes qadr-in-up {
+  from { opacity: 0; transform: translateY(14px) scale(0.97); }
+}
+@keyframes qadr-shake {
+  20% { transform: translateX(-9px); }
+  40% { transform: translateX(8px); }
+  60% { transform: translateX(-5px); }
+  80% { transform: translateX(4px); }
+}
+@keyframes qadr-out-right {
+  to { opacity: 0; transform: translateX(40px); }
+}
+@keyframes qadr-grow-x {
+  from { transform: scaleX(0); }
+}
+@utility animate-pop { animation: qadr-pop 480ms var(--ease-qadr) both; }
+@utility animate-in-up { animation: qadr-in-up 520ms var(--ease-qadr) both; }
+@utility animate-shake { animation: qadr-shake 420ms ease-in-out; }
+@utility animate-out-right { animation: qadr-out-right 340ms var(--ease-qadr) forwards; }
+@utility animate-grow-x { animation: qadr-grow-x 1100ms var(--ease-qadr) both; transform-origin: left; }
+.burst-dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  animation: qadr-burst 560ms var(--ease-qadr) forwards;
+}
+
+/* Hero parallax: CSS scroll-driven animation where supported, static elsewhere */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .parallax-layer {
+      animation: qadr-parallax linear both;
+      animation-timeline: view();
+      animation-range: cover 50% cover 100%;
+    }
+  }
+}
+@keyframes qadr-parallax {
+  from { transform: translateY(0); }
+  to { transform: translateY(var(--parallax-distance, 40px)); }
+}
+
+/* Tilt + glare (Tilt), magnetic pull (Magnetic), follower ring (Cursor) */
+.tilt {
+  transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transform-style: preserve-3d;
+  transition: transform 500ms var(--ease-qadr);
+}
+.tilt[data-tilting] {
+  transition-duration: 120ms;
+}
+.tilt-glare {
+  background: radial-gradient(420px circle at var(--gx, 50%) var(--gy, 50%), color-mix(in oklab, var(--qadr-white) 55%, transparent), transparent 55%);
+  opacity: 0;
+  transition: opacity 400ms var(--ease-qadr);
+}
+.tilt[data-tilting] .tilt-glare {
+  opacity: 1;
+}
+.magnetic {
+  transition: translate 450ms cubic-bezier(0.3, 1.6, 0.4, 1);
+}
+.cursor-ring {
+  width: var(--size, 0px);
+  height: var(--size, 0px);
+  background: color-mix(in oklab, var(--qadr-forest) 4%, transparent);
+  transition:
+    width 300ms var(--ease-qadr),
+    height 300ms var(--ease-qadr),
+    background-color 300ms var(--ease-qadr),
+    opacity 300ms;
+}
+.cursor-ring[data-mode="magnetic"] {
+  background: color-mix(in oklab, var(--qadr-forest) 10%, transparent);
+}
+.cursor-ring[data-mode="hidden"] {
+  opacity: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tilt { transform: none !important; }
+  .tilt-glare { display: none; }
+  .magnetic { translate: none !important; }
+}

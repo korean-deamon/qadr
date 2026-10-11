@@ -21,7 +21,7 @@ for (const vp of viewports) {
   for (const route of routes) {
     await page.goto(base + route, { waitUntil: "networkidle" })
     await page.evaluate(() => document.fonts.ready)
-    await page.waitForTimeout(1600)
+    await page.waitForTimeout(Number(process.env.SETTLE_MS ?? 1600))
     const name = route.replace(/\//g, "_").replace(/^_/, "") || "root"
     await page.screenshot({ path: `${out}/${name}-${vp.name}-fold.png` })
     // Walk the page so scroll-reveal content is in its final state.
@@ -35,6 +35,19 @@ for (const vp of viewports) {
     await page.waitForTimeout(1200)
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)
     if (overflow > 0) problems.push(`[${vp.name}] ${route}: horizontal overflow ${overflow}px`)
+    // Clipped overflow: visible text that ends past the right edge of the viewport
+    const clipped = await page.evaluate(() => {
+      const out = []
+      for (const el of document.querySelectorAll("main p, main h1, main h2, main h3, main a, main button, main span")) {
+        const r = el.getBoundingClientRect()
+        if (!el.childElementCount && el.textContent.trim() && r.width && r.right > innerWidth + 2 && getComputedStyle(el).visibility !== "hidden") {
+          const scroller = el.closest("[data-lenis-prevent-horizontal], ul.overflow-x-auto, .overflow-x-auto")
+          if (!scroller) out.push(el.textContent.trim().slice(0, 40))
+        }
+      }
+      return out.slice(0, 5)
+    })
+    if (clipped.length) problems.push(`[${vp.name}] ${route}: content past right edge: ${clipped.join(" | ")}`)
     await page.evaluate(() => window.scrollTo(0, 0))
     await page.waitForTimeout(800)
     await page.screenshot({ path: `${out}/${name}-${vp.name}-full.png`, fullPage: true })

@@ -11,7 +11,68 @@
       "ru": "Русский",
       "en": "English"
     },
-    "localeSwitcher": "Tilni oʻzgartirish"
+    "localeSwitcher": "Tilni oʻzgartirish",
+    "back": "Orqaga",
+    "close": "Yopish",
+    "seeAll": "Hammasi",
+    "cancel": "Bekor qilish",
+    "breadcrumb": "Navigatsiya yoʻli",
+    "calendar": {
+      "month": {
+        "0": "yanvar",
+        "1": "fevral",
+        "2": "mart",
+        "3": "aprel",
+        "4": "may",
+        "5": "iyun",
+        "6": "iyul",
+        "7": "avgust",
+        "8": "sentabr",
+        "9": "oktabr",
+        "10": "noyabr",
+        "11": "dekabr"
+      },
+      "monthShort": {
+        "0": "yan",
+        "1": "fev",
+        "2": "mar",
+        "3": "apr",
+        "4": "may",
+        "5": "iyn",
+        "6": "iyl",
+        "7": "avg",
+        "8": "sen",
+        "9": "okt",
+        "10": "noy",
+        "11": "dek"
+      },
+      "monthOf": {
+        "0": "yanvar",
+        "1": "fevral",
+        "2": "mart",
+        "3": "aprel",
+        "4": "may",
+        "5": "iyun",
+        "6": "iyul",
+        "7": "avgust",
+        "8": "sentabr",
+        "9": "oktabr",
+        "10": "noyabr",
+        "11": "dekabr"
+      },
+      "weekday": {
+        "0": "D",
+        "1": "S",
+        "2": "C",
+        "3": "P",
+        "4": "J",
+        "5": "S",
+        "6": "Y"
+      },
+      "monthYear": "{year}-yil, {month}",
+      "dayMonth": "{day}-{month}",
+      "range": "{start} – {end}"
+    }
   },
   "metadata": {
     "title": "Qadr — mahallangizda buyumlarni olib turing va ulashing",
@@ -31,7 +92,9 @@
     "mainNav": "Asosiy menyu",
     "mobileNav": "Ilova menyusi",
     "unread": "{count} ta oʻqilmagan",
-    "footerNav": "Pastki menyu"
+    "footerNav": "Pastki menyu",
+    "dashboard": "Boshqaruv paneli",
+    "notifications": "Bildirishnomalar"
   },
   "home": {
     "hero": {
@@ -88,6 +151,23 @@
       "return": {
         "title": "Olib keting va qaytaring",
         "body": "Soʻrov tasdiqlangach, bir-biringizning telefon raqamingizni koʻrasiz. Oʻz vaqtida qaytaring va bir-biringizni baholang."
+      },
+      "demo": {
+        "query": "Matkap",
+        "results": {
+          "r0": "Bosch akkumulyatorli matkap",
+          "r1": "Zarbli matkap, 18 V",
+          "r2": "Parmalar toʻplami"
+        },
+        "dates": "12–14 okt",
+        "terms": "Egasining shartlariga roziman",
+        "send": "Soʻrov yuborish",
+        "sent": "Soʻrov yuborildi",
+        "approved": "Tasdiqlandi",
+        "phoneLabel": "Egasining telefoni",
+        "returned": "Oʻz vaqtida qaytarildi",
+        "rate": "Dilnozani baholang",
+        "progress": "{total} qadamdan {current}-qadam"
       }
     },
     "trust": {
@@ -109,7 +189,40 @@
       "secondary": "Avval koʻrib chiqish"
     }
   },
-  "explore": {},
+  "explore": {
+    "title": "Yaqindan toping",
+    "lead": "Toshkent boʻylab qoʻshnilar ulashayotgan {count} ta buyum",
+    "all": "Hammasi",
+    "filters": "Filtrlar",
+    "sort": {
+      "label": "Saralash",
+      "nearest": "Eng yaqin",
+      "newest": "Eng yangi",
+      "rating": "Reytingi yuqori"
+    },
+    "distance": "Masofa",
+    "within": "{km} km gacha",
+    "condition": "Holati",
+    "duration": "Kamida necha kunga",
+    "days": "{days} kun",
+    "availableNow": "Shu hafta boʻsh",
+    "apply": "Natijalarni koʻrsatish",
+    "reset": "Tozalash",
+    "showing": "{total} tadan {shown} tasi koʻrsatilmoqda",
+    "more": "Yana koʻrsatish",
+    "resultsFor": "“{q}” boʻyicha natijalar",
+    "empty": {
+      "title": "“{q}” boʻyicha hozircha hech narsa yoʻq",
+      "body": "Umumiyroq soʻz yoki boshqa hududni sinab koʻring yoxud filtrlarni tozalang.",
+      "action": "Filtrlarni tozalash"
+    },
+    "spotlight": {
+      "title": "Sayohat mavsumi",
+      "body": "10 km ichida chodirlar, oʻchoqlar va uxlash qoplari. Zomin sizni kutmoqda.",
+      "cta": "Sayohat jihozlari"
+    },
+    "results": "Natijalar"
+  },
   "listings": {
     "upToDays": "{days} kungacha",
     "lentBy": "Egasi: {name}",
@@ -120,14 +233,206 @@
       "new": "Yangi",
       "good": "Yaxshi",
       "used": "Ishlatilgan"
+    },
+    "savedToast": "Roʻyxatingizga saqlandi",
+    "undo": "Bekor qilish",
+    "item": {
+      "about": "Buyum haqida",
+      "terms": "Egasining shartlari",
+      "noTerms": "Maxsus shartlar yoʻq. Qanday olgan boʻlsangiz, shunday qaytaring.",
+      "location": "Olib ketish hududi",
+      "locationNote": "Aniq manzil egasi soʻrovingizni tasdiqlagach ulashiladi.",
+      "owner": "Egasi",
+      "verified": "Email tasdiqlangan",
+      "completed": "{count} marta muvaffaqiyatli ulashgan",
+      "reviews": "{count} ta baho",
+      "memberSince": "{date} dan beri aʼzo",
+      "responds": "Odatda {hours} soat ichida javob beradi",
+      "listed": "{ago} qoʻshilgan",
+      "similar": "Yaqinda yana",
+      "photo": "{total} ta rasmdan {n}-si",
+      "gallery": "Rasmlar",
+      "completedLabel": "marta ulashgan"
+    },
+    "request": {
+      "title": "Olib turish",
+      "free": "Bepul",
+      "pickDates": "Sanalarni tanlang",
+      "booked": "Band",
+      "available": "Boʻsh",
+      "nights": "{days} kun",
+      "maxNote": "Bir martada {days} kungacha",
+      "tooLong": "Bu egasi {days} kungacha beradi.",
+      "messageLabel": "Egasiga xabar",
+      "messagePlaceholder": "Salom bering va nima uchun kerakligini yozing",
+      "acceptTerms": "Egasining shartlariga roziman",
+      "submit": "Soʻrov yuborish",
+      "sentTitle": "Soʻrov yuborildi",
+      "sentBody": "{name} odatda bir necha soat ichida javob beradi.",
+      "messageOwner": "Egasiga yozish",
+      "prevMonth": "Oldingi oy",
+      "nextMonth": "Keyingi oy",
+      "selectStart": "Birinchi kunni tanlang",
+      "selectEnd": "Endi oxirgi kunni tanlang",
+      "jump": "Sanalarni tanlash"
     }
   },
-  "borrowing": {},
-  "messages": {},
-  "dashboard": {},
-  "auth": {},
-  "notifications": {},
-  "validation": {},
+  "borrowing": {
+    "status": {
+      "pending": "Tasdiq kutilmoqda",
+      "approved": "Tasdiqlandi",
+      "rejected": "Rad etildi",
+      "cancelled": "Bekor qilindi",
+      "expired": "Muddati oʻtdi",
+      "active": "Foydalanishda",
+      "returned": "Qaytarildi",
+      "dueToday": "Bugun qaytariladi",
+      "dueTomorrow": "Ertaga qaytariladi",
+      "overdue": "Muddati oʻtgan"
+    },
+    "approve": "Tasdiqlash",
+    "decline": "Rad etish",
+    "approvedToast": "Soʻrov tasdiqlandi. Endi {name} telefon raqamingizni koʻradi.",
+    "declinedToast": "Soʻrov rad etildi",
+    "markReturned": "Qaytarildi deb belgilash",
+    "returnedToast": "Qaytarildi deb belgilandi. {name}ni baholashni unutmang.",
+    "call": "Qoʻngʻiroq",
+    "until": "{date} gacha",
+    "owner": "Egasi: {name}",
+    "borrower": "Oluvchi: {name}",
+    "pickup": "{when} olib ketasiz",
+    "dueIn": "{when} qaytariladi",
+    "day": "{total} kundan {day}-kun"
+  },
+  "messages": {
+    "title": "Xabarlar",
+    "search": "Suhbatlarni qidirish",
+    "empty": "Suhbatni tanlang",
+    "emptyBody": "Soʻrovlar va olib ketish haqidagi xabarlar shu yerda.",
+    "placeholder": "Xabar yozing",
+    "send": "Yuborish",
+    "you": "Siz:",
+    "back": "Barcha suhbatlar",
+    "viewItem": "Buyumni koʻrish",
+    "events": {
+      "requested": "Olib turish soʻrovi yuborildi",
+      "approved": "Soʻrov tasdiqlandi: telefon raqamlari endi koʻrinadi",
+      "pickedUp": "Buyum olib ketildi"
+    },
+    "today": "Bugun",
+    "yesterday": "Kecha"
+  },
+  "dashboard": {
+    "greeting": "Xayrli tong, {name}",
+    "lead": "Bugun buyumlaringiz bilan nimalar boʻlayotgani.",
+    "nav": {
+      "overview": "Umumiy",
+      "myItems": "Buyumlarim",
+      "requests": "Soʻrovlar",
+      "borrowings": "Olganlarim",
+      "saved": "Saqlanganlar",
+      "settings": "Sozlamalar",
+      "label": "Panel boʻlimlari"
+    },
+    "stats": {
+      "active": "Hozir foydalanishda",
+      "pending": "Javobingizni kutmoqda",
+      "completed": "Yakunlangan",
+      "rating": "Reytingingiz"
+    },
+    "sections": {
+      "incoming": "Javobingizni kutayotganlar",
+      "lending": "Hozir boshqalarda",
+      "borrowing": "Siz olganlar",
+      "items": "Buyumlaringiz",
+      "activity": "Soʻnggi voqealar"
+    },
+    "itemStatus": {
+      "available": "Boʻsh",
+      "onLoan": "Foydalanishda"
+    },
+    "emptyIncoming": "Yangi soʻrovlar yoʻq. Kelsa, xabar beramiz."
+  },
+  "auth": {
+    "email": "Email",
+    "password": "Parol",
+    "showPassword": "Parolni koʻrsatish",
+    "hidePassword": "Parolni yashirish",
+    "login": {
+      "title": "Qaytganingizdan xursandmiz",
+      "lead": "Soʻrovlar va xabarlarni boshqarish uchun kiring.",
+      "forgot": "Parolni unutdingizmi?",
+      "submit": "Kirish",
+      "noAccount": "Qadrda yangimisiz?",
+      "create": "Hisob yaratish",
+      "done": "Tizimga kirdingiz. Xush kelibsiz!"
+    },
+    "register": {
+      "title": "Qoʻshnilaringizga qoʻshiling",
+      "lead": "Keragini oling, kam ishlatadiganingizni ulashing. Bepul.",
+      "name": "Ismingiz",
+      "passwordHint": "Kamida 8 ta belgi",
+      "agree": "Hisob yaratish orqali jamiyat qoidalariga rozilik bildirasiz.",
+      "submit": "Hisob yaratish",
+      "haveAccount": "Hisobingiz bormi?",
+      "done": "Hisob yaratildi. Emailingizdagi kodni kiriting."
+    },
+    "strength": {
+      "label": "Parol mustahkamligi: {level}",
+      "weak": "Zaif",
+      "fair": "Oʻrtacha",
+      "good": "Yaxshi",
+      "strong": "Kuchli"
+    },
+    "verify": {
+      "title": "Emailingizni tekshiring",
+      "lead": "{email} manziliga 6 xonali kod yubordik. Kod 10 daqiqa amal qiladi.",
+      "codeLabel": "Tasdiqlash kodi",
+      "digit": "{n}-raqam",
+      "submit": "Tasdiqlash",
+      "resendIn": "Kodni {seconds} soniyadan keyin qayta yuborish mumkin",
+      "resend": "Kodni qayta yuborish",
+      "wrong": "Kod notoʻgʻri. Qayta urinib koʻring.",
+      "resent": "Yangi kod yuborildi",
+      "done": "Email tasdiqlandi. Qadrga xush kelibsiz!",
+      "hint": "Maslahat: bu namunada 000000 dan boshqa istalgan kod ishlaydi."
+    },
+    "forgot": {
+      "title": "Parolni tiklash",
+      "lead": "Emailingizni kiriting, sizga kod yuboramiz.",
+      "submit": "Kod yuborish",
+      "back": "Kirishga qaytish",
+      "done": "Kod yuborildi. Emailingizni tekshiring."
+    },
+    "reset": {
+      "title": "Yangi parol oʻylab toping",
+      "lead": "Emaildagi kodni va yangi parolni kiriting.",
+      "code": "Emaildagi kod",
+      "newPassword": "Yangi parol",
+      "confirm": "Parolni takrorlang",
+      "submit": "Parolni saqlash",
+      "done": "Parol oʻzgartirildi. Endi kirishingiz mumkin."
+    }
+  },
+  "notifications": {
+    "title": "Bildirishnomalar",
+    "markAllRead": "Hammasini oʻqilgan deb belgilash",
+    "requestReceived": "{name} “{item}” uchun soʻrov yubordi",
+    "requestApproved": "{name} “{item}” boʻyicha soʻrovingizni tasdiqladi",
+    "returnDue": "{name} “{item}”ni ertaga qaytaradi",
+    "newMessage": "{name}dan yangi xabar",
+    "ratingReceived": "{name} sizga 5 yulduz qoʻydi"
+  },
+  "validation": {
+    "required": "Bu maydonni toʻldiring",
+    "email": "Toʻgʻri email kiriting, masalan: ism@mail.uz",
+    "passwordMin": "Kamida 8 ta belgi ishlating",
+    "passwordMatch": "Parollar mos kelmadi",
+    "nameMin": "Kamida 2 ta harf kiriting",
+    "code": "6 ta raqamning hammasini kiriting",
+    "terms": "Davom etish uchun shartlarga rozi boʻling",
+    "dates": "Boshlanish va tugash sanasini tanlang"
+  },
   "errors": {
     "notFoundTitle": "Bu sahifani kimdir olib ketib, qaytarmadi.",
     "notFoundBody": "Havola eskirgan yoki sahifa koʻchirilgan boʻlishi mumkin.",

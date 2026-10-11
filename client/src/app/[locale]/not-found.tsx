@@ -5,7 +5,7 @@ import { Link } from "@/i18n/navigation"
 export default function NotFound() {
   const t = useTranslations("errors")
   return (
-    <section className="relative isolate overflow-hidden">
+    <main id="main" className="relative isolate overflow-hidden pt-[var(--header-height)] pb-bottom-nav md:pb-0">
       <GirihPattern className="absolute inset-0 -z-10 h-full w-full text-forest opacity-[0.07]" />
       <div className="container-qadr py-28 lg:py-40">
         <h1 className="max-w-[18ch] text-title text-forest">{t("notFoundTitle")}</h1>
@@ -14,6 +14,6 @@ export default function NotFound() {
           {t("backHome")}
         </Link>
       </div>
-    </section>
+    </main>
   )
 }

@@ -11,7 +11,68 @@
       "ru": "Русский",
       "en": "English"
     },
-    "localeSwitcher": "Change language"
+    "localeSwitcher": "Change language",
+    "back": "Back",
+    "close": "Close",
+    "seeAll": "See all",
+    "cancel": "Cancel",
+    "breadcrumb": "Breadcrumb",
+    "calendar": {
+      "month": {
+        "0": "January",
+        "1": "February",
+        "2": "March",
+        "3": "April",
+        "4": "May",
+        "5": "June",
+        "6": "July",
+        "7": "August",
+        "8": "September",
+        "9": "October",
+        "10": "November",
+        "11": "December"
+      },
+      "monthShort": {
+        "0": "Jan",
+        "1": "Feb",
+        "2": "Mar",
+        "3": "Apr",
+        "4": "May",
+        "5": "Jun",
+        "6": "Jul",
+        "7": "Aug",
+        "8": "Sep",
+        "9": "Oct",
+        "10": "Nov",
+        "11": "Dec"
+      },
+      "monthOf": {
+        "0": "January",
+        "1": "February",
+        "2": "March",
+        "3": "April",
+        "4": "May",
+        "5": "June",
+        "6": "July",
+        "7": "August",
+        "8": "September",
+        "9": "October",
+        "10": "November",
+        "11": "December"
+      },
+      "weekday": {
+        "0": "M",
+        "1": "T",
+        "2": "W",
+        "3": "T",
+        "4": "F",
+        "5": "S",
+        "6": "S"
+      },
+      "monthYear": "{month} {year}",
+      "dayMonth": "{month} {day}",
+      "range": "{start} – {end}"
+    }
   },
   "metadata": {
     "title": "Qadr — borrow and lend things in your neighbourhood",
@@ -31,7 +92,9 @@
     "mainNav": "Main navigation",
     "mobileNav": "App navigation",
     "unread": "{count, plural, one {# unread} other {# unread}}",
-    "footerNav": "Footer navigation"
+    "footerNav": "Footer navigation",
+    "dashboard": "Dashboard",
+    "notifications": "Notifications"
   },
   "home": {
     "hero": {
@@ -88,6 +151,23 @@
       "return": {
         "title": "Pick up and return",
         "body": "Once approved, you both see each other's phone number. Return on time, then rate each other."
+      },
+      "demo": {
+        "query": "Drill",
+        "results": {
+          "r0": "Bosch cordless drill",
+          "r1": "Impact drill, 18 V",
+          "r2": "Drill bit set"
+        },
+        "dates": "12–14 Oct",
+        "terms": "I accept the owner's terms",
+        "send": "Send request",
+        "sent": "Request sent",
+        "approved": "Approved",
+        "phoneLabel": "Owner's phone",
+        "returned": "Returned on time",
+        "rate": "Rate Dilnoza",
+        "progress": "Step {current} of {total}"
       }
     },
     "trust": {
@@ -109,7 +189,40 @@
       "secondary": "Browse first"
     }
   },
-  "explore": {},
+  "explore": {
+    "title": "Find it nearby",
+    "lead": "{count, plural, one {# thing} other {# things}} lent by neighbours across Tashkent",
+    "all": "All",
+    "filters": "Filters",
+    "sort": {
+      "label": "Sort by",
+      "nearest": "Nearest",
+      "newest": "Newest",
+      "rating": "Top rated"
+    },
+    "distance": "Distance",
+    "within": "Within {km} km",
+    "condition": "Condition",
+    "duration": "Borrow for at least",
+    "days": "{days, plural, one {# day} other {# days}}",
+    "availableNow": "Available this week",
+    "apply": "Show results",
+    "reset": "Clear all",
+    "showing": "Showing {shown} of {total}",
+    "more": "Show more",
+    "resultsFor": "Results for “{q}”",
+    "empty": {
+      "title": "Nothing matches “{q}” yet",
+      "body": "Try a broader word, another area, or clear the filters.",
+      "action": "Clear filters"
+    },
+    "spotlight": {
+      "title": "Camping season",
+      "body": "Tents, stoves and sleeping bags within 10 km. Zaamin is waiting.",
+      "cta": "See camping gear"
+    },
+    "results": "Results"
+  },
   "listings": {
     "upToDays": "{days, plural, one {Up to # day} other {Up to # days}}",
     "lentBy": "Lent by {name}",
@@ -120,14 +233,206 @@
       "new": "New",
       "good": "Good",
       "used": "Used"
+    },
+    "savedToast": "Saved to your list",
+    "undo": "Undo",
+    "item": {
+      "about": "About this item",
+      "terms": "Owner's terms",
+      "noTerms": "No special terms. Return it as you got it.",
+      "location": "Pickup area",
+      "locationNote": "The exact pickup point is shared after the owner approves your request.",
+      "owner": "Lent by",
+      "verified": "Email verified",
+      "completed": "{count, plural, one {# completed loan} other {# completed loans}}",
+      "reviews": "{count, plural, one {# review} other {# reviews}}",
+      "memberSince": "Member since {date}",
+      "responds": "Usually replies within {hours, plural, one {an hour} other {# hours}}",
+      "listed": "Listed {ago}",
+      "similar": "More nearby",
+      "photo": "Photo {n} of {total}",
+      "gallery": "Photos",
+      "completedLabel": "completed loans"
+    },
+    "request": {
+      "title": "Borrow this",
+      "free": "Free",
+      "pickDates": "Choose dates",
+      "booked": "Booked",
+      "available": "Available",
+      "nights": "{days, plural, one {# day} other {# days}}",
+      "maxNote": "Up to {days, plural, one {# day} other {# days}} at a time",
+      "tooLong": "This owner lends for up to {days, plural, one {# day} other {# days}}.",
+      "messageLabel": "Message to the owner",
+      "messagePlaceholder": "Say hello and what you need it for",
+      "acceptTerms": "I accept the owner's terms",
+      "submit": "Send request",
+      "sentTitle": "Request sent",
+      "sentBody": "{name} usually replies within a few hours.",
+      "messageOwner": "Message the owner",
+      "prevMonth": "Previous month",
+      "nextMonth": "Next month",
+      "selectStart": "Pick the first day",
+      "selectEnd": "Now pick the last day",
+      "jump": "Choose dates"
     }
   },
-  "borrowing": {},
-  "messages": {},
-  "dashboard": {},
-  "auth": {},
-  "notifications": {},
-  "validation": {},
+  "borrowing": {
+    "status": {
+      "pending": "Waiting for approval",
+      "approved": "Approved",
+      "rejected": "Declined",
+      "cancelled": "Cancelled",
+      "expired": "Expired",
+      "active": "On loan",
+      "returned": "Returned",
+      "dueToday": "Due back today",
+      "dueTomorrow": "Due back tomorrow",
+      "overdue": "Overdue"
+    },
+    "approve": "Approve",
+    "decline": "Decline",
+    "approvedToast": "Request approved. {name} can now see your phone number.",
+    "declinedToast": "Request declined",
+    "markReturned": "Mark as returned",
+    "returnedToast": "Marked as returned. Don't forget to rate {name}.",
+    "call": "Call",
+    "until": "until {date}",
+    "owner": "Owner: {name}",
+    "borrower": "Borrower: {name}",
+    "pickup": "Pick up {when}",
+    "dueIn": "Due back {when}",
+    "day": "Day {day} of {total}"
+  },
+  "messages": {
+    "title": "Messages",
+    "search": "Search conversations",
+    "empty": "Pick a conversation",
+    "emptyBody": "Messages about requests and pickups appear here.",
+    "placeholder": "Write a message",
+    "send": "Send",
+    "you": "You:",
+    "back": "All conversations",
+    "viewItem": "View item",
+    "events": {
+      "requested": "Borrow request sent",
+      "approved": "Request approved: phone numbers are now visible",
+      "pickedUp": "Item picked up"
+    },
+    "today": "Today",
+    "yesterday": "Yesterday"
+  },
+  "dashboard": {
+    "greeting": "Good morning, {name}",
+    "lead": "Here is what's happening with your things today.",
+    "nav": {
+      "overview": "Overview",
+      "myItems": "My items",
+      "requests": "Requests",
+      "borrowings": "Borrowing",
+      "saved": "Saved",
+      "settings": "Settings",
+      "label": "Dashboard sections"
+    },
+    "stats": {
+      "active": "On loan now",
+      "pending": "Waiting for you",
+      "completed": "Completed loans",
+      "rating": "Your rating"
+    },
+    "sections": {
+      "incoming": "Waiting for your answer",
+      "lending": "Lent out right now",
+      "borrowing": "You're borrowing",
+      "items": "Your items",
+      "activity": "Recent activity"
+    },
+    "itemStatus": {
+      "available": "Available",
+      "onLoan": "On loan"
+    },
+    "emptyIncoming": "No new requests. We'll let you know."
+  },
+  "auth": {
+    "email": "Email",
+    "password": "Password",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "login": {
+      "title": "Welcome back",
+      "lead": "Log in to manage your requests and messages.",
+      "forgot": "Forgot password?",
+      "submit": "Log in",
+      "noAccount": "New to Qadr?",
+      "create": "Create an account",
+      "done": "Signed in. Good to see you!"
+    },
+    "register": {
+      "title": "Join your neighbours",
+      "lead": "Borrow what you need, lend what you rarely use. Free.",
+      "name": "Your name",
+      "passwordHint": "At least 8 characters",
+      "agree": "By creating an account you agree to the community rules.",
+      "submit": "Create account",
+      "haveAccount": "Already have an account?",
+      "done": "Account created. Enter the code from your email."
+    },
+    "strength": {
+      "label": "Password strength: {level}",
+      "weak": "Weak",
+      "fair": "Fair",
+      "good": "Good",
+      "strong": "Strong"
+    },
+    "verify": {
+      "title": "Check your email",
+      "lead": "We sent a 6-digit code to {email}. It expires in 10 minutes.",
+      "codeLabel": "Verification code",
+      "digit": "Digit {n}",
+      "submit": "Verify email",
+      "resendIn": "Resend code in {seconds}s",
+      "resend": "Resend code",
+      "wrong": "Incorrect code. Try again.",
+      "resent": "A new code is on its way",
+      "done": "Email verified. Welcome to Qadr!",
+      "hint": "Tip: in this preview, any code except 000000 works."
+    },
+    "forgot": {
+      "title": "Reset your password",
+      "lead": "Enter your email and we'll send you a code.",
+      "submit": "Send code",
+      "back": "Back to log in",
+      "done": "Code sent. Check your email."
+    },
+    "reset": {
+      "title": "Choose a new password",
+      "lead": "Enter the code from your email and a new password.",
+      "code": "Code from email",
+      "newPassword": "New password",
+      "confirm": "Repeat password",
+      "submit": "Save password",
+      "done": "Password changed. You can log in now."
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "markAllRead": "Mark all as read",
+    "requestReceived": "{name} wants to borrow {item}",
+    "requestApproved": "{name} approved your request for {item}",
+    "returnDue": "{name} returns {item} tomorrow",
+    "newMessage": "New message from {name}",
+    "ratingReceived": "{name} rated you 5 stars"
+  },
+  "validation": {
+    "required": "Fill in this field",
+    "email": "Enter a valid email, like name@mail.uz",
+    "passwordMin": "Use at least 8 characters",
+    "passwordMatch": "Passwords don't match",
+    "nameMin": "Enter at least 2 characters",
+    "code": "Enter all 6 digits",
+    "terms": "Accept the terms to continue",
+    "dates": "Choose start and end dates"
+  },
   "errors": {
     "notFoundTitle": "This page was borrowed and never returned.",
     "notFoundBody": "The link may be old, or the page has moved.",

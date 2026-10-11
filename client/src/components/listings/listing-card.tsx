@@ -1,6 +1,8 @@
 import { MapPin, Star } from "lucide-react"
 import Image, { type StaticImageData } from "next/image"
 import { useFormatter, useTranslations } from "next-intl"
+import { ViewTransition } from "react"
+import { Tilt } from "@/components/motion/tilt"
 import { Link } from "@/i18n/navigation"
 import { cn } from "@/lib/utils"
 import { SaveButton } from "./save-button"
@@ -21,30 +23,36 @@ type Props = {
   featured?: boolean
   className?: string
   sizes?: string
+  /** Above-the-fold cards: load eagerly with high priority (LCP) */
+  priority?: boolean
 }
 
-export function ListingCard({ listing, featured, className, sizes }: Props) {
+export function ListingCard({ listing, featured, className, sizes, priority }: Props) {
   const t = useTranslations("listings")
   const common = useTranslations("common")
   const format = useFormatter()
 
   return (
+    <Tilt className={className}>
     <article
       className={cn(
         "group relative flex h-full flex-col rounded-2xl border border-line bg-white p-2.5 transition-[box-shadow,border-color] duration-500 ease-[var(--ease-qadr)] hover:border-forest/25 hover:shadow-lift",
-        className,
       )}
     >
+      <ViewTransition name={`listing-photo-${listing.id}`} share="morph" default="none">
       <div className={cn("relative overflow-hidden rounded-xl bg-sage", featured ? "aspect-[4/3] md:aspect-auto md:flex-1" : "aspect-[4/3]")}>
         <Image
           src={listing.image}
           alt={listing.title}
           fill
+          loading={priority ? "eager" : undefined}
+          fetchPriority={priority ? "high" : undefined}
           sizes={sizes ?? "(min-width: 1024px) 22vw, (min-width: 768px) 45vw, 80vw"}
           className="object-cover transition-transform duration-[900ms] ease-[var(--ease-qadr)] group-hover:scale-[1.04]"
         />
-        <SaveButton className="absolute top-2.5 right-2.5 z-10" />
+        <SaveButton className="absolute top-2.5 right-2.5 z-30" title={listing.title} />
       </div>
+      </ViewTransition>
       <div className="flex flex-col gap-2 px-1.5 pt-3.5 pb-1.5">
         <div className="flex items-center gap-1.5 text-meta text-ink-soft">
           <MapPin className="size-3.5" aria-hidden="true" />
@@ -66,7 +74,7 @@ export function ListingCard({ listing, featured, className, sizes }: Props) {
           </span>
           <span className="flex items-center gap-1.5 text-ink-soft">
             {t("lentBy", { name: listing.owner })}
-            <span className="flex items-center gap-0.5 font-medium text-charcoal" aria-label={common("rating", { rating: listing.rating })}>
+            <span role="img" className="flex items-center gap-0.5 font-medium text-charcoal" aria-label={common("rating", { rating: listing.rating })}>
               <Star className="size-3.5 fill-ochre text-ochre" aria-hidden="true" />
               <span aria-hidden="true">{format.number(listing.rating, { minimumFractionDigits: 1 })}</span>
             </span>
@@ -74,5 +82,6 @@ export function ListingCard({ listing, featured, className, sizes }: Props) {
         </div>
       </div>
     </article>
+    </Tilt>
   )
 }

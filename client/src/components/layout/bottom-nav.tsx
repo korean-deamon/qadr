@@ -3,6 +3,7 @@
 import { Compass, House, MessageCircle, Plus, UserRound, type LucideIcon } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { Link, usePathname } from "@/i18n/navigation"
+import { isAuthRoute, isPending } from "@/lib/routes"
 import { cn } from "@/lib/utils"
 
 type Item = {
@@ -28,15 +29,28 @@ export function BottomNav({ unreadMessages = 0, unreadNotifications = 0 }: Botto
     { key: "messages", href: "/messages", icon: MessageCircle, badge: unreadMessages },
     { key: "profile", href: "/dashboard", icon: UserRound, badge: unreadNotifications },
   ]
+  if (isAuthRoute(pathname)) return null
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`)
+  const activeIndex = items.findIndex((i) => i.key !== "add" && isActive(i.href))
 
   return (
     <nav
       aria-label={t("mobileNav")}
       className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-ivory/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md md:hidden"
     >
-      <ul className="mx-auto grid h-[var(--bottom-nav-height)] max-w-md grid-cols-5 items-stretch px-2">
+      <ul className="relative mx-auto grid h-[var(--bottom-nav-height)] max-w-md grid-cols-5 items-stretch px-2">
+        {/* active indicator: one bar that glides between slots (CSS transform) */}
+        <span
+          aria-hidden="true"
+          className={cn(
+            "pointer-events-none absolute top-0 left-2 flex w-[calc((100%-1rem)/5)] justify-center transition-[translate,opacity] duration-500 ease-[var(--ease-qadr)]",
+            activeIndex < 0 && "opacity-0",
+          )}
+          style={{ translate: `${Math.max(activeIndex, 0) * 100}% 0` }}
+        >
+          <span className="h-[3px] w-7 rounded-b-full bg-ochre" />
+        </span>
         {items.map(({ key, href, icon: Icon, badge }) => {
           const active = isActive(href)
           if (key === "add") {
@@ -44,6 +58,7 @@ export function BottomNav({ unreadMessages = 0, unreadNotifications = 0 }: Botto
               <li key={key} className="flex items-center justify-center">
                 <Link
                   href={href}
+                  prefetch={false}
                   aria-label={t("listItem")}
                   className="flex h-12 w-12 items-center justify-center bg-forest text-ivory shadow-lift transition-transform duration-200 active:scale-95 [clip-path:url(#qadr-arch)]"
                 >
@@ -56,19 +71,14 @@ export function BottomNav({ unreadMessages = 0, unreadNotifications = 0 }: Botto
             <li key={key}>
               <Link
                 href={href}
+                prefetch={isPending(href) ? false : undefined}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "relative flex h-full flex-col items-center justify-center gap-1 text-[0.6875rem] font-medium transition-colors",
+                  "relative flex h-full flex-col items-center justify-center gap-1 text-[0.6875rem] font-medium transition-[color,transform] duration-200 active:scale-95",
                   active ? "text-forest" : "text-ink-soft",
                 )}
               >
-                <span
-                  aria-hidden="true"
-                  className={cn(
-                    "absolute top-0 h-0.5 w-6 rounded-full bg-ochre transition-opacity duration-300",
-                    active ? "opacity-100" : "opacity-0",
-                  )}
-                />
+
                 <span className="relative">
                   <Icon className="size-[1.375rem]" strokeWidth={active ? 2 : 1.6} aria-hidden="true" />
                   {badge ? (

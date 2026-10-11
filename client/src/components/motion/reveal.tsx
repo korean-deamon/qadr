@@ -1,18 +1,7 @@
 "use client"
 
-import { motion, useReducedMotion, type Variants } from "motion/react"
-import type { ReactNode } from "react"
-
-const EASE = [0.22, 1, 0.36, 1] as const
-
-const group: Variants = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.08, delayChildren: 0.04 } },
-}
-const child: Variants = {
-  hidden: { opacity: 0, y: 18 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: EASE } },
-}
+import { useEffect, useRef, type ReactNode } from "react"
+import { cn } from "@/lib/utils"
 
 type RevealProps = {
   children: ReactNode
@@ -23,46 +12,31 @@ type RevealProps = {
 }
 
 /**
- * Scroll reveal: transform + opacity only (compositor-friendly, no layout
- * shift). Renders static content under prefers-reduced-motion.
+ * Scroll reveal with CSS transitions (transform + opacity, no layout shift).
+ * Content is server-rendered and only hidden when JS runs and motion is
+ * allowed; one IntersectionObserver flips `data-inview`. See `.reveal` in
+ * globals.css. Keep it below the fold: never wrap LCP content.
  */
 export function Reveal({ children, className, stagger, as = "div" }: RevealProps) {
-  const reduce = useReducedMotion()
-  const Tag = motion[as]
-  if (reduce) {
-    const Static = as
-    return <Static className={className}>{children}</Static>
-  }
+  const ref = useRef<HTMLElement>(null)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          el.dataset.inview = ""
+          io.disconnect()
+        }
+      },
+      { rootMargin: "0px 0px -12% 0px" },
+    )
+    io.observe(el)
+    return () => io.disconnect()
+  }, [])
+  const Tag = as
   return (
-    <Tag
-      className={className}
-      variants={stagger ? group : child}
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, margin: "0px 0px -12% 0px" }}
-    >
-      {children}
-    </Tag>
-  )
-}
-
-export function RevealItem({
-  children,
-  className,
-  as = "div",
-}: {
-  children: ReactNode
-  className?: string
-  as?: "div" | "li"
-}) {
-  const reduce = useReducedMotion()
-  if (reduce) {
-    const Static = as
-    return <Static className={className}>{children}</Static>
-  }
-  const Tag = motion[as]
-  return (
-    <Tag className={className} variants={child}>
+    <Tag ref={ref as React.Ref<never>} className={cn("reveal", className)} data-stagger={stagger ? "" : undefined}>
       {children}
     </Tag>
   )
