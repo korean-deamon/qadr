@@ -801,5 +801,284 @@
     "reviewsTitle": "Отзывы",
     "noReviews": "Отзывов пока нет.",
     "stars": "{n} из 5"
+  },
+  "admin": {
+    "title": "Модерация",
+    "pagination": "Страницы",
+    "nav": {
+      "label": "Модерация",
+      "overview": "Обзор",
+      "reports": "Жалобы",
+      "users": "Пользователи",
+      "listings": "Объявления",
+      "audit": "Журнал аудита"
+    },
+    "overview": {
+      "title": "Панель модерации",
+      "lead": "Очередь жалоб и состояние платформы.",
+      "queue": "Жалобы в очереди",
+      "allReports": "Все жалобы"
+    },
+    "stats": {
+      "open_reports": "Открытые жалобы",
+      "high_priority": "Срочные",
+      "users": "Пользователи",
+      "restricted": "Ограничены",
+      "banned": "Заблокированы",
+      "listings": "Активные объявления",
+      "hidden_listings": "Скрытые объявления",
+      "active_loans": "Активные аренды"
+    },
+    "reasons": {
+      "not_returned": "Не вернули",
+      "damaged": "Повреждено",
+      "no_show": "Не пришли",
+      "fraud": "Мошенничество",
+      "inappropriate": "Неуместный контент",
+      "harassment": "Оскорбления",
+      "spam": "Спам",
+      "other": "Другое"
+    },
+    "status": {
+      "active": "Активные",
+      "open": "Открыта",
+      "in_review": "На рассмотрении",
+      "resolved": "Решена",
+      "dismissed": "Отклонена",
+      "all": "Все"
+    },
+    "priority": {
+      "high": "Срочно",
+      "normal": "Обычная"
+    },
+    "targets": {
+      "user": "Пользователь",
+      "listing": "Объявление",
+      "message": "Сообщение",
+      "report": "Жалоба",
+      "conversation": "Переписка"
+    },
+    "roles": {
+      "reporter": "заявитель",
+      "target": "на кого жалоба",
+      "owner": "владелец",
+      "borrower": "арендатор"
+    },
+    "assignee": {
+      "any": "Любой",
+      "me": "Мне",
+      "unassigned": "Не назначена"
+    },
+    "userStates": {
+      "all": "Все",
+      "restricted": "Ограничены",
+      "banned": "Заблокированы",
+      "admins": "Администраторы",
+      "unverified": "Не подтверждены"
+    },
+    "listingStatus": {
+      "active": "Активно",
+      "hidden_by_owner": "Скрыто владельцем",
+      "hidden_by_admin": "Скрыто модерацией",
+      "removed": "Удалено"
+    },
+    "columns": {
+      "priority": "Приоритет",
+      "reason": "Причина",
+      "target": "На что",
+      "reporter": "От кого",
+      "age": "Когда",
+      "status": "Статус",
+      "assignee": "Ответственный"
+    },
+    "filters": {
+      "search": "Поиск",
+      "searchReports": "Email, имя или объявление",
+      "searchUsers": "Email, имя или телефон",
+      "searchListings": "Название объявления",
+      "status": "Статус",
+      "reason": "Причина",
+      "priority": "Приоритет",
+      "target": "Объект",
+      "assignee": "Ответственный",
+      "from": "С",
+      "to": "По",
+      "state": "Состояние",
+      "action": "Действие",
+      "any": "Все",
+      "apply": "Применить",
+      "reset": "Сбросить"
+    },
+    "reports": {
+      "title": "Жалобы",
+      "lead": "{count, plural, one {# жалоба} few {# жалобы} many {# жалоб} other {# жалобы}}. Сначала невозвраты, затем самые старые.",
+      "empty": "Подходящих жалоб нет."
+    },
+    "report": {
+      "title": "Жалоба",
+      "assignedTo": "Ответственный: {name}",
+      "unassigned": "Пока никому не назначена",
+      "assignMe": "Взять себе",
+      "contact": "Написать сторонам",
+      "contactTitle": "Сообщение сторонам",
+      "contactNote": "Сообщение придёт в приложение и в Telegram, если он подключён.",
+      "send": "Отправить",
+      "sent": "Сообщение отправлено",
+      "dismiss": "Отклонить",
+      "dismissTitle": "Отклонить жалобу",
+      "dismissed": "Жалоба отклонена",
+      "resolve": "Решено",
+      "resolveTitle": "Закрыть жалобу",
+      "resolved": "Жалоба закрыта",
+      "description": "Текст жалобы",
+      "outcome": "Итог",
+      "parties": "Стороны",
+      "reporter": "Заявитель",
+      "target": "На кого жалоба",
+      "actOnTarget": "Меры к пользователю {name}",
+      "listing": "Объявление",
+      "history": "История запросов и аренд",
+      "request": "запрос",
+      "loan": "аренда",
+      "pickedUp": "передано",
+      "borrowerReturned": "арендатор вернул",
+      "returned": "принято",
+      "notes": "Внутренние заметки",
+      "addNote": "Добавить заметку",
+      "notesNote": "Видят только администраторы.",
+      "saveNote": "Сохранить",
+      "noteSaved": "Заметка сохранена",
+      "noNotes": "Заметок нет.",
+      "pastReports": "Прошлые жалобы",
+      "noPast": "Нет.",
+      "trail": "История действий",
+      "noTrail": "Действий пока не было."
+    },
+    "conversation": {
+      "title": "Переписка",
+      "locked": "Переписка личная. Чтобы открыть, укажите причину — это запишется в журнал аудита.",
+      "reason": "Причина просмотра",
+      "reasonPlaceholder": "Например, проверка заявления о мошенничестве",
+      "reasonRequired": "Минимум 3 символа.",
+      "open": "Открыть переписку",
+      "empty": "Сообщений нет.",
+      "none": "С этой жалобой не связана переписка."
+    },
+    "events": {
+      "requested": "Запрос отправлен",
+      "approved": "Одобрено",
+      "rejected": "Отклонено",
+      "cancelled": "Отменено",
+      "pickedUp": "Передано",
+      "returned": "Возвращено"
+    },
+    "users": {
+      "title": "Пользователи",
+      "lead": "{count, plural, one {# пользователь} few {# пользователя} many {# пользователей} other {# пользователя}}",
+      "empty": "Никого не нашли."
+    },
+    "user": {
+      "profile": "Профиль",
+      "admin": "Админ",
+      "banned": "Заблокирован",
+      "restricted": "Ограничен",
+      "restrictedUntil": "Ограничен до {date}",
+      "rating": "Рейтинг",
+      "completed": "Завершённые аренды",
+      "memberSince": "Зарегистрирован",
+      "warnings": "Предупреждения",
+      "asTarget": "Жалобы на него",
+      "asReporter": "Его жалобы",
+      "emailVerified": "Email подтверждён",
+      "emailUnverified": "Email не подтверждён",
+      "noPhone": "Нет телефона",
+      "telegram": "Telegram подключён",
+      "noTelegram": "Нет Telegram",
+      "reportsCount": "{count, plural, one {# жалоба} few {# жалобы} many {# жалоб} other {# жалобы}}",
+      "reports": "Жалобы",
+      "listings": "Объявления",
+      "loans": "Аренды",
+      "warningsTitle": "Предупреждения",
+      "adminProtected": "К администраторам здесь меры не применяются."
+    },
+    "listings": {
+      "title": "Объявления",
+      "lead": "{count, plural, one {# объявление} few {# объявления} many {# объявлений} other {# объявления}}",
+      "empty": "Объявлений не найдено."
+    },
+    "audit": {
+      "title": "Журнал аудита",
+      "lead": "Каждое действие модерации и каждый просмотр переписки. Записи нельзя изменить или удалить.",
+      "empty": "Записей нет.",
+      "columns": {
+        "time": "Время",
+        "admin": "Администратор",
+        "action": "Действие",
+        "target": "Объект",
+        "reason": "Причина",
+        "ip": "IP"
+      }
+    },
+    "auditActions": {
+      "add_note": "Заметка",
+      "assign_report": "Назначено",
+      "contact_parties": "Сообщение сторонам",
+      "resolve_report": "Решено",
+      "dismiss_report": "Отклонено",
+      "warn_user": "Предупреждение",
+      "restrict_user": "Ограничение",
+      "unrestrict_user": "Снятие ограничения",
+      "ban_user": "Блокировка",
+      "unban_user": "Разблокировка",
+      "hide_listing": "Объявление скрыто",
+      "unhide_listing": "Объявление возвращено",
+      "remove_listing": "Объявление удалено",
+      "view_conversation": "Просмотр переписки"
+    },
+    "action": {
+      "reason": "Причина",
+      "message": "Текст",
+      "reasonPlaceholder": "Напишите понятно для пользователя",
+      "reasonHint": "Причина попадёт в журнал аудита и при необходимости будет показана пользователю.",
+      "reasonRequired": "Минимум 3 символа.",
+      "days": "На сколько дней",
+      "to": "Кому",
+      "recipients": {
+        "both": "Обоим",
+        "reporter": "Заявителю",
+        "target": "Второй стороне"
+      },
+      "relogin": "Войти снова"
+    },
+    "actions": {
+      "warn": "Предупредить",
+      "warnTitle": "Предупредить: {name}",
+      "warned": "Предупреждение отправлено",
+      "notifiedNote": "Пользователь увидит причину в уведомлении.",
+      "restrict": "Ограничить",
+      "restrictTitle": "Ограничить: {name}",
+      "restrictNote": "На время ограничения нельзя создавать объявления, запросы и сообщения.",
+      "restricted": "Пользователь ограничен",
+      "unrestrict": "Снять ограничение",
+      "unrestrictTitle": "Снять ограничение: {name}",
+      "unrestricted": "Ограничение снято",
+      "ban": "Заблокировать",
+      "banTitle": "Заблокировать: {name}",
+      "banNote": "Все сессии завершатся, вход закроется, объявления скроются.",
+      "banned": "Пользователь заблокирован",
+      "unban": "Разблокировать",
+      "unbanTitle": "Разблокировать: {name}",
+      "unbanned": "Разблокирован",
+      "hide": "Скрыть",
+      "hideTitle": "Скрыть объявление",
+      "hidden": "Объявление скрыто",
+      "unhide": "Вернуть",
+      "unhideTitle": "Вернуть объявление",
+      "unhidden": "Объявление снова видно",
+      "remove": "Удалить",
+      "removeTitle": "Удалить объявление",
+      "removeNote": "Ожидающие запросы отменятся. При активной аренде удалить нельзя.",
+      "removed": "Объявление удалено"
+    }
   }
 }

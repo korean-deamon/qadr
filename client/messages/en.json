@@ -801,5 +801,284 @@
     "reviewsTitle": "Reviews",
     "noReviews": "No reviews yet.",
     "stars": "{n} out of 5"
+  },
+  "admin": {
+    "title": "Moderation",
+    "pagination": "Pages",
+    "nav": {
+      "label": "Moderation",
+      "overview": "Overview",
+      "reports": "Reports",
+      "users": "Users",
+      "listings": "Listings",
+      "audit": "Audit log"
+    },
+    "overview": {
+      "title": "Moderation",
+      "lead": "The report queue and the state of the platform.",
+      "queue": "Next in the queue",
+      "allReports": "All reports"
+    },
+    "stats": {
+      "open_reports": "Open reports",
+      "high_priority": "Urgent",
+      "users": "Users",
+      "restricted": "Restricted",
+      "banned": "Banned",
+      "listings": "Live listings",
+      "hidden_listings": "Hidden listings",
+      "active_loans": "Active loans"
+    },
+    "reasons": {
+      "not_returned": "Not returned",
+      "damaged": "Damaged",
+      "no_show": "No-show",
+      "fraud": "Fraud",
+      "inappropriate": "Inappropriate content",
+      "harassment": "Harassment",
+      "spam": "Spam",
+      "other": "Other"
+    },
+    "status": {
+      "active": "Active",
+      "open": "Open",
+      "in_review": "In review",
+      "resolved": "Resolved",
+      "dismissed": "Dismissed",
+      "all": "All"
+    },
+    "priority": {
+      "high": "Urgent",
+      "normal": "Normal"
+    },
+    "targets": {
+      "user": "User",
+      "listing": "Listing",
+      "message": "Message",
+      "report": "Report",
+      "conversation": "Conversation"
+    },
+    "roles": {
+      "reporter": "reporter",
+      "target": "reported",
+      "owner": "owner",
+      "borrower": "borrower"
+    },
+    "assignee": {
+      "any": "Anyone",
+      "me": "Me",
+      "unassigned": "Unassigned"
+    },
+    "userStates": {
+      "all": "All",
+      "restricted": "Restricted",
+      "banned": "Banned",
+      "admins": "Admins",
+      "unverified": "Unverified"
+    },
+    "listingStatus": {
+      "active": "Live",
+      "hidden_by_owner": "Hidden by owner",
+      "hidden_by_admin": "Hidden by moderation",
+      "removed": "Removed"
+    },
+    "columns": {
+      "priority": "Priority",
+      "reason": "Reason",
+      "target": "About",
+      "reporter": "From",
+      "age": "When",
+      "status": "Status",
+      "assignee": "Assignee"
+    },
+    "filters": {
+      "search": "Search",
+      "searchReports": "Email, name or listing",
+      "searchUsers": "Email, name or phone",
+      "searchListings": "Listing title",
+      "status": "Status",
+      "reason": "Reason",
+      "priority": "Priority",
+      "target": "Target",
+      "assignee": "Assignee",
+      "from": "From",
+      "to": "To",
+      "state": "State",
+      "action": "Action",
+      "any": "Any",
+      "apply": "Apply",
+      "reset": "Clear"
+    },
+    "reports": {
+      "title": "Reports",
+      "lead": "{count, plural, one {# report} other {# reports}}. Missing returns first, then the oldest.",
+      "empty": "No matching reports."
+    },
+    "report": {
+      "title": "Report",
+      "assignedTo": "Assigned to {name}",
+      "unassigned": "Not assigned yet",
+      "assignMe": "Assign to me",
+      "contact": "Contact parties",
+      "contactTitle": "Message the parties",
+      "contactNote": "Delivered in the app, and by Telegram when linked.",
+      "send": "Send",
+      "sent": "Message sent",
+      "dismiss": "Dismiss",
+      "dismissTitle": "Dismiss the report",
+      "dismissed": "Report dismissed",
+      "resolve": "Resolve",
+      "resolveTitle": "Resolve the report",
+      "resolved": "Report resolved",
+      "description": "What they wrote",
+      "outcome": "Outcome",
+      "parties": "People involved",
+      "reporter": "Reporter",
+      "target": "Reported",
+      "actOnTarget": "Actions on {name}",
+      "listing": "Listing",
+      "history": "Requests and loans between them",
+      "request": "request",
+      "loan": "loan",
+      "pickedUp": "handed over",
+      "borrowerReturned": "borrower says returned",
+      "returned": "confirmed",
+      "notes": "Internal notes",
+      "addNote": "Add note",
+      "notesNote": "Only admins can see notes.",
+      "saveNote": "Save note",
+      "noteSaved": "Note saved",
+      "noNotes": "No notes yet.",
+      "pastReports": "Earlier reports",
+      "noPast": "None.",
+      "trail": "Action history",
+      "noTrail": "No actions yet."
+    },
+    "conversation": {
+      "title": "Conversation",
+      "locked": "Conversations are private. Give a reason to open this one; the view is written to the audit log.",
+      "reason": "Reason for viewing",
+      "reasonPlaceholder": "For example, checking the fraud claim",
+      "reasonRequired": "Use at least 3 characters.",
+      "open": "Open conversation",
+      "empty": "No messages.",
+      "none": "No conversation is tied to this report."
+    },
+    "events": {
+      "requested": "Request sent",
+      "approved": "Approved",
+      "rejected": "Declined",
+      "cancelled": "Cancelled",
+      "pickedUp": "Handed over",
+      "returned": "Returned"
+    },
+    "users": {
+      "title": "Users",
+      "lead": "{count, plural, one {# user} other {# users}}",
+      "empty": "Nobody found."
+    },
+    "user": {
+      "profile": "Profile",
+      "admin": "Admin",
+      "banned": "Banned",
+      "restricted": "Restricted",
+      "restrictedUntil": "Restricted until {date}",
+      "rating": "Rating",
+      "completed": "Completed loans",
+      "memberSince": "Joined",
+      "warnings": "Warnings",
+      "asTarget": "Reported",
+      "asReporter": "Reports filed",
+      "emailVerified": "Email verified",
+      "emailUnverified": "Email not verified",
+      "noPhone": "No phone",
+      "telegram": "Telegram linked",
+      "noTelegram": "No Telegram",
+      "reportsCount": "{count, plural, one {# report} other {# reports}}",
+      "reports": "Reports",
+      "listings": "Listings",
+      "loans": "Loans",
+      "warningsTitle": "Warnings",
+      "adminProtected": "Admins can't be moderated here."
+    },
+    "listings": {
+      "title": "Listings",
+      "lead": "{count, plural, one {# listing} other {# listings}}",
+      "empty": "No listings found."
+    },
+    "audit": {
+      "title": "Audit log",
+      "lead": "Every moderation action and every conversation view. Entries can't be edited or deleted.",
+      "empty": "No entries.",
+      "columns": {
+        "time": "Time",
+        "admin": "Admin",
+        "action": "Action",
+        "target": "Target",
+        "reason": "Reason",
+        "ip": "IP"
+      }
+    },
+    "auditActions": {
+      "add_note": "Note added",
+      "assign_report": "Assigned",
+      "contact_parties": "Parties contacted",
+      "resolve_report": "Resolved",
+      "dismiss_report": "Dismissed",
+      "warn_user": "Warned",
+      "restrict_user": "Restricted",
+      "unrestrict_user": "Restriction lifted",
+      "ban_user": "Banned",
+      "unban_user": "Unbanned",
+      "hide_listing": "Listing hidden",
+      "unhide_listing": "Listing restored",
+      "remove_listing": "Listing removed",
+      "view_conversation": "Conversation viewed"
+    },
+    "action": {
+      "reason": "Reason",
+      "message": "Text",
+      "reasonPlaceholder": "Write it so the user understands",
+      "reasonHint": "The reason goes into the audit log and, where relevant, to the user.",
+      "reasonRequired": "Use at least 3 characters.",
+      "days": "For how many days",
+      "to": "Send to",
+      "recipients": {
+        "both": "Both",
+        "reporter": "Reporter",
+        "target": "Reported user"
+      },
+      "relogin": "Log in again"
+    },
+    "actions": {
+      "warn": "Warn",
+      "warnTitle": "Warn {name}",
+      "warned": "Warning sent",
+      "notifiedNote": "The user sees the reason in a notification.",
+      "restrict": "Restrict",
+      "restrictTitle": "Restrict {name}",
+      "restrictNote": "While restricted they can't list items, send requests or messages.",
+      "restricted": "User restricted",
+      "unrestrict": "Lift restriction",
+      "unrestrictTitle": "Lift {name}'s restriction",
+      "unrestricted": "Restriction lifted",
+      "ban": "Ban",
+      "banTitle": "Ban {name}",
+      "banNote": "Ends every session, blocks login and hides their listings.",
+      "banned": "User banned",
+      "unban": "Unban",
+      "unbanTitle": "Unban {name}",
+      "unbanned": "User unbanned",
+      "hide": "Hide",
+      "hideTitle": "Hide the listing",
+      "hidden": "Listing hidden",
+      "unhide": "Restore",
+      "unhideTitle": "Restore the listing",
+      "unhidden": "Listing visible again",
+      "remove": "Remove",
+      "removeTitle": "Remove the listing",
+      "removeNote": "Pending requests are cancelled. Not possible during an active loan.",
+      "removed": "Listing removed"
+    }
   }
 }

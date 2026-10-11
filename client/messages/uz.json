@@ -801,5 +801,284 @@
     "reviewsTitle": "Baholar",
     "noReviews": "Hali baho yoʻq.",
     "stars": "{n} yulduz"
+  },
+  "admin": {
+    "title": "Moderatsiya",
+    "pagination": "Sahifalar",
+    "nav": {
+      "label": "Moderatsiya",
+      "overview": "Umumiy",
+      "reports": "Shikoyatlar",
+      "users": "Foydalanuvchilar",
+      "listings": "Eʼlonlar",
+      "audit": "Audit jurnali"
+    },
+    "overview": {
+      "title": "Moderatsiya paneli",
+      "lead": "Shikoyatlar navbati va platforma holati.",
+      "queue": "Navbatdagi shikoyatlar",
+      "allReports": "Barcha shikoyatlar"
+    },
+    "stats": {
+      "open_reports": "Ochiq shikoyatlar",
+      "high_priority": "Shoshilinch",
+      "users": "Foydalanuvchilar",
+      "restricted": "Cheklangan",
+      "banned": "Bloklangan",
+      "listings": "Faol eʼlonlar",
+      "hidden_listings": "Yashirilgan eʼlonlar",
+      "active_loans": "Faol ijaralar"
+    },
+    "reasons": {
+      "not_returned": "Qaytarilmadi",
+      "damaged": "Shikastlangan",
+      "no_show": "Kelmadi",
+      "fraud": "Firibgarlik",
+      "inappropriate": "Nomaqbul kontent",
+      "harassment": "Haqorat",
+      "spam": "Spam",
+      "other": "Boshqa"
+    },
+    "status": {
+      "active": "Faol",
+      "open": "Ochiq",
+      "in_review": "Koʻrib chiqilmoqda",
+      "resolved": "Hal qilindi",
+      "dismissed": "Rad etildi",
+      "all": "Hammasi"
+    },
+    "priority": {
+      "high": "Shoshilinch",
+      "normal": "Oddiy"
+    },
+    "targets": {
+      "user": "Foydalanuvchi",
+      "listing": "Eʼlon",
+      "message": "Xabar",
+      "report": "Shikoyat",
+      "conversation": "Suhbat"
+    },
+    "roles": {
+      "reporter": "shikoyatchi",
+      "target": "shikoyat qilingan",
+      "owner": "egasi",
+      "borrower": "oluvchi"
+    },
+    "assignee": {
+      "any": "Har kim",
+      "me": "Menga",
+      "unassigned": "Biriktirilmagan"
+    },
+    "userStates": {
+      "all": "Hammasi",
+      "restricted": "Cheklangan",
+      "banned": "Bloklangan",
+      "admins": "Administratorlar",
+      "unverified": "Tasdiqlanmagan"
+    },
+    "listingStatus": {
+      "active": "Faol",
+      "hidden_by_owner": "Egasi yashirgan",
+      "hidden_by_admin": "Moderatsiya yashirgan",
+      "removed": "Oʻchirilgan"
+    },
+    "columns": {
+      "priority": "Muhimlik",
+      "reason": "Sabab",
+      "target": "Nima haqida",
+      "reporter": "Kimdan",
+      "age": "Qachon",
+      "status": "Holat",
+      "assignee": "Masʼul"
+    },
+    "filters": {
+      "search": "Qidirish",
+      "searchReports": "Email, ism yoki eʼlon",
+      "searchUsers": "Email, ism yoki telefon",
+      "searchListings": "Eʼlon nomi",
+      "status": "Holat",
+      "reason": "Sabab",
+      "priority": "Muhimlik",
+      "target": "Obyekt",
+      "assignee": "Masʼul",
+      "from": "Dan",
+      "to": "Gacha",
+      "state": "Holat",
+      "action": "Amal",
+      "any": "Hammasi",
+      "apply": "Qoʻllash",
+      "reset": "Tozalash"
+    },
+    "reports": {
+      "title": "Shikoyatlar",
+      "lead": "{count, plural, other {# ta shikoyat}}. Qaytarilmaganlar birinchi, keyin eng eskilari.",
+      "empty": "Mos shikoyat yoʻq."
+    },
+    "report": {
+      "title": "Shikoyat",
+      "assignedTo": "Masʼul: {name}",
+      "unassigned": "Hali hech kimga biriktirilmagan",
+      "assignMe": "Oʻzimga olish",
+      "contact": "Tomonlarga yozish",
+      "contactTitle": "Tomonlarga xabar",
+      "contactNote": "Xabar ilovada va ulangan boʻlsa Telegramda yetkaziladi.",
+      "send": "Yuborish",
+      "sent": "Xabar yuborildi",
+      "dismiss": "Rad etish",
+      "dismissTitle": "Shikoyatni rad etish",
+      "dismissed": "Shikoyat rad etildi",
+      "resolve": "Hal qilindi",
+      "resolveTitle": "Shikoyatni yopish",
+      "resolved": "Shikoyat yopildi",
+      "description": "Shikoyat matni",
+      "outcome": "Natija",
+      "parties": "Tomonlar",
+      "reporter": "Shikoyatchi",
+      "target": "Shikoyat qilingan",
+      "actOnTarget": "{name} boʻyicha choralar",
+      "listing": "Eʼlon",
+      "history": "Soʻrov va ijaralar tarixi",
+      "request": "soʻrov",
+      "loan": "ijara",
+      "pickedUp": "olib ketildi",
+      "borrowerReturned": "oluvchi qaytardi",
+      "returned": "qabul qilindi",
+      "notes": "Ichki eslatmalar",
+      "addNote": "Eslatma qoʻshish",
+      "notesNote": "Faqat administratorlar koʻradi.",
+      "saveNote": "Saqlash",
+      "noteSaved": "Eslatma saqlandi",
+      "noNotes": "Eslatma yoʻq.",
+      "pastReports": "Avvalgi shikoyatlar",
+      "noPast": "Yoʻq.",
+      "trail": "Amallar tarixi",
+      "noTrail": "Hali amal bajarilmagan."
+    },
+    "conversation": {
+      "title": "Suhbat",
+      "locked": "Suhbat shaxsiy. Ochish uchun sabab yozing, bu audit jurnaliga yoziladi.",
+      "reason": "Ochish sababi",
+      "reasonPlaceholder": "Masalan, firibgarlik daʼvosini tekshirish",
+      "reasonRequired": "Kamida 3 ta belgi yozing.",
+      "open": "Suhbatni ochish",
+      "empty": "Xabarlar yoʻq.",
+      "none": "Bu shikoyat bilan bogʻliq suhbat yoʻq."
+    },
+    "events": {
+      "requested": "Soʻrov yuborildi",
+      "approved": "Tasdiqlandi",
+      "rejected": "Rad etildi",
+      "cancelled": "Bekor qilindi",
+      "pickedUp": "Olib ketildi",
+      "returned": "Qaytarildi"
+    },
+    "users": {
+      "title": "Foydalanuvchilar",
+      "lead": "{count, plural, other {# ta foydalanuvchi}}",
+      "empty": "Hech kim topilmadi."
+    },
+    "user": {
+      "profile": "Profil",
+      "admin": "Admin",
+      "banned": "Bloklangan",
+      "restricted": "Cheklangan",
+      "restrictedUntil": "{date} gacha cheklangan",
+      "rating": "Reyting",
+      "completed": "Tugagan ijaralar",
+      "memberSince": "Roʻyxatdan oʻtgan",
+      "warnings": "Ogohlantirishlar",
+      "asTarget": "Unga shikoyatlar",
+      "asReporter": "Uning shikoyatlari",
+      "emailVerified": "Email tasdiqlangan",
+      "emailUnverified": "Email tasdiqlanmagan",
+      "noPhone": "Telefon yoʻq",
+      "telegram": "Telegram ulangan",
+      "noTelegram": "Telegram yoʻq",
+      "reportsCount": "{count, plural, other {# ta shikoyat}}",
+      "reports": "Shikoyatlar",
+      "listings": "Eʼlonlari",
+      "loans": "Ijaralari",
+      "warningsTitle": "Ogohlantirishlar",
+      "adminProtected": "Administratorlarga bu yerdan chora koʻrilmaydi."
+    },
+    "listings": {
+      "title": "Eʼlonlar",
+      "lead": "{count, plural, other {# ta eʼlon}}",
+      "empty": "Eʼlon topilmadi."
+    },
+    "audit": {
+      "title": "Audit jurnali",
+      "lead": "Har bir moderatsiya amali va suhbatni koʻrish shu yerda. Yozuvlarni oʻzgartirib ham, oʻchirib ham boʻlmaydi.",
+      "empty": "Yozuv yoʻq.",
+      "columns": {
+        "time": "Vaqt",
+        "admin": "Administrator",
+        "action": "Amal",
+        "target": "Obyekt",
+        "reason": "Sabab",
+        "ip": "IP"
+      }
+    },
+    "auditActions": {
+      "add_note": "Eslatma",
+      "assign_report": "Biriktirildi",
+      "contact_parties": "Tomonlarga xabar",
+      "resolve_report": "Hal qilindi",
+      "dismiss_report": "Rad etildi",
+      "warn_user": "Ogohlantirish",
+      "restrict_user": "Cheklash",
+      "unrestrict_user": "Cheklov olindi",
+      "ban_user": "Bloklash",
+      "unban_user": "Blokdan chiqarish",
+      "hide_listing": "Eʼlon yashirildi",
+      "unhide_listing": "Eʼlon qaytarildi",
+      "remove_listing": "Eʼlon oʻchirildi",
+      "view_conversation": "Suhbat koʻrildi"
+    },
+    "action": {
+      "reason": "Sabab",
+      "message": "Matn",
+      "reasonPlaceholder": "Foydalanuvchiga tushunarli qilib yozing",
+      "reasonHint": "Sabab audit jurnaliga yoziladi va kerak boʻlsa foydalanuvchiga koʻrsatiladi.",
+      "reasonRequired": "Kamida 3 ta belgi yozing.",
+      "days": "Necha kunga",
+      "to": "Kimga",
+      "recipients": {
+        "both": "Ikkalasiga",
+        "reporter": "Shikoyatchiga",
+        "target": "Shikoyat qilinganga"
+      },
+      "relogin": "Qayta kirish"
+    },
+    "actions": {
+      "warn": "Ogohlantirish",
+      "warnTitle": "{name}ni ogohlantirish",
+      "warned": "Ogohlantirish yuborildi",
+      "notifiedNote": "Foydalanuvchi sababni bildirishnomada koʻradi.",
+      "restrict": "Cheklash",
+      "restrictTitle": "{name}ni cheklash",
+      "restrictNote": "Cheklov davomida yangi eʼlon, soʻrov va xabar yuborib boʻlmaydi.",
+      "restricted": "Foydalanuvchi cheklandi",
+      "unrestrict": "Cheklovni olish",
+      "unrestrictTitle": "{name} cheklovini olish",
+      "unrestricted": "Cheklov olindi",
+      "ban": "Bloklash",
+      "banTitle": "{name}ni bloklash",
+      "banNote": "Barcha sessiyalar tugatiladi, kirish yopiladi, eʼlonlari yashiriladi.",
+      "banned": "Foydalanuvchi bloklandi",
+      "unban": "Blokdan chiqarish",
+      "unbanTitle": "{name}ni blokdan chiqarish",
+      "unbanned": "Blokdan chiqarildi",
+      "hide": "Yashirish",
+      "hideTitle": "Eʼlonni yashirish",
+      "hidden": "Eʼlon yashirildi",
+      "unhide": "Qaytarish",
+      "unhideTitle": "Eʼlonni qaytarish",
+      "unhidden": "Eʼlon yana koʻrinadi",
+      "remove": "Oʻchirish",
+      "removeTitle": "Eʼlonni oʻchirish",
+      "removeNote": "Kutilayotgan soʻrovlar bekor qilinadi. Faol ijara boʻlsa oʻchirib boʻlmaydi.",
+      "removed": "Eʼlon oʻchirildi"
+    }
   }
 }
