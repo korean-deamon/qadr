@@ -1,0 +1,146 @@
+{
+  "common": {
+    "brand": "Qadr",
+    "tagline": "Har narsaning qadri bor.",
+    "skipToContent": "Asosiy mazmunga oʻtish",
+    "loading": "Yuklanmoqda",
+    "free": "Bepul",
+    "rating": "Baho: 5 dan {rating}",
+    "locales": {
+      "uz": "Oʻzbekcha",
+      "ru": "Русский",
+      "en": "English"
+    },
+    "localeSwitcher": "Tilni oʻzgartirish"
+  },
+  "metadata": {
+    "title": "Qadr — mahallangizda buyumlarni olib turing va ulashing",
+    "description": "Asboblar, kitoblar, sayohat jihozlari va oshxona texnikasini yaqin atrofdagilardan vaqtincha oling, kam ishlatadigan narsalaringizni ulashing. Bepul, Oʻzbekistonda."
+  },
+  "navigation": {
+    "home": "Bosh sahifa",
+    "explore": "Izlash",
+    "categories": "Turkumlar",
+    "howItWorks": "Qanday ishlaydi",
+    "add": "Qoʻshish",
+    "listItem": "Buyum qoʻshish",
+    "messages": "Xabarlar",
+    "profile": "Profil",
+    "login": "Kirish",
+    "register": "Roʻyxatdan oʻtish",
+    "mainNav": "Asosiy menyu",
+    "mobileNav": "Ilova menyusi",
+    "unread": "{count} ta oʻqilmagan",
+    "footerNav": "Pastki menyu"
+  },
+  "home": {
+    "hero": {
+      "title": "Har narsaning qadri bor.",
+      "lead": "Matkap, chodir yoki mikserni mahallangizdagi qoʻshnidan vaqtincha oling, javonda turgan narsangizni esa boshqalarga ulashing.",
+      "imageAlt": "Chodir ichidan togʻ koʻli va qaragʻayzorga qarash",
+      "caption": "Sardorning chodiri bu yil Chimyon, Zomin va Arslonbobda boʻldi."
+    },
+    "search": {
+      "label": "Buyum qidirish",
+      "placeholder": "Sizga nima kerak?",
+      "areaLabel": "Hudud",
+      "areaPlaceholder": "Toshkentning istalgan joyi",
+      "submit": "Qidirish",
+      "popular": "Koʻp soʻraladi",
+      "suggestions": {
+        "drill": "Matkap",
+        "tent": "Chodir",
+        "projector": "Proyektor",
+        "ladder": "Narvon"
+      }
+    },
+    "categories": {
+      "title": "Odamlar nimalarni olib turadi",
+      "lead": "Koʻp narsalar yiliga bir necha marta ishlatiladi. Qoʻshnilar hozir ulashayotgan buyumlar shu yerda.",
+      "count": "{count} ta buyum",
+      "viewAll": "Barcha turkumlar",
+      "items": {
+        "tools": "Asboblar",
+        "books": "Kitoblar",
+        "camping": "Sayohat va tabiat",
+        "photo": "Foto va video",
+        "kitchen": "Oshxona",
+        "sports": "Sport",
+        "music": "Musiqa",
+        "kids": "Bolalar uchun"
+      }
+    },
+    "nearby": {
+      "title": "Shu hafta yaqiningizda",
+      "lead": "Shahar markazidan bir necha kilometr ichida yaqinda qoʻshilgan buyumlar.",
+      "viewAll": "Yaqindagi barcha buyumlar"
+    },
+    "steps": {
+      "title": "Qanday ishlaydi",
+      "find": {
+        "title": "Yaqindan toping",
+        "body": "Kerakli narsani qidiring va uni hududingizda kim ulashayotganini koʻring."
+      },
+      "ask": {
+        "title": "Egasidan soʻrang",
+        "body": "Sanalarni tanlang, shartlarga rozi boʻling va soʻrov yuboring. Savollaringizni chatda bering."
+      },
+      "return": {
+        "title": "Olib keting va qaytaring",
+        "body": "Soʻrov tasdiqlangach, bir-biringizning telefon raqamingizni koʻrasiz. Oʻz vaqtida qaytaring va bir-biringizni baholang."
+      }
+    },
+    "trust": {
+      "title": "Ishonch har bir qaytarilgan buyum bilan ortadi",
+      "quote": "Bitta javon osish uchun matkap sotib olgandim. Shundan beri u qirqqa yaqin javon osdi, birortasi ham meniki emas.",
+      "author": "Dilnoza",
+      "authorRole": "Yunusobodda asboblarini ulashadi",
+      "portraitAlt": "Yogʻoch stol ustida chizmalar va vintlar yonida turgan matkap",
+      "points": {
+        "verified": "Har bir profil email orqali tasdiqlangan",
+        "ratings": "Har bir qaytarishdan soʻng ikki tomon bir-birini baholaydi",
+        "phone": "Telefon raqami faqat soʻrov tasdiqlangach koʻrinadi"
+      }
+    },
+    "cta": {
+      "title": "Shkafingizdagi matkap bu oy uchta qoʻshningizga yordam berishi mumkin.",
+      "body": "Buyum qoʻshish ikki daqiqa oladi. Kim, qachon va qanday shartlarda olishini oʻzingiz hal qilasiz.",
+      "button": "Buyum qoʻshish",
+      "secondary": "Avval koʻrib chiqish"
+    }
+  },
+  "explore": {},
+  "listings": {
+    "upToDays": "{days} kungacha",
+    "lentBy": "Egasi: {name}",
+    "distance": "{km} km uzoqlikda",
+    "save": "Saqlash",
+    "saved": "Saqlangan",
+    "condition": {
+      "new": "Yangi",
+      "good": "Yaxshi",
+      "used": "Ishlatilgan"
+    }
+  },
+  "borrowing": {},
+  "messages": {},
+  "dashboard": {},
+  "auth": {},
+  "notifications": {},
+  "validation": {},
+  "errors": {
+    "notFoundTitle": "Bu sahifani kimdir olib ketib, qaytarmadi.",
+    "notFoundBody": "Havola eskirgan yoki sahifa koʻchirilgan boʻlishi mumkin.",
+    "backHome": "Bosh sahifaga qaytish"
+  },
+  "footer": {
+    "about": "Qadr Oʻzbekistondagi qoʻshnilarga kam ishlatiladigan narsalarini ulashishga yordam beradi.",
+    "borrow": "Olib turish",
+    "lend": "Ulashish",
+    "company": "Qadr",
+    "lendingTips": "Ulashish boʻyicha maslahatlar",
+    "trustSafety": "Ishonch va xavfsizlik",
+    "contact": "Aloqa",
+    "rights": "© {year} Qadr. Toshkentda yaratilgan."
+  }
+}

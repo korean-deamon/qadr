@@ -1,0 +1,18 @@
+# Image credits
+
+Placeholder photography for the homepage. All CC0 / public domain, found via Openverse.
+
+| File | Creator | License | Source |
+|---|---|---|---|
+| bike.jpg | Paul Filitchkin | CC0 | https://stocksnap.io/photo/speedbike-bicycle-6B6C7FF9C1 |
+| books.jpg | Kristin Hardwick | CC0 | https://stocksnap.io/photo/books-shelf-M4IJAPYMQJ |
+| bookshelf.jpg | Andrew Nolan | CC0 | https://stocksnap.io/photo/books-shelf-ZEAZB6SSFL |
+| camera.jpg | Dustin Lee | CC0 | https://stocksnap.io/photo/camera-lens-8LC5H9IZIU |
+| guitar.jpg | Paulina Lohunko | CC0 | https://stocksnap.io/photo/guitar-music-8N3NW8ZGRT |
+| hero-drill.jpg | JESHOOTS.com | CC0 | https://stocksnap.io/photo/floorplan-workshop-N3BPNPN0FY |
+| kayak.jpg | Aaron Burden | CC0 | https://stocksnap.io/photo/kayak-lake-171KGI3VPL |
+| mixer.jpg | rawpixel | CC0 | https://www.rawpixel.com |
+| sockets.jpg | Jaroslaw%20Puszczy%u0144ski | CC0 | https://stocksnap.io/photo/wrench-sockets-M07SV6AMBD |
+| tent-mountain.jpg | Christopher Jolly | CC0 | https://stocksnap.io/photo/camp-tent-PTERNSNX0F |
+| tent-view.jpg | Elliott Chau | CC0 | https://stocksnap.io/photo/camping-tent-OCXLY7U3OG |
+| tools-wall.jpg | Barn Images | CC0 | https://stocksnap.io/photo/tools-workshop-KD30XPQR0A |

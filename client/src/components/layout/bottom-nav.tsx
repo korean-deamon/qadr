@@ -1,0 +1,89 @@
+"use client"
+
+import { Compass, House, MessageCircle, Plus, UserRound, type LucideIcon } from "lucide-react"
+import { useTranslations } from "next-intl"
+import { Link, usePathname } from "@/i18n/navigation"
+import { cn } from "@/lib/utils"
+
+type Item = {
+  key: "home" | "explore" | "add" | "messages" | "profile"
+  href: string
+  icon: LucideIcon
+  badge?: number
+}
+
+export type BottomNavProps = { unreadMessages?: number; unreadNotifications?: number }
+
+/**
+ * App-style bottom navigation below `md` (SPEC §3 Mobile). Fixed, respects
+ * the safe-area inset; <main> reserves matching space via `pb-bottom-nav`.
+ */
+export function BottomNav({ unreadMessages = 0, unreadNotifications = 0 }: BottomNavProps) {
+  const t = useTranslations("navigation")
+  const pathname = usePathname()
+  const items: Item[] = [
+    { key: "home", href: "/", icon: House },
+    { key: "explore", href: "/explore", icon: Compass },
+    { key: "add", href: "/items/new", icon: Plus },
+    { key: "messages", href: "/messages", icon: MessageCircle, badge: unreadMessages },
+    { key: "profile", href: "/dashboard", icon: UserRound, badge: unreadNotifications },
+  ]
+  const isActive = (href: string) =>
+    href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`)
+
+  return (
+    <nav
+      aria-label={t("mobileNav")}
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-ivory/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md md:hidden"
+    >
+      <ul className="mx-auto grid h-[var(--bottom-nav-height)] max-w-md grid-cols-5 items-stretch px-2">
+        {items.map(({ key, href, icon: Icon, badge }) => {
+          const active = isActive(href)
+          if (key === "add") {
+            return (
+              <li key={key} className="flex items-center justify-center">
+                <Link
+                  href={href}
+                  aria-label={t("listItem")}
+                  className="flex h-12 w-12 items-center justify-center bg-forest text-ivory shadow-lift transition-transform duration-200 active:scale-95 [clip-path:url(#qadr-arch)]"
+                >
+                  <Icon className="mt-1.5 size-5" strokeWidth={2} aria-hidden="true" />
+                </Link>
+              </li>
+            )
+          }
+          return (
+            <li key={key}>
+              <Link
+                href={href}
+                aria-current={active ? "page" : undefined}
+                className={cn(
+                  "relative flex h-full flex-col items-center justify-center gap-1 text-[0.6875rem] font-medium transition-colors",
+                  active ? "text-forest" : "text-ink-soft",
+                )}
+              >
+                <span
+                  aria-hidden="true"
+                  className={cn(
+                    "absolute top-0 h-0.5 w-6 rounded-full bg-ochre transition-opacity duration-300",
+                    active ? "opacity-100" : "opacity-0",
+                  )}
+                />
+                <span className="relative">
+                  <Icon className="size-[1.375rem]" strokeWidth={active ? 2 : 1.6} aria-hidden="true" />
+                  {badge ? (
+                    <span className="absolute -top-1.5 -right-2.5 min-w-[1.125rem] rounded-full bg-ochre px-1 text-center text-[0.625rem] leading-[1.125rem] font-semibold text-charcoal ring-2 ring-ivory">
+                      <span aria-hidden="true">{badge > 9 ? "9+" : badge}</span>
+                      <span className="sr-only">{t("unread", { count: badge })}</span>
+                    </span>
+                  ) : null}
+                </span>
+                {t(key)}
+              </Link>
+            </li>
+          )
+        })}
+      </ul>
+    </nav>
+  )
+}

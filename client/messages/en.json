@@ -1,0 +1,146 @@
+{
+  "common": {
+    "brand": "Qadr",
+    "tagline": "Good things are worth sharing.",
+    "skipToContent": "Skip to content",
+    "loading": "Loading",
+    "free": "Free to borrow",
+    "rating": "Rated {rating} out of 5",
+    "locales": {
+      "uz": "Oʻzbekcha",
+      "ru": "Русский",
+      "en": "English"
+    },
+    "localeSwitcher": "Change language"
+  },
+  "metadata": {
+    "title": "Qadr — borrow and lend things in your neighbourhood",
+    "description": "Borrow tools, books, camping gear and kitchen appliances from people nearby, and lend what you rarely use. Free, in Uzbekistan."
+  },
+  "navigation": {
+    "home": "Home",
+    "explore": "Explore",
+    "categories": "Categories",
+    "howItWorks": "How it works",
+    "add": "Add",
+    "listItem": "List an item",
+    "messages": "Messages",
+    "profile": "Profile",
+    "login": "Log in",
+    "register": "Sign up",
+    "mainNav": "Main navigation",
+    "mobileNav": "App navigation",
+    "unread": "{count, plural, one {# unread} other {# unread}}",
+    "footerNav": "Footer navigation"
+  },
+  "home": {
+    "hero": {
+      "title": "Good things are worth sharing.",
+      "lead": "Borrow a drill, a tent or a stand mixer from someone in your mahalla, and lend what sits idle on your shelf.",
+      "imageAlt": "Looking out of a tent at a mountain lake and pine forest",
+      "caption": "Sardor's tent has been to Chimgan, Zaamin and Arslanbob this year."
+    },
+    "search": {
+      "label": "Search for an item",
+      "placeholder": "What do you need?",
+      "areaLabel": "Area",
+      "areaPlaceholder": "Anywhere in Tashkent",
+      "submit": "Search",
+      "popular": "Often borrowed",
+      "suggestions": {
+        "drill": "Drill",
+        "tent": "Tent",
+        "projector": "Projector",
+        "ladder": "Ladder"
+      }
+    },
+    "categories": {
+      "title": "What people borrow",
+      "lead": "Most things get used a few times a year. Here is what neighbours are lending right now.",
+      "count": "{count, plural, one {# item} other {# items}}",
+      "viewAll": "All categories",
+      "items": {
+        "tools": "Tools",
+        "books": "Books",
+        "camping": "Camping and outdoors",
+        "photo": "Photo and video",
+        "kitchen": "Kitchen",
+        "sports": "Sports",
+        "music": "Music",
+        "kids": "For kids"
+      }
+    },
+    "nearby": {
+      "title": "Near you this week",
+      "lead": "Recently listed within a few kilometres of the city centre.",
+      "viewAll": "See everything nearby"
+    },
+    "steps": {
+      "title": "How borrowing works",
+      "find": {
+        "title": "Find it nearby",
+        "body": "Search for what you need and see who lends it in your area."
+      },
+      "ask": {
+        "title": "Ask the owner",
+        "body": "Pick your dates, accept their terms and send a request. Questions go in the chat."
+      },
+      "return": {
+        "title": "Pick up and return",
+        "body": "Once approved, you both see each other's phone number. Return on time, then rate each other."
+      }
+    },
+    "trust": {
+      "title": "Trust grows with every return",
+      "quote": "I bought a drill to hang one shelf. Since then it has hung about forty, and none of them are mine.",
+      "author": "Dilnoza",
+      "authorRole": "lends her tools in Yunusobod",
+      "portraitAlt": "A cordless drill on a wooden table beside floor plans and screws",
+      "points": {
+        "verified": "Every profile is verified by email",
+        "ratings": "Both sides rate each other after every return",
+        "phone": "Phone numbers appear only after a request is approved"
+      }
+    },
+    "cta": {
+      "title": "The drill in your cupboard could help three neighbours this month.",
+      "body": "Listing takes two minutes. You decide who borrows, when, and on what terms.",
+      "button": "List an item",
+      "secondary": "Browse first"
+    }
+  },
+  "explore": {},
+  "listings": {
+    "upToDays": "{days, plural, one {Up to # day} other {Up to # days}}",
+    "lentBy": "Lent by {name}",
+    "distance": "{km} km away",
+    "save": "Save",
+    "saved": "Saved",
+    "condition": {
+      "new": "New",
+      "good": "Good",
+      "used": "Used"
+    }
+  },
+  "borrowing": {},
+  "messages": {},
+  "dashboard": {},
+  "auth": {},
+  "notifications": {},
+  "validation": {},
+  "errors": {
+    "notFoundTitle": "This page was borrowed and never returned.",
+    "notFoundBody": "The link may be old, or the page has moved.",
+    "backHome": "Back to home"
+  },
+  "footer": {
+    "about": "Qadr helps neighbours in Uzbekistan share the things they rarely use.",
+    "borrow": "Borrow",
+    "lend": "Lend",
+    "company": "Qadr",
+    "lendingTips": "Lending tips",
+    "trustSafety": "Trust and safety",
+    "contact": "Contact",
+    "rights": "© {year} Qadr. Made in Tashkent."
+  }
+}

@@ -1,0 +1,254 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+/*
+ * Qadr design tokens (SPEC §2). Components use these through Tailwind
+ * utilities (bg-forest, text-charcoal, ...) or shadcn aliases (bg-primary).
+ * No raw hex values outside this file.
+ */
+:root {
+  /* Brand palette */
+  --qadr-forest: #214e3d;
+  --qadr-forest-deep: #183a2d;
+  --qadr-ivory: #f7f5ef;
+  --qadr-charcoal: #252822;
+  --qadr-sage: #e6e9df;
+  --qadr-ochre: #d8a45b;
+  --qadr-white: #ffffff;
+  --qadr-muted: #72766f; /* AA only on white (4.63:1) */
+  --qadr-muted-ink: #5f635c; /* secondary text on ivory/sage (5.6:1 / 5.0:1) */
+  --qadr-border: #d8ddd3;
+  /* Suzani accent: motif fills only, never text or UI surfaces */
+  --qadr-madder: #8a3b33;
+  --qadr-danger: #a3342a;
+
+  /* shadcn semantic aliases */
+  --background: var(--qadr-ivory);
+  --foreground: var(--qadr-charcoal);
+  --card: var(--qadr-white);
+  --card-foreground: var(--qadr-charcoal);
+  --popover: var(--qadr-white);
+  --popover-foreground: var(--qadr-charcoal);
+  --primary: var(--qadr-forest);
+  --primary-foreground: var(--qadr-ivory);
+  --secondary: var(--qadr-sage);
+  --secondary-foreground: var(--qadr-charcoal);
+  --muted: var(--qadr-sage);
+  --muted-foreground: var(--qadr-muted-ink);
+  --accent: var(--qadr-sage);
+  --accent-foreground: var(--qadr-forest);
+  --destructive: var(--qadr-danger);
+  --border: var(--qadr-border);
+  --input: var(--qadr-border);
+  --ring: var(--qadr-forest);
+  --radius: 0.875rem;
+
+  /* Motion */
+  --ease-qadr: cubic-bezier(0.22, 1, 0.36, 1);
+  --duration-quick: 180ms;
+  --duration-base: 320ms;
+  --duration-slow: 720ms;
+
+  /* Layout */
+  --header-height: 4.5rem;
+  --bottom-nav-height: 4.25rem;
+  --gutter: clamp(1rem, 4vw, 3rem);
+}
+
+@theme inline {
+  /* Colour utilities */
+  --color-forest: var(--qadr-forest);
+  --color-forest-deep: var(--qadr-forest-deep);
+  --color-ivory: var(--qadr-ivory);
+  --color-charcoal: var(--qadr-charcoal);
+  --color-sage: var(--qadr-sage);
+  --color-ochre: var(--qadr-ochre);
+  --color-white: var(--qadr-white);
+  --color-madder: var(--qadr-madder);
+  --color-line: var(--qadr-border);
+  --color-stone: var(--qadr-muted);
+  --color-ink-soft: var(--qadr-muted-ink);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Typography */
+  --font-sans: var(--font-onest), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-brygada), ui-serif, Georgia, serif;
+  --font-heading: var(--font-display);
+
+  /* Type scale: display / title / section / lead / body / caption / meta */
+  --text-display: clamp(3rem, 1.6rem + 5.6vw, 6.75rem);
+  --text-display--line-height: 0.96;
+  --text-display--letter-spacing: -0.025em;
+  --text-title: clamp(2.25rem, 1.6rem + 2.6vw, 3.75rem);
+  --text-title--line-height: 1.02;
+  --text-title--letter-spacing: -0.02em;
+  --text-section: clamp(1.75rem, 1.35rem + 1.6vw, 2.625rem);
+  --text-section--line-height: 1.08;
+  --text-section--letter-spacing: -0.015em;
+  --text-lead: clamp(1.125rem, 1.05rem + 0.3vw, 1.3125rem);
+  --text-lead--line-height: 1.55;
+  --text-body: 1rem;
+  --text-body--line-height: 1.6;
+  --text-caption: 0.875rem;
+  --text-caption--line-height: 1.5;
+  --text-meta: 0.8125rem;
+  --text-meta--line-height: 1.4;
+
+  /* Radii: arch for imagery, card, control, pill */
+  --radius-sm: calc(var(--radius) * 0.5);
+  --radius-md: calc(var(--radius) * 0.75);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.5);
+  --radius-2xl: calc(var(--radius) * 2);
+  --radius-3xl: calc(var(--radius) * 2.5);
+  --radius-4xl: calc(var(--radius) * 3);
+
+  /* Restrained, warm shadows (charcoal-tinted, never grey) */
+  --shadow-soft: 0 1px 2px color-mix(in oklab, var(--qadr-charcoal) 6%, transparent),
+    0 8px 24px -12px color-mix(in oklab, var(--qadr-charcoal) 18%, transparent);
+  --shadow-lift: 0 2px 4px color-mix(in oklab, var(--qadr-charcoal) 6%, transparent),
+    0 22px 48px -24px color-mix(in oklab, var(--qadr-forest-deep) 35%, transparent);
+
+  --ease-qadr: var(--ease-qadr);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply font-sans;
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    @apply bg-background text-foreground text-body antialiased;
+    font-feature-settings: "ss01", "cv11";
+  }
+  h1,
+  h2,
+  h3 {
+    @apply font-display text-balance;
+    font-weight: 500;
+    font-optical-sizing: auto;
+  }
+  p {
+    text-wrap: pretty;
+  }
+  ::selection {
+    background: var(--qadr-forest);
+    color: var(--qadr-ivory);
+  }
+  :focus-visible {
+    outline: 2px solid var(--qadr-forest);
+    outline-offset: 3px;
+  }
+}
+
+/* Lenis (https://github.com/darkroomengineering/lenis) recommended CSS */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis:not(.lenis-autoToggle).lenis-stopped {
+  overflow: clip;
+}
+.lenis [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+/* Page transitions (React <ViewTransition>) */
+::view-transition-old(.page-fade) {
+  animation: qadr-page-out var(--duration-quick) var(--ease-qadr) both;
+}
+::view-transition-new(.page-fade) {
+  animation: qadr-page-in var(--duration-base) var(--ease-qadr) both;
+}
+@keyframes qadr-page-out {
+  to {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+@keyframes qadr-page-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+@utility container-qadr {
+  width: 100%;
+  max-width: 88rem;
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+/* Reserve space for the fixed mobile bottom nav (SPEC §3 Mobile) */
+@utility pb-bottom-nav {
+  /* +1px for the nav's top border */
+  padding-bottom: calc(var(--bottom-nav-height) + 1px + env(safe-area-inset-bottom));
+}
+
+/* Hero load sequence: the page's single orchestrated entrance */
+@keyframes qadr-rise {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+}
+@keyframes qadr-unveil {
+  from {
+    opacity: 0;
+    transform: scale(1.04);
+  }
+}
+@keyframes qadr-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@utility animate-rise {
+  animation: qadr-rise 900ms var(--ease-qadr) both;
+}
+@utility animate-unveil {
+  animation: qadr-unveil 1400ms var(--ease-qadr) both;
+}
