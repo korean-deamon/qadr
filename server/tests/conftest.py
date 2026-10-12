@@ -34,6 +34,7 @@ os.environ.update(
         "CLOUDINARY_CLOUD_NAME": "",
         "CLOUDINARY_API_KEY": "",
         "CLOUDINARY_API_SECRET": "",
+        "GOOGLE_CLIENT_ID": "",  # individual tests enable it via the `google` fixture
     }
 )
 

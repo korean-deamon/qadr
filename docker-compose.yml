@@ -115,6 +115,7 @@ services:
       args:
         NEXT_PUBLIC_SITE_URL: http://localhost:8080
         API_INTERNAL_URL: http://api:8000
+        NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${NEXT_PUBLIC_GOOGLE_CLIENT_ID:-}
     environment:
       API_INTERNAL_URL: http://api:8000
     depends_on:

@@ -5,7 +5,7 @@ from app.core.deps import DB, csrf_protect, current_user_any
 from app.core.rate_limit import client_ip
 from app.modules.auth import service
 from app.modules.auth.models import User
-from app.modules.auth.schemas import ForgotIn, LoginIn, MeOut, RegisterIn, ResendIn, ResetIn
+from app.modules.auth.schemas import ForgotIn, GoogleLoginIn, LoginIn, MeOut, RegisterIn, ResendIn, ResetIn
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -31,6 +31,13 @@ async def resend_otp(body: ResendIn, db: DB) -> dict[str, bool]:
 @router.post("/login")
 async def login(body: LoginIn, request: Request, response: Response, db: DB) -> MeOut:
     session = await service.login(db, body.email, body.password, client_ip(request))
+    set_session_cookies(response, session.access, session.refresh)
+    return MeOut.model_validate(service.me(session.user))
+
+
+@router.post("/google")
+async def google_login(body: GoogleLoginIn, request: Request, response: Response, db: DB) -> MeOut:
+    session = await service.google_login(db, body.credential, body.locale, client_ip(request))
     set_session_cookies(response, session.access, session.refresh)
     return MeOut.model_validate(service.me(session.user))
 

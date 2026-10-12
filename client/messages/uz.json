@@ -486,7 +486,8 @@
       "deleteNotice": "Ulanmagan hisoblar {hours} soatdan keyin oʻchiriladi.",
       "otherAccount": "Bu siz emasmi? Chiqish",
       "unavailable": "Telegramni ulash vaqtincha ishlamayapti. Birozdan keyin qayta urinib koʻring."
-    }
+    },
+    "orContinueWith": "yoki quyidagi orqali"
   },
   "notifications": {
     "title": "Bildirishnomalar",
@@ -597,7 +598,10 @@
     "SERVER": "Bizda nimadir xato ketdi. Qayta urinib koʻring.",
     "GENERIC": "Bajarilmadi. Qayta urinib koʻring.",
     "NETWORK": "Internet aloqasi yoʻq. Tekshirib, qayta urinib koʻring.",
-    "TELEGRAM_REQUIRED": "Davom etish uchun Telegramni ulang."
+    "TELEGRAM_REQUIRED": "Davom etish uchun Telegramni ulang.",
+    "GOOGLE_NOT_CONFIGURED": "Google orqali kirish hali mavjud emas.",
+    "GOOGLE_TOKEN_INVALID": "Google orqali kirishda xatolik. Qayta urinib koʻring.",
+    "GOOGLE_EMAIL_UNVERIFIED": "Bu Google hisobining emaili tasdiqlanmagan, shuning uchun u bilan kira olmaymiz."
   },
   "account": {
     "menu": "Hisob",

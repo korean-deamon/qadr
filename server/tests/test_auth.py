@@ -129,6 +129,91 @@ async def test_unverified_accounts_are_deleted_after_24_hours() -> None:
     assert {recent.id, linked_long_ago.id, unlinked_later.id, admin.id} <= remaining
 
 
+def google_claims(**overrides: object) -> dict:  # type: ignore[type-arg]
+    claims = {"email": "googler@test.uz", "email_verified": True, "name": "Googler Test"}
+    claims.update(overrides)
+    return claims
+
+
+@pytest.fixture
+def google(monkeypatch):  # type: ignore[no-untyped-def]
+    """Stubs Google's token verification (no real network call) and enables the feature."""
+    from app.core.config import settings
+
+    monkeypatch.setattr(settings, "google_client_id", "test-client-id.apps.googleusercontent.com")
+    calls: list[str] = []
+
+    def fake_verify(token, request, audience):  # type: ignore[no-untyped-def]
+        calls.append(token)
+        if token == "bad-token":
+            raise ValueError("Wrong number of segments")
+        assert audience == settings.google_client_id
+        return google_claims() if token == "valid-token" else google_claims(email=token)
+
+    monkeypatch.setattr("app.modules.auth.service.google_id_token.verify_oauth2_token", fake_verify)
+    return calls
+
+
+async def test_google_creates_an_unlinked_account_like_register(client: Client, google) -> None:  # type: ignore[no-untyped-def]
+    res = await client.post("/auth/google", json={"credential": "valid-token", "locale": "ru"})
+    assert res.status_code == 200, res.text
+    body = res.json()
+    assert body["email"] == "googler@test.uz" and body["display_name"] == "Googler Test"
+    assert body["telegram_required"] is True  # same gate as email sign-up (SPEC §11)
+    assert "qadr_access" in client.cookies and "qadr_refresh" in client.cookies
+    async with SessionLocal() as db:
+        user = await db.scalar(select(User).where(User.email == "googler@test.uz"))
+        assert user and user.password_hash is None and user.preferred_locale == "ru"
+
+
+async def test_google_logs_into_the_existing_account_by_email_not_a_duplicate(client: Client, google) -> None:  # type: ignore[no-untyped-def]
+    existing = await make_user(email="googler@test.uz")
+    res = await client.post("/auth/google", json={"credential": "valid-token"})
+    assert res.status_code == 200
+    assert res.json()["id"] == str(existing.id)
+    async with SessionLocal() as db:
+        assert await db.scalar(select(func.count()).select_from(User).where(User.email == "googler@test.uz")) == 1
+
+
+async def test_google_rejects_unverified_email_claim(client: Client, monkeypatch) -> None:  # type: ignore[no-untyped-def]
+    from app.core.config import settings
+
+    monkeypatch.setattr(settings, "google_client_id", "test-client-id")
+
+    def fake_verify(token, request, audience):  # type: ignore[no-untyped-def]
+        return google_claims(email_verified=False)
+
+    monkeypatch.setattr("app.modules.auth.service.google_id_token.verify_oauth2_token", fake_verify)
+    res = await client.post("/auth/google", json={"credential": "x"})
+    assert res.status_code == 401 and res.json()["error"]["code"] == "GOOGLE_EMAIL_UNVERIFIED"
+
+
+async def test_google_rejects_a_bad_token(client: Client, google) -> None:  # type: ignore[no-untyped-def]
+    res = await client.post("/auth/google", json={"credential": "bad-token"})
+    assert res.status_code == 401 and res.json()["error"]["code"] == "GOOGLE_TOKEN_INVALID"
+
+
+async def test_google_disabled_without_a_client_id(client: Client) -> None:
+    res = await client.post("/auth/google", json={"credential": "x"})
+    assert res.status_code == 503 and res.json()["error"]["code"] == "GOOGLE_NOT_CONFIGURED"
+
+
+async def test_google_rejects_a_banned_users_existing_account(client: Client, google) -> None:  # type: ignore[no-untyped-def]
+    banned = await make_user(email="googler@test.uz")
+    async with SessionLocal() as db:
+        await db.execute(update(User).where(User.id == banned.id).values(banned_at=now_utc()))
+        await db.commit()
+    res = await client.post("/auth/google", json={"credential": "valid-token"})
+    assert res.status_code == 403 and res.json()["error"]["code"] == "ACCOUNT_BANNED"
+
+
+async def test_google_only_account_cannot_password_login(client: Client, google) -> None:  # type: ignore[no-untyped-def]
+    await client.post("/auth/google", json={"credential": "valid-token"})
+    async with new_client() as c:
+        res = await c.post("/auth/login", json={"email": "googler@test.uz", "password": "whatever123!"})
+        assert res.status_code == 401 and res.json()["error"]["code"] == "INVALID_CREDENTIALS"
+
+
 async def test_login_works_before_linking_and_reports_the_gate(client: Client) -> None:
     user = await make_user(verified=False)
     res = await client.post("/auth/login", json={"email": user.email, "password": PASSWORD})

@@ -15,6 +15,7 @@ import type { Me } from "@/lib/api/types"
 import { safeNext } from "@/lib/routes"
 import { cn } from "@/lib/utils"
 import { AuthHeading, Field, FormAlert, PasswordField, SubmitButton } from "./fields"
+import { ContinueWithGoogle } from "./google-button"
 
 function useSchemas() {
   const v = useTranslations("validation")
@@ -68,6 +69,9 @@ export function LoginForm() {
         </div>
         <SubmitButton pending={formState.isSubmitting}>{t("login.submit")}</SubmitButton>
       </form>
+      <div className="mt-7">
+        <ContinueWithGoogle onError={setError} />
+      </div>
       <p className="mt-8 text-center text-caption text-ink-soft">
         {t("login.noAccount")}{" "}
         <Link href={next ? { pathname: "/register", query: { next } } : "/register"} className="font-medium text-forest underline decoration-forest/30 underline-offset-4 hover:decoration-forest">{t("login.create")}</Link>
@@ -160,6 +164,9 @@ export function RegisterForm() {
         <p className="text-meta text-ink-soft">{t("register.agree")}</p>
         <SubmitButton pending={formState.isSubmitting}>{t("register.submit")}</SubmitButton>
       </form>
+      <div className="mt-7">
+        <ContinueWithGoogle onError={setError} />
+      </div>
       <p className="mt-8 text-center text-caption text-ink-soft">
         {t("register.haveAccount")}{" "}
         <Link href="/login" className="font-medium text-forest underline decoration-forest/30 underline-offset-4 hover:decoration-forest">{t("login.submit")}</Link>

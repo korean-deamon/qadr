@@ -6,10 +6,13 @@ One-time codes (password reset) are delivered only through the Telegram bot.
 Accounts that never link are deleted after UNVERIFIED_TTL (see tasks/jobs.py).
 """
 
+import asyncio
 import uuid
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 
+from google.auth.transport import requests as google_requests
+from google.oauth2 import id_token as google_id_token
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -127,6 +130,41 @@ async def register(db: AsyncSession, email: str, password: str, name: str, local
     return session
 
 
+async def google_login(db: AsyncSession, credential: str, locale: str, ip: str) -> Session:
+    """Verifies a Google ID token (the Identity Services button) and signs the user
+    in, creating the account on first use. Matches by verified email: an existing
+    email+password account signing in with the same Google account just logs in,
+    nothing is overwritten. Telegram linking is still required afterward (SPEC §11)
+    — Google only replaces the password, never the verification gate."""
+    if not settings.google_enabled:
+        raise AppError("GOOGLE_NOT_CONFIGURED", 503)
+    await rl.hit(rl.GOOGLE_LOGIN_IP, ip)
+    try:
+        # Verifies the signature against Google's public keys and the `aud` claim
+        # against our client ID; network call (fetches/caches Google's certs), so
+        # it runs off the event loop.
+        claims = await asyncio.to_thread(
+            google_id_token.verify_oauth2_token, credential, google_requests.Request(), settings.google_client_id
+        )
+    except ValueError as exc:
+        raise AppError("GOOGLE_TOKEN_INVALID", 401) from exc
+    if not claims.get("email_verified"):
+        raise AppError("GOOGLE_EMAIL_UNVERIFIED", 401)
+    email = normalize_email(claims["email"])
+    user = await get_by_email(db, email)
+    if user:
+        if user.banned_at or not user.is_active:
+            raise AppError("ACCOUNT_BANNED", 403)
+    else:
+        name = (claims.get("name") or claims.get("given_name") or email.split("@")[0]).strip()[:80]
+        user = User(id=uuid.uuid4(), email=email, password_hash=None, display_name=name, preferred_locale=locale)
+        db.add(user)
+        await db.flush()
+    session = await create_session(db, user)
+    await db.commit()
+    return session
+
+
 async def create_session(
     db: AsyncSession, user: User, *, auth_time: datetime | None = None, family: uuid.UUID | None = None
 ) -> Session:
@@ -164,7 +202,9 @@ async def login(db: AsyncSession, email: str, password: str, ip: str) -> Session
     await rl.hit(rl.LOGIN_IP, ip)
     await rl.hit(rl.LOGIN_EMAIL, key)
     user = await get_by_email(db, key)
-    if not user:
+    if not user or user.password_hash is None:
+        # No account, or a Google-only account with no password: identical response
+        # either way (no enumeration, no hint that this email uses Google).
         verify_password(password, _DUMMY_HASH)
         raise AppError("INVALID_CREDENTIALS", 401)
     if not verify_password(password, user.password_hash):

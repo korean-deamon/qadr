@@ -46,6 +46,12 @@ class Settings(BaseSettings):
     telegram_webhook_secret: str = ""
     telegram_link_token_ttl_minutes: int = 10
 
+    # Google "Sign in" button (ID-token flow): only the client ID is needed, never a
+    # secret — the backend verifies the token's signature against Google's public
+    # keys. Telegram linking is still required afterward; this only replaces the
+    # password (SPEC §11).
+    google_client_id: str = ""
+
     # Multiplies every rate-limit budget (1 in production; higher locally so repeated
     # e2e runs from one IP don't lock you out). Never set below 1.
     rate_limit_multiplier: int = Field(default=1, ge=1, le=100)
@@ -72,6 +78,10 @@ class Settings(BaseSettings):
     @property
     def telegram_enabled(self) -> bool:
         return bool(self.telegram_bot_token and self.telegram_bot_username)
+
+    @property
+    def google_enabled(self) -> bool:
+        return bool(self.google_client_id)
 
     @property
     def is_production(self) -> bool:

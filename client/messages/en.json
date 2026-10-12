@@ -486,7 +486,8 @@
       "deleteNotice": "Accounts that aren't connected are deleted in {hours, plural, one {# hour} other {# hours}}.",
       "otherAccount": "Not you? Log out",
       "unavailable": "Telegram connection is temporarily unavailable. Try again a little later."
-    }
+    },
+    "orContinueWith": "or continue with"
   },
   "notifications": {
     "title": "Notifications",
@@ -597,7 +598,10 @@
     "SERVER": "Something went wrong on our side. Please try again.",
     "GENERIC": "That didn't work. Please try again.",
     "NETWORK": "No connection. Check your internet and try again.",
-    "TELEGRAM_REQUIRED": "Connect Telegram to continue."
+    "TELEGRAM_REQUIRED": "Connect Telegram to continue.",
+    "GOOGLE_NOT_CONFIGURED": "Google sign-in isn't available yet.",
+    "GOOGLE_TOKEN_INVALID": "Google sign-in failed. Try again.",
+    "GOOGLE_EMAIL_UNVERIFIED": "This Google account's email isn't verified, so we can't use it to sign in."
   },
   "account": {
     "menu": "Account",

@@ -486,7 +486,8 @@
       "deleteNotice": "Неподключённые аккаунты удаляются через {hours, plural, one {# час} few {# часа} many {# часов} other {# часа}}.",
       "otherAccount": "Это не вы? Выйти",
       "unavailable": "Подключение Telegram временно недоступно. Попробуйте чуть позже."
-    }
+    },
+    "orContinueWith": "или продолжить через"
   },
   "notifications": {
     "title": "Уведомления",
@@ -597,7 +598,10 @@
     "SERVER": "У нас что-то пошло не так. Попробуйте ещё раз.",
     "GENERIC": "Не получилось. Попробуйте ещё раз.",
     "NETWORK": "Нет соединения. Проверьте интернет и попробуйте снова.",
-    "TELEGRAM_REQUIRED": "Подключите Telegram, чтобы продолжить."
+    "TELEGRAM_REQUIRED": "Подключите Telegram, чтобы продолжить.",
+    "GOOGLE_NOT_CONFIGURED": "Вход через Google пока недоступен.",
+    "GOOGLE_TOKEN_INVALID": "Не удалось войти через Google. Попробуйте ещё раз.",
+    "GOOGLE_EMAIL_UNVERIFIED": "Email этого аккаунта Google не подтверждён, поэтому им нельзя войти."
   },
   "account": {
     "menu": "Аккаунт",

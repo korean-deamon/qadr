@@ -51,7 +51,8 @@ async def delete_me(body: DeleteIn, request: Request, response: Response, db: DB
     Loans/ratings stay for the counterparty's history, attributed to a deleted account."""
     from app.modules.loans.models import Loan
 
-    if not verify_password(body.password, user.password_hash):
+    # Google-only accounts (no password set) can't confirm this way yet.
+    if user.password_hash is None or not verify_password(body.password, user.password_hash):
         raise AppError("INVALID_CREDENTIALS", 401)
     open_loan = await db.scalar(
         select(Loan.id).where(

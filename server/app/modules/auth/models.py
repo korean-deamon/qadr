@@ -21,7 +21,8 @@ from app.core.db import Base, Timestamps, UUIDPk
 class User(UUIDPk, Timestamps, Base):
     __tablename__ = "users"
     email: Mapped[str] = mapped_column(String(254), unique=True, index=True)  # normalized lower-case
-    password_hash: Mapped[str] = mapped_column(String(255))
+    # Null for accounts created via Google sign-in that never set a password (SPEC §11).
+    password_hash: Mapped[str | None] = mapped_column(String(255))
     display_name: Mapped[str] = mapped_column(String(80))
     avatar_url: Mapped[str | None] = mapped_column(String(500))
     area: Mapped[str | None] = mapped_column(String(80))

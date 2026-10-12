@@ -12,8 +12,11 @@ WORKDIR /app
 # Public origin (canonical/hreflang) and where /api/v1 rewrites point at build time.
 ARG NEXT_PUBLIC_SITE_URL=http://localhost:8080
 ARG API_INTERNAL_URL=http://api:8000
+# Google's OAuth client ID — not a secret (read by the browser), empty disables the button.
+ARG NEXT_PUBLIC_GOOGLE_CLIENT_ID=""
 ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL \
     API_INTERNAL_URL=$API_INTERNAL_URL \
+    NEXT_PUBLIC_GOOGLE_CLIENT_ID=$NEXT_PUBLIC_GOOGLE_CLIENT_ID \
     NEXT_TELEMETRY_DISABLED=1
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .

@@ -25,6 +25,13 @@ class LoginIn(BaseModel):
     password: str = Field(min_length=1, max_length=128)
 
 
+class GoogleLoginIn(BaseModel):
+    """`credential` is the signed ID token Google's Identity Services button returns."""
+
+    credential: str = Field(min_length=1)
+    locale: Literal["uz", "ru", "en"] = "uz"
+
+
 class ResendIn(BaseModel):
     """Resends a password-reset code to the account's Telegram."""
 
