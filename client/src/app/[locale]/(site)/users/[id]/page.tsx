@@ -1,4 +1,4 @@
-import { BadgeCheck, MapPin, Phone, Star } from "lucide-react"
+import { MapPin, Phone, Star } from "lucide-react"
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { getFormatter, getTranslations } from "next-intl/server"
@@ -56,9 +56,6 @@ export default async function UserPage({ params }: PageProps<"/[locale]/users/[i
                 <span>{t("memberSince", { date: format.dateTime(new Date(user.member_since), { month: "long", year: "numeric" }) })}</span>
               </p>
               <ul className="mt-4 flex flex-wrap gap-2 text-meta">
-                {user.email_verified ? (
-                  <li className="flex items-center gap-1.5 rounded-full bg-ivory/10 px-3 py-1"><BadgeCheck className="size-3.5" aria-hidden="true" />{t("emailVerified")}</li>
-                ) : null}
                 {user.phone_verified ? (
                   <li className="flex items-center gap-1.5 rounded-full bg-ivory/10 px-3 py-1"><Phone className="size-3.5" aria-hidden="true" />{t("phoneVerified")}</li>
                 ) : null}

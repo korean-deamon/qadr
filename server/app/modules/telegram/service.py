@@ -97,6 +97,7 @@ async def link(
     now = now_utc()
     user.phone = e164
     user.phone_verified_at = now
+    user.verified_at = user.verified_at or now  # first link verifies the account for good
     user.telegram_id = from_id
     user.telegram_username = username
     user.telegram_linked_at = now
@@ -116,7 +117,8 @@ async def link(
 
 
 async def unlink(db: AsyncSession, user: User) -> None:
-    """Unlinking keeps nothing from Telegram; the phone stays but is no longer verified."""
+    """Unlinking keeps nothing from Telegram; the phone stays but is no longer verified.
+    The account is then limited again until Telegram is linked (SPEC §11)."""
     user.telegram_id = None
     user.telegram_username = None
     user.telegram_linked_at = None

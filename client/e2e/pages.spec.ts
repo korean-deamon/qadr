@@ -17,7 +17,6 @@ const ROUTES = [
   ["/uz/explore", "Yaqindan toping"],
   ["/uz/login", "Qaytganingizdan xursandmiz"],
   ["/uz/register", "Qoʻshnilaringizga qoʻshiling"],
-  ["/uz/verify?email=someone@test.uz", "Emailingizni tekshiring"],
   ["/uz/forgot-password", "Parolni tiklash"],
   ["/uz/reset-password", "Yangi parol oʻylab toping"],
 ] as const
@@ -128,12 +127,31 @@ test("an owner declines an incoming request from the requests page", async ({ br
   await owner.close()
 })
 
-test("verify: a wrong code shows the API's localized error", async ({ page }) => {
-  await open(page, "/uz/verify?email=nobody-e2e@test.uz")
-  await page.getByRole("textbox", { name: "1-raqam" }).click()
-  await page.keyboard.type("123456")
-  await page.getByRole("button", { name: "Tasdiqlash" }).click()
-  await expect(page.locator("#otp-error")).toContainText("Kod notoʻgʻri. Qayta urinib koʻring.")
+test("sign-up needs no code, then Telegram is the only way in (SPEC §11)", async ({ page }) => {
+  const email = `e2e-${Date.now()}-${Math.random().toString(36).slice(2, 7)}@test.uz`
+  await open(page, "/en/register")
+  await page.getByLabel("Your name").fill("E2E Neighbour")
+  await page.getByLabel("Email").fill(email)
+  await page.getByLabel("Password", { exact: true }).fill("Neighbour123!")
+  await page.getByRole("button", { name: "Create account" }).click()
+  await expect(page).toHaveURL(/\/en\/connect-telegram/)
+  await expect(page.getByRole("heading", { name: "Connect Telegram" })).toBeVisible()
+  await expect(page.getByText(/deleted in \d+ hours?/)).toBeVisible()
+
+  // public and private pages alike lead back to the gate
+  for (const path of ["/en/explore", "/en/dashboard"]) {
+    await page.goto(path)
+    await expect(page).toHaveURL(/\/en\/connect-telegram/)
+  }
+  const res = await page.request.get("/api/v1/users/me")
+  expect(res.status()).toBe(403)
+  expect(((await res.json()) as { error: { code: string } }).error.code).toBe("TELEGRAM_REQUIRED")
+
+  await page.locator("html[data-hydrated]").waitFor({ state: "attached" })
+  await page.getByRole("button", { name: "Not you? Log out" }).click()
+  await expect(page).toHaveURL(/\/en$/)
+  await page.goto("/en/explore")
+  await expect(page).toHaveURL(/\/en\/explore/)
 })
 
 test("register validates fields with localized messages", async ({ page }) => {

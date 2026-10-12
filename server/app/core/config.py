@@ -34,14 +34,6 @@ class Settings(BaseSettings):
     media_root: str = "./media"
     media_url: str = "/api/v1/media"
 
-    # Email: smtp (Mailpit in dev), console (prints), or memory (tests)
-    email_provider: Literal["smtp", "console", "memory"] = "console"
-    email_api_key: str = ""
-    email_from: str = "Qadr <no-reply@qadr.uz>"
-    smtp_host: str = "localhost"
-    smtp_port: int = 1025
-    smtp_username: str = "apikey"  # SendGrid/Brevo-style relays log in with a fixed user + API key
-
     default_locale: str = "uz"
     supported_locales: str = "uz,ru,en"
 

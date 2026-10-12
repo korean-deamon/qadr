@@ -9,13 +9,15 @@ export type Me = {
   avatar_url: string | null
   area: string | null
   preferred_locale: Locale
-  email_verified: boolean
   phone: string | null
   phone_verified: boolean
   telegram_linked: boolean
   telegram_username: string | null
   telegram_notifications: boolean
-  show_telegram_prompt: boolean
+  /** Telegram not linked: everything except /connect-telegram is off limits (SPEC §11) */
+  telegram_required: boolean
+  /** When an account that never linked Telegram is removed; null once verified */
+  delete_unverified_at: string | null
   is_admin: boolean
   restricted_until: string | null
   created_at: string
@@ -46,7 +48,6 @@ export type PublicUser = {
   first_name: string
   avatar_url: string | null
   area: string | null
-  email_verified: boolean
   phone_verified: boolean
   member_since: string
   rating: number | null

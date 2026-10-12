@@ -1,37 +1,12 @@
-"""Server-side message catalogue (emails, Telegram, notification texts) in uz/ru/en.
+"""Server-side message catalogue (Telegram bot and notification texts) in uz/ru/en.
 
 The web UI renders notifications from `type` + `payload` with its own dictionaries;
-these strings are for channels outside the browser (email, Telegram).
+these strings are for the one channel outside the browser: Telegram (SPEC §11, §22).
 """
 
 from typing import Any
 
 T: dict[str, dict[str, str]] = {
-    # ---- one-time codes -------------------------------------------------
-    "otp.verify.subject": {
-        "uz": "Qadr: tasdiqlash kodi {code}",
-        "ru": "Qadr: код подтверждения {code}",
-        "en": "Qadr: your verification code {code}",
-    },
-    "otp.verify.body": {
-        "uz": "Salom, {name}!\n\nEmailingizni tasdiqlash kodi: {code}\nKod 10 daqiqa amal qiladi.\n\n"
-        "Agar siz roʻyxatdan oʻtmagan boʻlsangiz, bu xatga eʼtibor bermang.",
-        "ru": "Здравствуйте, {name}!\n\nКод подтверждения email: {code}\nКод действует 10 минут.\n\n"
-        "Если вы не регистрировались, просто проигнорируйте это письмо.",
-        "en": "Hi {name},\n\nYour email verification code is {code}.\nIt expires in 10 minutes.\n\n"
-        "If you didn't sign up, you can ignore this email.",
-    },
-    "otp.reset.subject": {
-        "uz": "Qadr: parolni tiklash kodi {code}",
-        "ru": "Qadr: код для сброса пароля {code}",
-        "en": "Qadr: password reset code {code}",
-    },
-    "otp.reset.body": {
-        "uz": "Parolni tiklash kodi: {code}\nKod 10 daqiqa amal qiladi. Agar siz soʻramagan boʻlsangiz, eʼtibor bermang.",
-        "ru": "Код для сброса пароля: {code}\nКод действует 10 минут. Если вы его не запрашивали, проигнорируйте.",
-        "en": "Your password reset code is {code}.\nIt expires in 10 minutes. If you didn't ask for it, ignore this.",
-    },
-    # ---- notifications (title line) -------------------------------------
     "n.request_received": {
         "uz": "{actor} “{item}” uchun soʻrov yubordi ({dates}).",
         "ru": "{actor} хочет взять «{item}» ({dates}).",
@@ -142,22 +117,13 @@ T: dict[str, dict[str, str]] = {
         "ru": "Telegram подключён. Номер телефона подтверждён.",
         "en": "Telegram linked. Your phone number is verified.",
     },
-    "email.notification.subject": {
-        "uz": "Qadr: yangi bildirishnoma",
-        "ru": "Qadr: новое уведомление",
-        "en": "Qadr: new notification",
-    },
-    "email.footer": {
-        "uz": "\n\n— Qadr. Har narsaning qadri bor.\n{url}",
-        "ru": "\n\n— Qadr. У каждой вещи своя ценность.\n{url}",
-        "en": "\n\n— Qadr. Good things are worth sharing.\n{url}",
-    },
-    # ---- Telegram bot ---------------------------------------------------
     "bot.welcome": {
-        "uz": "Assalomu alaykum! Bu Qadr boti. Telefon raqamingizni ulash uchun saytdagi "
-        "“Telegramni ulash” tugmasini bosing.",
-        "ru": "Здравствуйте! Это бот Qadr. Чтобы привязать номер, нажмите «Подключить Telegram» на сайте.",
-        "en": "Hello! This is the Qadr bot. To link your phone, tap “Link Telegram” on the website.",
+        "uz": "Assalomu alaykum! Bu Qadr boti. Qadrdan foydalanish uchun saytda roʻyxatdan oʻting va "
+        "“Telegramni ulash” tugmasini bosing. Parolni tiklash kodlari shu yerga keladi.",
+        "ru": "Здравствуйте! Это бот Qadr. Чтобы пользоваться Qadr, зарегистрируйтесь на сайте и нажмите "
+        "«Подключить Telegram». Коды для сброса пароля будут приходить сюда.",
+        "en": "Hello! This is the Qadr bot. To use Qadr, sign up on the website and tap “Connect Telegram”. "
+        "Password reset codes will arrive here.",
     },
     "bot.ask_contact": {
         "uz": "Raqamingizni tasdiqlash uchun pastdagi tugma orqali kontaktingizni yuboring.",
@@ -166,9 +132,9 @@ T: dict[str, dict[str, str]] = {
     },
     "bot.share_button": {"uz": "📱 Kontaktni yuborish", "ru": "📱 Отправить контакт", "en": "📱 Share my contact"},
     "bot.token_invalid": {
-        "uz": "Havola eskirgan yoki allaqachon ishlatilgan. Saytdagi sozlamalardan yangisini oling: {url}",
-        "ru": "Ссылка устарела или уже использована. Получите новую в настройках на сайте: {url}",
-        "en": "This link has expired or was already used. Get a new one in your settings: {url}",
+        "uz": "Havola eskirgan yoki allaqachon ishlatilgan. Saytdan yangisini oling: {url}",
+        "ru": "Ссылка устарела или уже использована. Получите новую на сайте: {url}",
+        "en": "This link has expired or was already used. Get a new one on the website: {url}",
     },
     "bot.wrong_contact": {
         "uz": "Iltimos, oʻzingizning kontaktingizni yuboring (boshqa odamniki emas).",
@@ -191,9 +157,12 @@ T: dict[str, dict[str, str]] = {
         "en": "This Telegram account is already linked to another Qadr account.",
     },
     "bot.linked": {
-        "uz": "Tayyor! Raqamingiz {phone} tasdiqlandi. Endi kodlar va muhim bildirishnomalar shu yerga keladi.",
-        "ru": "Готово! Номер {phone} подтверждён. Коды и важные уведомления будут приходить сюда.",
-        "en": "Done! {phone} is verified. Codes and key notifications will arrive here.",
+        "uz": "Tayyor! Raqamingiz {phone} tasdiqlandi. Saytga qayting: hisobingiz ochildi. "
+        "Kodlar va muhim bildirishnomalar shu yerga keladi.",
+        "ru": "Готово! Номер {phone} подтверждён. Вернитесь на сайт: аккаунт открыт. "
+        "Коды и важные уведомления будут приходить сюда.",
+        "en": "Done! {phone} is verified. Go back to the website: your account is ready. "
+        "Codes and key notifications will arrive here.",
     },
     "bot.stopped": {
         "uz": "Bildirishnomalar oʻchirildi. Kodlar baribir keladi. Qayta yoqish: /notify",
@@ -207,9 +176,12 @@ T: dict[str, dict[str, str]] = {
         "en": "/stop — turn notifications off\n/notify — turn them on\nWebsite: {url}",
     },
     "bot.otp": {
-        "uz": "Qadr kodi: <b>{code}</b>\n10 daqiqa amal qiladi. Hech kimga bermang.",
-        "ru": "Код Qadr: <b>{code}</b>\nДействует 10 минут. Никому его не сообщайте.",
-        "en": "Qadr code: <b>{code}</b>\nValid for 10 minutes. Never share it.",
+        "uz": "Qadr: parolni tiklash kodi <b>{code}</b>\n10 daqiqa amal qiladi. Hech kimga bermang. "
+        "Agar siz soʻramagan boʻlsangiz, eʼtibor bermang.",
+        "ru": "Qadr: код для сброса пароля <b>{code}</b>\nДействует 10 минут. Никому его не сообщайте. "
+        "Если вы его не запрашивали, просто проигнорируйте.",
+        "en": "Qadr password reset code: <b>{code}</b>\nValid for 10 minutes. Never share it. "
+        "If you didn't ask for it, ignore this message.",
     },
 }
 

@@ -88,7 +88,6 @@ async def _user_summary(db: DB, user: User) -> dict[str, Any]:
         "name": user.display_name,
         "email": user.email,
         "phone": user.phone if user.phone_verified_at else None,
-        "email_verified": user.email_verified_at is not None,
         "phone_verified": user.phone_verified_at is not None,
         "telegram_linked": user.telegram_id is not None,
         "member_since": user.created_at,
@@ -516,7 +515,7 @@ async def list_users(
     elif state == "admins":
         where.append(User.is_admin.is_(True))
     elif state == "unverified":
-        where.append(User.email_verified_at.is_(None))
+        where.append(User.phone_verified_at.is_(None))  # Telegram not linked
     total = await db.scalar(select(func.count()).select_from(User).where(*where)) or 0
     rows = (
         await db.scalars(

@@ -1,4 +1,4 @@
-import { BadgeCheck, Phone, Star } from "lucide-react"
+import { Phone, Star } from "lucide-react"
 import { useFormatter, useTranslations } from "next-intl"
 import { Avatar } from "@/components/ui/avatar"
 import { Link } from "@/i18n/navigation"
@@ -40,9 +40,6 @@ export function OwnerCard({ owner }: { owner: PublicUser }) {
         </div>
       </div>
       <ul className="mt-5 space-y-2.5 text-caption text-charcoal">
-        {owner.email_verified ? (
-          <li className="flex items-center gap-2.5"><BadgeCheck className="size-[1.125rem] text-forest" aria-hidden="true" />{t("verified")}</li>
-        ) : null}
         {owner.phone_verified ? (
           <li className="flex items-center gap-2.5"><Phone className="size-[1.125rem] text-forest" aria-hidden="true" />{t("phoneVerified")}</li>
         ) : null}

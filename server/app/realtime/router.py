@@ -43,7 +43,7 @@ async def ws(websocket: WebSocket) -> None:
     # never trust client-sent ids: identity comes from the verified token only
     async with SessionLocal() as db:
         user = await db.get(User, uuid.UUID(claims["sub"]))
-    if not user or not user.is_active or user.banned_at or not user.email_verified_at:
+    if not user or not user.is_active or user.banned_at:  # unlinked users too: they await "telegram.linked"
         await websocket.close(code=4401)
         return
     await websocket.accept()

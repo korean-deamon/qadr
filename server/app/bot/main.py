@@ -71,7 +71,7 @@ async def start_link(message: Message, command: CommandObject) -> None:
         user = await service.pending_user(db, token)
     if not user:
         locale = tg_locale(message.from_user.language_code)
-        await message.answer(t("bot.token_invalid", locale, url=f"{settings.frontend_url}/{locale}/settings"))
+        await message.answer(t("bot.token_invalid", locale, url=f"{settings.frontend_url}/{locale}/connect-telegram"))
         return
     await get_redis().set(_pending_key(message.from_user.id), token, ex=PENDING_TTL)
     keyboard = ReplyKeyboardMarkup(
@@ -123,7 +123,7 @@ async def on_contact(message: Message) -> None:
         await message.answer(t("bot.telegram_taken", locale), reply_markup=ReplyKeyboardRemove())
     else:
         await message.answer(
-            t("bot.token_invalid", locale, url=f"{settings.frontend_url}/{locale}/settings"),
+            t("bot.token_invalid", locale, url=f"{settings.frontend_url}/{locale}/connect-telegram"),
             reply_markup=ReplyKeyboardRemove(),
         )
     log.info("bot.link", result=str(result), tg=message.from_user.id)

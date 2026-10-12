@@ -54,7 +54,6 @@ def public_user(user: User, trust: dict[str, Any]) -> dict[str, Any]:
         "first_name": first_name(user.display_name),
         "avatar_url": user.avatar_url,
         "area": user.area,
-        "email_verified": user.email_verified_at is not None,
         "phone_verified": user.phone_verified_at is not None,
         "member_since": user.created_at,
         **trust,

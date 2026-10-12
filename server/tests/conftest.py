@@ -25,7 +25,6 @@ os.environ.update(
         )[0]
         + "/15",
         "SECRET_KEY": "test-secret-key-0123456789abcdef",
-        "EMAIL_PROVIDER": "memory",
         "RATE_LIMIT_MULTIPLIER": "1",
         "MEDIA_ROOT": tempfile.mkdtemp(prefix="qadr-media-"),
         "FRONTEND_URL": "http://localhost:3000",
@@ -38,6 +37,7 @@ os.environ.update(
     }
 )
 
+import itertools
 import uuid
 from collections.abc import AsyncIterator
 from datetime import timedelta
@@ -53,7 +53,6 @@ from app.core.db import SessionLocal, engine
 from app.core.redis import get_redis
 from app.core.security import hash_password
 from app.core.time import now_utc
-from app.email import provider
 from app.main import app
 from app.modules.auth.models import User
 from app.modules.categories.models import Category, CategoryTranslation
@@ -93,7 +92,6 @@ async def _clean() -> AsyncIterator[None]:
         await conn.execute(text(f"TRUNCATE {TABLES} CASCADE"))
         await conn.execute(text("ALTER TABLE admin_audit_log ENABLE TRIGGER admin_audit_log_no_change"))
     await get_redis().flushdb()
-    provider.OUTBOX.clear()
     yield
 
 
@@ -119,6 +117,9 @@ def new_client() -> Client:
     return Client(transport=ASGITransport(app=app), base_url="http://test/api/v1")
 
 
+_phones = itertools.count(1)
+
+
 async def make_user(
     email: str | None = None,
     *,
@@ -135,9 +136,10 @@ async def make_user(
             email=email or f"u{uuid.uuid4().hex[:8]}@test.uz",
             password_hash=hash_password(PASSWORD),
             display_name=name,
-            email_verified_at=now_utc() if verified else None,
-            phone=phone,
-            phone_verified_at=now_utc() if phone else None,
+            # verified = Telegram linked (SPEC §11): that is what verifies the phone
+            verified_at=now_utc() if verified else None,
+            phone=phone or (f"+99899{next(_phones):07d}" if verified else None),
+            phone_verified_at=now_utc() if (phone or verified) else None,
             telegram_id=telegram_id,
             is_admin=admin,
             preferred_locale=locale,

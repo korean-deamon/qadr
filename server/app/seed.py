@@ -55,17 +55,18 @@ AREAS = {
 }
 
 USERS = [
-    # key, name, email, area, phone, admin
+    # key, name, email, area, phone, admin. Every account needs a verified phone: in the
+    # real app that comes from linking Telegram (SPEC §11), which demo users skip.
     ("me", "Dilnoza Karimova", "demo@qadr.uz", "Yunusobod", "+998901234567", False),
     ("sardor", "Sardor Rahimov", "sardor@qadr.uz", "Chilonzor", "+998935552014", False),
     ("malika", "Malika Yusupova", "malika@qadr.uz", "Mirobod", "+998974108803", False),
     ("aziza", "Aziza Tosheva", "aziza@qadr.uz", "Yunusobod", "+998907023155", False),
     ("jasur", "Jasur Ergashev", "jasur@qadr.uz", "Mirzo Ulugʻbek", "+998991186420", False),
     ("timur", "Тимур Ахмедов", "timur@qadr.uz", "Yakkasaroy", "+998909771240", False),
-    ("bekzod", "Bekzod Nazarov", "bekzod@qadr.uz", "Sergeli", None, False),
+    ("bekzod", "Bekzod Nazarov", "bekzod@qadr.uz", "Sergeli", "+998935009021", False),
     ("olga", "Ольга Ким", "olga@qadr.uz", "Mirobod", "+998973004512", False),
     ("nodira", "Nodira Alimova", "nodira@qadr.uz", "Shayxontohur", "+998936401809", False),
-    ("admin", "Qadr Moderator", "admin@qadr.uz", "Mirobod", None, True),
+    ("admin", "Qadr Moderator", "admin@qadr.uz", "Mirobod", "+998900000001", True),
 ]
 
 # key, owner, category, title, condition, max_days, images, description, terms, days_ago
@@ -328,7 +329,7 @@ async def seed() -> None:
                 phone=phone,
                 phone_verified_at=now if phone else None,
                 preferred_locale="ru" if key in ("timur", "olga") else "uz",
-                email_verified_at=now,
+                verified_at=now,
                 is_admin=admin,
                 created_at=now - timedelta(days=200 - i * 15),
             )

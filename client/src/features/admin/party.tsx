@@ -37,7 +37,7 @@ export async function Party({ user, role }: { user: UserSummary; role: string })
         <Row label={t("asReporter")}>{user.reports_as_reporter}</Row>
       </dl>
       <ul className="mt-3 flex flex-wrap gap-3 text-meta text-charcoal">
-        <li className="flex items-center gap-1"><BadgeCheck className={user.email_verified ? "size-3.5 text-forest" : "size-3.5 text-line"} aria-hidden="true" />{user.email_verified ? t("emailVerified") : t("emailUnverified")}</li>
+        <li className="flex items-center gap-1"><BadgeCheck className={user.phone_verified ? "size-3.5 text-forest" : "size-3.5 text-line"} aria-hidden="true" />{user.phone_verified ? t("telegramLinked") : t("telegramMissing")}</li>
         <li className="flex items-center gap-1"><Phone className={user.phone_verified ? "size-3.5 text-forest" : "size-3.5 text-line"} aria-hidden="true" />{user.phone ?? t("noPhone")}</li>
         <li className="flex items-center gap-1"><Send className={user.telegram_linked ? "size-3.5 text-forest" : "size-3.5 text-line"} aria-hidden="true" />{user.telegram_linked ? t("telegram") : t("noTelegram")}</li>
       </ul>

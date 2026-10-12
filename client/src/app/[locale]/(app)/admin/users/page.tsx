@@ -54,7 +54,7 @@ export default async function AdminUsers({ searchParams }: PageProps<"/[locale]/
                   {u.is_admin ? <Pill tone="admin">{t("user.admin")}</Pill> : null}
                   {u.banned_at ? <Pill tone="banned">{t("user.banned")}</Pill> : null}
                   {u.restricted_until ? <Pill tone="restricted">{t("user.restricted")}</Pill> : null}
-                  {!u.email_verified ? <Pill tone="normal">{t("user.emailUnverified")}</Pill> : null}
+                  {!u.phone_verified ? <Pill tone="normal">{t("user.telegramMissing")}</Pill> : null}
                   {u.reports_as_target ? <Pill tone="open">{t("user.reportsCount", { count: u.reports_as_target })}</Pill> : null}
                 </span>
                 <span className="w-28 text-right text-meta text-ink-soft">{format.dateTime(new Date(u.member_since), { dateStyle: "medium" })}</span>

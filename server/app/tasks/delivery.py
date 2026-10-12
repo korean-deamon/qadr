@@ -15,7 +15,6 @@ from app.core.config import settings
 from app.core.i18n import t
 from app.core.outbox import TaskOutbox
 from app.core.time import now_utc
-from app.email.provider import send_email
 from app.modules.auth.models import User
 from app.modules.notifications.models import Notification
 
@@ -83,44 +82,36 @@ async def _mark_blocked(db: AsyncSession, user: User) -> None:
 
 
 async def deliver_otp(db: AsyncSession, payload: dict[str, Any]) -> None:
+    """Codes go only to Telegram (SPEC §11). A blocked bot means no code; the user
+    is told on the site to reopen the bot and request a new one."""
     user = await db.get(User, uuid.UUID(payload["user_id"]))
     code = payload.get("code")
-    if not user or not code:
+    if not user or not code or not user.telegram_id or user.telegram_blocked_at:
         return
-    locale = user.preferred_locale
-    if payload.get("channel") == "telegram" and user.telegram_id and not user.telegram_blocked_at:
-        try:
-            await send_telegram(user.telegram_id, t("bot.otp", locale, code=code))
-            return
-        except TelegramBlocked:
-            await _mark_blocked(db, user)  # fall back to email
-    purpose = payload.get("purpose", "verify")
-    await send_email(
-        user.email,
-        t(f"otp.{purpose}.subject", locale, code=code),
-        t(f"otp.{purpose}.body", locale, code=code, name=user.display_name.split(" ")[0])
-        + t("email.footer", locale, url=settings.frontend_url),
-    )
+    try:
+        await send_telegram(user.telegram_id, t("bot.otp", user.preferred_locale, code=code))
+    except TelegramBlocked:
+        await _mark_blocked(db, user)
+        log.warning("otp.undeliverable", user=str(user.id))
 
 
 async def deliver_notification(db: AsyncSession, payload: dict[str, Any]) -> None:
+    """Telegram copy of an in-app notification. The in-app row already exists, so
+    users without a reachable Telegram simply see it on the site."""
     n = await db.get(Notification, uuid.UUID(payload["notification_id"]))
     if not n:
         return
     user = await db.get(User, n.user_id)
     if not user or not user.is_active:
         return
-    locale = user.preferred_locale
-    text = render(n, locale)
-    if user.telegram_id and user.telegram_notifications and not user.telegram_blocked_at and settings.telegram_enabled:
-        try:
-            await send_telegram(user.telegram_id, f"{text}\n\n{site_link(n)}")
-            return
-        except TelegramBlocked:
-            await _mark_blocked(db, user)
-    await send_email(
-        user.email, t("email.notification.subject", locale), text + t("email.footer", locale, url=site_link(n))
-    )
+    if not (user.telegram_id and user.telegram_notifications and not user.telegram_blocked_at):
+        return
+    if not settings.telegram_enabled:
+        return
+    try:
+        await send_telegram(user.telegram_id, f"{render(n, user.preferred_locale)}\n\n{site_link(n)}")
+    except TelegramBlocked:
+        await _mark_blocked(db, user)
 
 
 HANDLERS = {"otp.deliver": deliver_otp, "notification.deliver": deliver_notification}

@@ -1,5 +1,12 @@
-# QADR — Technical Specification v3.2
+# QADR — Technical Specification v3.3
 
+> **v3.3 changes (2026-10-12):** no email anywhere. Sign-up needs no code;
+> linking Telegram is the account verification and is mandatory: until it is
+> linked the account can open nothing but `/connect-telegram`, and accounts
+> that never link are deleted after 24 hours. One-time codes (password reset)
+> and notifications go only through the Telegram bot. SMTP/Mailpit and all
+> email settings are removed (§6, §9, §10, §11, §12, §14, §17, §18, §20, §22–24).
+>
 > **v3.2 changes:** access control and route protection (§11.1–11.3), resolved
 > borrowing decisions (§10.1), Telegram bot (§22), administration and
 > moderation (§23), current implementation status (§24), performance targets
@@ -159,8 +166,10 @@ No Kubernetes, Kafka, or microservices. Pin and test dependency versions.
 ## 6. Frontend routes
 
 Public: `/{locale}`, `/explore`, `/items/[id]`, `/categories/[slug]`,
-`/users/[id]` (public profile), `/login`, `/register`, `/verify` (OTP),
+`/users/[id]` (public profile), `/login`, `/register`,
 `/forgot-password`, `/reset-password`.
+
+Signed in, Telegram not linked yet: `/connect-telegram` (and nothing else).
 
 Authenticated: `/dashboard`, `/my-items`, `/items/new`, `/items/[id]/edit`,
 `/requests`, `/borrowings`, `/messages`, `/messages/[conversationId]`,
@@ -215,12 +224,13 @@ foreign keys, constraints, Alembic migrations.
 - **users** — id, email, password_hash, display_name, avatar_url, phone,
   phone_verified_at, telegram_id (unique, nullable), telegram_username,
   telegram_linked_at, telegram_blocked_at, telegram_notifications (bool),
-  preferred_locale, email_verified_at, is_active, is_admin,
+  preferred_locale, verified_at (first Telegram link, never cleared),
+  is_active, is_admin,
   restricted_until, restriction_reason, banned_at, ban_reason,
   created_at, updated_at. `phone` is unique among verified phones;
   phone numbers are stored in E.164 (`+998…`).
-- **email_otps** (all one-time codes) — id, user_id, code_hash, purpose
-  (verify/reset), channel (email/telegram), expires_at, attempts,
+- **email_otps** (all one-time codes; legacy table name) — id, user_id,
+  code_hash, purpose (reset), channel (telegram), expires_at, attempts,
   consumed_at, created_at
 - **refresh_tokens** — id, user_id, token_hash, family_id, expires_at,
   revoked_at, created_at
@@ -321,7 +331,7 @@ The database is the final authority.
 - After return, both users rate each other (1–5 + optional comment).
 - If not returned after end_date, the owner can report `not_returned`;
   it goes to the admin queue with priority.
-- Public profiles show: verified email, completed loans, average rating.
+- Public profiles show: verified phone (via Telegram), completed loans, average rating.
 - Admins can warn, restrict or ban accounts (see §23).
 - Ratings are allowed only after `returned`, once per side, within 14 days.
 
@@ -329,32 +339,47 @@ The database is the final authority.
 
 ## 11. Authentication
 
-- Register with email + password → 6-digit email OTP (10 min expiry,
-  max 5 attempts, 60s resend cooldown). Account usable only after verification.
-- Wrong OTP → localized "incorrect code, try again".
-- Rate-limit login, OTP verify/resend, forgot/reset password → HTTP 429 with
+There is no email in Qadr: no verification email, no SMTP service. The email
+address is only the login name. **Telegram is the verification.**
+
+- **Register** with name, email and password → the account is created and
+  signed in at once (no code). An existing address, verified or not, returns
+  409 `EMAIL_TAKEN`; it is never overwritten.
+- **Connect Telegram (mandatory):** right after sign-up the user lands on
+  `/connect-telegram`. Linking (§22) shares the user's own contact, which
+  verifies the phone and sets `verified_at`. Until then the account can open
+  nothing else; the API answers every other protected request with 403
+  `TELEGRAM_REQUIRED`.
+- **Unlinked accounts are deleted after 24 hours** (`verified_at IS NULL`,
+  hourly job), which frees the address. An abandoned address older than 24 h
+  may also be registered again immediately. Accounts that were verified once
+  and unlink later are limited again but never deleted.
+- **Login** is email + password; an unlinked account signs in and is sent to
+  `/connect-telegram`.
+- **Forgot/reset password:** a 6-digit code (10 min expiry, max 5 attempts,
+  60 s resend cooldown) is sent **only to the Qadr bot** in the linked
+  Telegram. The response is identical for unknown, unlinked or blocked
+  accounts (no enumeration). Lost Telegram *and* password needs admin help.
+- Wrong code → localized "incorrect code, try again".
+- Rate-limit login, code resend, forgot/reset password → HTTP 429 with
   localized "too many requests, try again in N seconds".
 - JWT access token (15 min) + rotating refresh token (30 days), both in
   httpOnly, Secure, SameSite=Lax cookies. Refresh reuse detection revokes
-  the whole token family.
+  the whole token family. The access token carries `tg` (Telegram linked) as
+  a routing hint for the web proxy only.
 - CSRF protection for cookie-authenticated state-changing requests.
-- Forgot password uses an email OTP / reset token.
-- Phone/SMS OTP is out of MVP scope; model is ready for it.
-- **Code delivery channel:** the registration code is always emailed (no
-  Telegram link exists yet). Every later one-time code (forgot/reset password,
-  future re-verification) goes to the Telegram bot if the account has a linked,
-  non-blocked Telegram; otherwise to email. The UI says where the code was sent.
+- Phone/SMS OTP is out of MVP scope.
 - **Rate limits** (Redis, sliding window, keyed by IP and by account/email):
-  login 5/15 min per email + 20/15 min per IP; OTP verify 5 attempts per code;
-  OTP resend 1/60 s and 5/hour; forgot-password 3/hour per email; reset
-  5/hour; reports 10/day per user; messages 30/min per user; Telegram link
-  tokens 5/hour per user. Exceeding returns 429 with `retry_after`.
+  login 5/15 min per email + 20/15 min per IP; register per IP; code
+  attempts 5 per code; code resend 1/60 s and 5/hour; forgot-password 3/hour
+  per email; reset 5/hour; reports 10/day per user; messages 30/min per user;
+  Telegram link tokens 5/hour per user. Exceeding returns 429 with `retry_after`.
 
 ### 11.1 Access control and route protection
 - **Route families** (locale-less paths):
   - *Public:* home, explore, items, categories, public profiles.
   - *Guest-only:* `/login`, `/register`, `/forgot-password`, `/reset-password`.
-  - *Verification:* `/verify` (signed-in, unverified account).
+  - *Telegram gate:* `/connect-telegram` (signed in, Telegram not linked).
   - *Authenticated:* `/dashboard`, `/my-items`, `/items/new`,
     `/items/[id]/edit`, `/requests`, `/borrowings`, `/messages/**`, `/saved`,
     `/notifications`, `/settings`.
@@ -365,19 +390,23 @@ The database is the final authority.
   If the access token is expired but a refresh cookie exists, the proxy calls
   `POST /api/v1/auth/refresh` server-to-server, forwards the rotated cookies
   to the browser and continues. A guest-only route with a valid session
-  redirects to the `next` target or `/dashboard`.
+  redirects to the `next` target or `/dashboard`. A session whose access
+  token says `tg: false` is redirected from **any** page to
+  `/connect-telegram` (with `next` for app routes).
 - **Layer 2, server layouts (authoritative for the UI):** the `(app)` and
   `(admin)` layouts call `GET /api/v1/auth/me` with the user's cookies (no
-  caching). 401 → redirect to login with `next`; unverified → `/verify`;
+  caching). 401 → redirect to login with `next`; Telegram not linked → `/connect-telegram`;
   banned → logged out with a localized message.
 - **Layer 3, backend (authoritative):** every protected endpoint depends on
-  `current_user` (valid access token, active, verified, not banned);
+  `current_user` (valid access token, active, Telegram linked, not banned;
+  only `/auth/me`, logout and the Telegram link/status routes accept
+  unlinked users);
   restricted users get 403 `ACCOUNT_RESTRICTED` on write actions; every object
   is checked for ownership/participation. Admin routers depend on
   `require_admin` and return 403 for non-admins.
 - **`next` parameter:** accepted only if it is a relative, locale-prefixed path
   (`/uz/...`); `//`, absolute URLs and backslashes are rejected and replaced
-  by `/dashboard`. Login, register → verify, and Telegram linking all preserve it.
+  by `/dashboard`. Login, register → connect Telegram, and linking all preserve it.
 - **Admin UI:** non-admins hitting `/admin/**` get a 404 (no hint that it
   exists); admin links render only for admins. The backend check is still
   what protects the data.
@@ -396,15 +425,16 @@ The database is the final authority.
   `Origin`/`Referer` must match `FRONTEND_URL`.
 
 ### 11.3 Telegram phone linking
-After login, users without a verified phone see a dismissible prompt
-(dashboard + settings) to link Telegram. Full flow in §22.
+Mandatory, on `/connect-telegram` right after sign-up; settings shows the
+link afterwards. Unlinking asks for confirmation because the account is then
+limited until Telegram is linked again. Full flow in §22.
 
 ---
 
 ## 12. REST API (`/api/v1`)
 
-**Auth:** POST register, verify-email, resend-otp, login, logout, refresh,
-forgot-password, reset-password · GET me
+**Auth:** POST register (signs in), resend-otp (reset code), login, logout,
+refresh, forgot-password, reset-password · GET me
 **Users:** GET/PATCH /users/me · GET /users/{id} (public profile + trust signals)
 **Categories:** GET /categories
 **Listings:** GET/POST /listings · GET/PATCH/DELETE /listings/{id} ·
@@ -461,13 +491,13 @@ Never expose private pickup addresses publicly.
 
 ## 14. Celery and Redis
 
-Worker tasks: emails (OTP, notifications), Telegram deliveries (codes and
-notifications via the Bot API), return reminders (day before and on
-`end_date`), stale-request expiry, outbox dispatch, cleanup of expired OTPs and
-link tokens. One Beat scheduler only.
+Worker tasks: Telegram deliveries (codes and notifications via the Bot API),
+return reminders (day before and on `end_date`), stale-request expiry, outbox
+dispatch, hourly deletion of accounts that never linked Telegram, cleanup of
+expired codes and link tokens. One Beat scheduler only.
 
 Tasks are idempotent, retried with bounded exponential backoff, with
-timeouts and limits. No duplicate emails or notifications. Booking validity
+timeouts and limits. No duplicate notifications. Booking validity
 is decided only in PostgreSQL transactions, never in Celery.
 
 ---
@@ -505,16 +535,17 @@ Add a banner only if analytics or tracking cookies are introduced.
 
 ## 17. Testing
 
-**Backend (pytest + HTTPX, real PostgreSQL):** registration + OTP
-(correct, wrong, expired, rate-limited), login/refresh rotation/reuse
+**Backend (pytest + HTTPX, real PostgreSQL):** registration without a code,
+the Telegram gate (403 `TELEGRAM_REQUIRED`), 24 h deletion of unlinked
+accounts, password reset by Telegram code (correct, wrong, expired,
+rate-limited, no enumeration), login/refresh rotation/reuse
 detection, permissions, listings + images, search, saved items, request
 approve/reject/cancel, overlapping and concurrent bookings, pickup/return,
 ratings, messaging permissions and deletion, notifications, WebSocket auth
 and delivery, Celery idempotency, admin moderation, route protection
 (401/403 for every protected endpoint, non-admin on admin endpoints, banned and
 restricted users), Telegram linking (expired/reused token, contact.user_id ≠
-from.id, phone already linked elsewhere, blocked bot → email fallback),
-code delivery channel selection, audit log written for every admin action and
+from.id, phone already linked elsewhere, blocked bot → in-app only), audit log written for every admin action and
 conversation view, overlapping pending requests auto-rejected on approval.
 
 **Route protection E2E:** guest → `/dashboard` redirects to login and back
@@ -525,7 +556,8 @@ after login; signed-in user → `/login` redirects to `/dashboard`; non-admin �
 locale switching and dictionary parity, statuses, loading/empty/error states,
 accessibility.
 
-**E2E (Playwright):** two users — register + OTP, create listing with image,
+**E2E (Playwright):** sign-up lands on `/connect-telegram` and every page
+leads back there until linked; two users — create listing with image,
 discover, message owner, request, approve, see loan + phone on both sides,
 pickup, return, rate each other, verify notifications/toasts appear live
 without refresh, overlapping booking rejected. Repeat key flows in uz/ru/en,
@@ -552,9 +584,6 @@ COOKIE_DOMAIN=
 CLOUDINARY_CLOUD_NAME=
 CLOUDINARY_API_KEY=
 CLOUDINARY_API_SECRET=
-EMAIL_PROVIDER=
-EMAIL_API_KEY=
-EMAIL_FROM=
 DEFAULT_LOCALE=uz
 SUPPORTED_LOCALES=uz,ru,en
 TELEGRAM_BOT_TOKEN=
@@ -595,7 +624,8 @@ The phases above replace the original 7-step order (same scope, regrouped).
 
 ## 20. Definition of done
 
-- Register with email OTP, log in, refresh sessions securely; rate limits work.
+- Register without a code, connect Telegram (mandatory), log in, reset the
+  password by Telegram code, refresh sessions securely; rate limits work.
 - Owners create, edit, delete listings with Cloudinary images.
 - Borrowers search, save, message owners, and request items.
 - Requests follow the rules; conflicting bookings blocked at the DB level.
@@ -605,8 +635,8 @@ The phases above replace the original 7-step order (same scope, regrouped).
 - Fixed bottom navigation on mobile.
 - Protected routes redirect to login and back; guests-only routes redirect
   signed-in users; `/admin` is admin-only in the UI and the API.
-- Users can link Telegram via the bot; codes and key notifications arrive
-  in Telegram, with email fallback.
+- Users link Telegram via the bot; codes and key notifications arrive in
+  Telegram, and every notification is also in the app.
 - Admins work reports end to end, and every admin action and conversation
   view appears in the audit log.
 - Everything works in Uzbek, Russian, and English.
@@ -623,41 +653,43 @@ deposits and payments · in-app voice calls · map view.
 
 ## 22. Telegram bot
 
-**Purpose:** verified phone numbers, code delivery and key notifications.
+**Purpose:** account verification (mandatory), verified phone numbers, code
+delivery and key notifications.
 **Stack:** aiogram 3, its own `bot` service in docker-compose, sharing the
 server codebase (same models and services, different entrypoint).
 Webhook in production (`TELEGRAM_MODE=webhook`), long polling in development.
 
 ### Linking flow
-1. A signed-in user without a verified phone sees a prompt (dashboard and
-   settings, dismissible, shown again after 7 days) to link Telegram.
+1. Right after sign-up (and whenever the account is unlinked) the user is on
+   `/connect-telegram`, which explains the three steps and opens the bot.
 2. `POST /telegram/link-token` creates a random 32-byte token (stored hashed,
    10 min expiry, single use, max 5 per hour) and returns
    `https://t.me/<TELEGRAM_BOT_USERNAME>?start=<token>`.
 3. `/start <token>`: the bot validates the token (exists, unexpired, unused)
    and asks the user to share their contact with a one-tap
    `request_contact` keyboard. Invalid or expired tokens get a localized
-   message with a link back to settings.
+   message with a link back to `/connect-telegram`.
 4. On a contact message the bot checks **`contact.user_id == from.id`** (the
    sender shares their own number). If it doesn't match, it refuses.
 5. It normalizes the phone to E.164 and refuses if the phone or `telegram_id`
    is already linked to another account. Otherwise it saves `phone`,
    `phone_verified_at`, `telegram_id`, `telegram_username`,
-   `telegram_linked_at`, consumes the token and confirms in the user's language.
-6. The web app updates live (WebSocket event + toast); settings shows the
-   linked number with an **Unlink** action.
+   `telegram_linked_at` (and `verified_at` on the first link), consumes the
+   token and confirms in the user's language.
+6. The web app updates live (WebSocket event, with 3 s polling as fallback),
+   refreshes the session and continues to `next`. Settings shows the linked
+   number with an **Unlink** action (confirmation required).
 
 ### Delivery
-- **Codes:** after linking, forgot/reset (and future) one-time codes are sent
-  by the bot; email is the fallback when no Telegram link exists or the bot
-  is blocked. Registration codes are always emailed.
+- **Codes:** password-reset codes are sent only by the bot. There is no
+  other channel.
 - **Notifications:** request received, request approved, return due (day
   before and on the day), item not returned report updates, and moderation
   messages (§23). Users can mute them (`/stop`, settings) without unlinking.
 - Sent from Celery via the outbox (idempotent, retried with backoff,
   respecting Telegram rate limits). A 403 from Telegram sets
-  `telegram_blocked_at`, and delivery falls back to email until the user
-  sends `/start` again.
+  `telegram_blocked_at`; notifications then stay in the app only (and reset
+  codes cannot be delivered) until the user sends `/start` again.
 - Messages use the user's `preferred_locale` (uz/ru/en), with no personal data
   beyond what the message needs (never the counterparty's phone).
 
@@ -679,7 +711,7 @@ Webhook in production (`TELEGRAM_MODE=webhook`), long polling in development.
 
 ### Report detail (`/admin/reports/[id]`)
 - Reporter and target (user and/or listing) with **trust signals for both
-  parties**: verified email/phone, completed loans, average rating, account
+  parties**: Telegram-verified phone, completed loans, average rating, account
   age, warnings, restrictions, and **past reports** (as reporter and as target).
 - The related **request and loan history** between the two users for this
   listing (dates, status transitions, pickup/return timestamps).
@@ -714,9 +746,10 @@ actions additionally require a fresh login within the last 12 hours.
 
 - **Backend:** complete. FastAPI modular monolith with PostgreSQL 17 (booking
   overlap enforced by a `btree_gist` exclusion constraint), Redis, Celery
-  worker and beat (transactional outbox, OTP and notification delivery,
-  request expiry, return reminders, cleanup), and an aiogram Telegram bot
-  (polling in dev, webhook in prod). Auth: email OTP, rotating refresh tokens
+  worker and beat (transactional outbox, Telegram code and notification
+  delivery, request expiry, return reminders, unlinked-account deletion, cleanup), and an aiogram Telegram bot
+  (polling in dev, webhook in prod). Auth: no email; mandatory Telegram
+  verification, password reset by Telegram code, rotating refresh tokens
   with reuse detection, CSRF, rate limits. Real-time runs over WebSocket
   through Redis pub/sub.
 - **Frontend:** every page runs on real data with no mocks: home, explore,
@@ -726,7 +759,7 @@ actions additionally require a fresh login within the last 12 hours.
   linking) and `/admin/**` (overview, reports, report detail with the audited
   conversation viewer, users, listings, audit log).
 - **Route protection:** active in three layers: proxy, server layout and API dependencies.
-- **Docker:** `docker-compose.yml` (dev, with Mailpit) and
+- **Docker:** `docker-compose.yml` (dev) and
   `docker-compose.prod.yml` (Caddy with automatic HTTPS). Images are
   multi-stage, non-root and contain no secrets.
 - **Decisions taken during the build** (beyond §10.1):

@@ -40,7 +40,7 @@ function Switcher({ className }: { className?: string }) {
                 onClick={() => {
                   rememberLocale(l)
                   // signed-in: the profile locale wins and drives emails/Telegram (SPEC §4)
-                  if (me) void api("/users/me", { method: "PATCH", json: { preferred_locale: l } }).catch(() => {})
+                  if (me && !me.telegram_required) void api("/users/me", { method: "PATCH", json: { preferred_locale: l } }).catch(() => {})
                 }}
                 className={cn(
                   "block rounded-full px-2.5 py-1 text-meta font-medium transition-colors duration-200",

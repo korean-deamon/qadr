@@ -248,7 +248,6 @@
       "location": "Pickup area",
       "locationNote": "The exact pickup point is shared after the owner approves your request.",
       "owner": "Lent by",
-      "verified": "Email verified",
       "completed": "{count, plural, one {# completed loan} other {# completed loans}}",
       "reviews": "{count, plural, one {# review} other {# reviews}}",
       "memberSince": "Member since {date}",
@@ -445,7 +444,7 @@
       "agree": "By creating an account you agree to the community rules.",
       "submit": "Create account",
       "haveAccount": "Already have an account?",
-      "done": "Account created. Enter the code from your email."
+      "done": "Account created. One more step: connect Telegram."
     },
     "strength": {
       "label": "Password strength: {level}",
@@ -454,34 +453,39 @@
       "good": "Good",
       "strong": "Strong"
     },
-    "verify": {
-      "title": "Check your email",
-      "lead": "We sent a 6-digit code to {email}. It expires in 10 minutes.",
-      "codeLabel": "Verification code",
-      "digit": "Digit {n}",
-      "submit": "Verify email",
-      "resendIn": "Resend code in {seconds}s",
-      "resend": "Resend code",
-      "wrong": "Incorrect code. Try again.",
-      "resent": "A new code is on its way",
-      "done": "Email verified. Welcome to Qadr!",
-      "sentTelegram": "We sent the code to your Telegram."
-    },
     "forgot": {
       "title": "Reset your password",
-      "lead": "Enter your email and we'll send you a code.",
+      "lead": "Enter your email. We'll send a code to the Qadr bot in Telegram.",
       "submit": "Send code",
       "back": "Back to log in",
-      "done": "If an account exists, we sent a code to its email or Telegram."
+      "done": "If this account has Telegram connected, the code is waiting in the Qadr bot."
     },
     "reset": {
       "title": "Choose a new password",
-      "lead": "Enter the code from your email and a new password.",
-      "code": "Code from email",
+      "lead": "Enter the code from the Qadr bot in Telegram and choose a new password.",
+      "code": "Code from Telegram",
       "newPassword": "New password",
       "confirm": "Repeat password",
       "submit": "Save password",
       "done": "Password changed. You can log in now."
+    },
+    "connect": {
+      "title": "Connect Telegram",
+      "lead": "One last step. Qadr verifies every neighbour through Telegram, so you know who you lend to.",
+      "steps": {
+        "open": "Open our bot and press Start",
+        "share": "Tap “Share my contact”",
+        "back": "Come back here: your account opens by itself"
+      },
+      "why": "Your number is shown only to people you have an approved loan with. Password reset codes arrive in the bot.",
+      "open": "Open Telegram",
+      "openAgain": "Open the bot again",
+      "waiting": "Waiting for you to share your contact in Telegram…",
+      "expires": "The link works for {minutes} minutes.",
+      "done": "Telegram connected. Welcome to Qadr!",
+      "deleteNotice": "Accounts that aren't connected are deleted in {hours, plural, one {# hour} other {# hours}}.",
+      "otherAccount": "Not you? Log out",
+      "unavailable": "Telegram connection is temporarily unavailable. Try again a little later."
     }
   },
   "notifications": {
@@ -552,7 +556,6 @@
   },
   "apiErrors": {
     "INVALID_CREDENTIALS": "Wrong email or password.",
-    "EMAIL_NOT_VERIFIED": "Confirm your email first. We just sent you a new code.",
     "ACCOUNT_BANNED": "This account has been blocked. Contact support if you think this is a mistake.",
     "ACCOUNT_RESTRICTED": "Your account is temporarily restricted, so you can't do this right now.",
     "RATE_LIMITED": "Too many attempts. Try again in {seconds} s.",
@@ -560,7 +563,6 @@
     "OTP_EXPIRED": "This code has expired. Request a new one.",
     "OTP_ATTEMPTS_EXCEEDED": "Too many wrong codes. Request a new one.",
     "EMAIL_TAKEN": "An account with this email already exists. Log in instead.",
-    "ALREADY_VERIFIED": "This email is already verified. You can log in.",
     "DATES_UNAVAILABLE": "Someone has already booked some of these days. Choose other dates.",
     "DATES_IN_PAST": "Choose dates from today onwards.",
     "DATES_INVALID": "The end date must be after the start date.",
@@ -594,7 +596,8 @@
     "CANNOT_MODERATE_ADMIN": "Administrators can't be moderated here.",
     "SERVER": "Something went wrong on our side. Please try again.",
     "GENERIC": "That didn't work. Please try again.",
-    "NETWORK": "No connection. Check your internet and try again."
+    "NETWORK": "No connection. Check your internet and try again.",
+    "TELEGRAM_REQUIRED": "Connect Telegram to continue."
   },
   "account": {
     "menu": "Account",
@@ -608,10 +611,7 @@
     "notifications": "Notifications"
   },
   "telegram": {
-    "promptTitle": "Link your phone through Telegram",
-    "promptBody": "Owners see your number only after they approve a request. Linking also lets codes and reminders reach you in Telegram.",
     "promptAction": "Link Telegram",
-    "promptLater": "Later",
     "title": "Telegram and phone",
     "lead": "We verify your number through our Telegram bot. It is shown only to people you have an approved loan with.",
     "linked": "Linked as {username}",
@@ -626,9 +626,12 @@
     "unlinked": "Telegram unlinked",
     "linkedToast": "Telegram linked. Your phone is verified.",
     "notifications": "Send notifications to Telegram",
-    "notificationsHint": "Codes always arrive there once you're linked.",
+    "notificationsHint": "Password reset codes always arrive there.",
     "blocked": "Our bot can't reach you. Open Telegram and press Start again.",
-    "unavailable": "Telegram linking will be available soon."
+    "unavailable": "Telegram linking will be available soon.",
+    "unlinkConfirm": "After unlinking you can't use Qadr until you connect Telegram again.",
+    "unlinkAnyway": "Unlink anyway",
+    "keep": "Keep it linked"
   },
   "settings": {
     "title": "Settings",
@@ -639,11 +642,11 @@
     "save": "Save changes",
     "saved": "Saved",
     "language": "Language",
-    "languageHint": "Emails and Telegram messages use this language too.",
+    "languageHint": "Telegram messages use this language too.",
     "email": "Email",
     "password": "Password",
     "changePassword": "Change password",
-    "changePasswordHint": "We'll send a code to your email or Telegram.",
+    "changePasswordHint": "We'll send a code to your Telegram.",
     "danger": "Delete account",
     "dangerBody": "Your listings are removed and your personal data is erased. Finished loans and ratings stay, attributed to a deleted account.",
     "deleteConfirm": "Enter your password to confirm",
@@ -791,7 +794,6 @@
   },
   "profile": {
     "memberSince": "Member since {date}",
-    "emailVerified": "Email verified",
     "phoneVerified": "Phone verified",
     "rating": "Rating",
     "reviews": "{count, plural, one {# review} other {# reviews}}",
@@ -874,7 +876,7 @@
       "restricted": "Restricted",
       "banned": "Banned",
       "admins": "Admins",
-      "unverified": "Unverified"
+      "unverified": "Telegram not linked"
     },
     "listingStatus": {
       "active": "Live",
@@ -989,8 +991,6 @@
       "warnings": "Warnings",
       "asTarget": "Reported",
       "asReporter": "Reports filed",
-      "emailVerified": "Email verified",
-      "emailUnverified": "Email not verified",
       "noPhone": "No phone",
       "telegram": "Telegram linked",
       "noTelegram": "No Telegram",
@@ -999,7 +999,9 @@
       "listings": "Listings",
       "loans": "Loans",
       "warningsTitle": "Warnings",
-      "adminProtected": "Admins can't be moderated here."
+      "adminProtected": "Admins can't be moderated here.",
+      "telegramLinked": "Telegram linked",
+      "telegramMissing": "Telegram not linked"
     },
     "listings": {
       "title": "Listings",

@@ -21,6 +21,7 @@ celery.conf.update(
         "dispatch-outbox": {"task": "qadr.dispatch_outbox", "schedule": 10.0},
         "expire-requests": {"task": "qadr.expire_requests", "schedule": 300.0},
         "return-reminders": {"task": "qadr.return_reminders", "schedule": 1800.0},
+        "delete-unverified": {"task": "qadr.delete_unverified", "schedule": 3600.0},
         "cleanup": {"task": "qadr.cleanup", "schedule": 6 * 3600.0},
     },
 )

@@ -42,6 +42,15 @@ function toLogin() {
   window.location.href = `/${locale}/login?next=${encodeURIComponent(next)}`
 }
 
+/** Telegram was unlinked meanwhile (another tab, admin): back to the gate (SPEC §11). */
+function toConnectTelegram() {
+  const locale = location.pathname.split("/")[1] || "uz"
+  if (location.pathname.startsWith(`/${locale}/connect-telegram`)) return
+  const next = location.pathname + location.search
+  // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+  window.location.href = `/${locale}/connect-telegram?next=${encodeURIComponent(next)}`
+}
+
 type Options = Omit<RequestInit, "body"> & { json?: unknown; body?: BodyInit; retry?: boolean; redirectOn401?: boolean }
 
 /** Browser API call: same-origin cookies, CSRF header, JSON, one silent refresh on 401. */
@@ -68,6 +77,7 @@ export async function api<T>(path: string, opts: Options = {}): Promise<T> {
   }
   if (!res.ok) {
     const body = (await res.json().catch(() => null)) as ApiErrorBody | null
+    if (res.status === 403 && body?.error.code === "TELEGRAM_REQUIRED") toConnectTelegram()
     throw new ApiError(res.status, body?.error.code ?? `HTTP_${res.status}`, body?.error ?? null)
   }
   if (res.status === 204) return undefined as T

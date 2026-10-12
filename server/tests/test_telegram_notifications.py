@@ -5,7 +5,6 @@ from sqlalchemy import func, select, update
 from app.core.db import SessionLocal
 from app.core.outbox import TaskOutbox
 from app.core.time import now_utc, today_tashkent
-from app.email import provider
 from app.modules.auth.models import User
 from app.modules.borrowing.models import BorrowRequest
 from app.modules.loans.models import Loan
@@ -26,9 +25,9 @@ async def link_token(client: Client) -> str:
 
 
 async def test_link_flow_verifies_contact_ownership(client: Client) -> None:
-    user = await make_user()
+    user = await make_user(verified=False)
     await login(client, user)
-    assert (await client.get("/auth/me")).json()["show_telegram_prompt"] is True
+    assert (await client.get("/auth/me")).json()["telegram_required"] is True
     token = await link_token(client)
     async with SessionLocal() as db:
         # someone else's contact: contact.user_id != from.id
@@ -41,7 +40,7 @@ async def test_link_flow_verifies_contact_ownership(client: Client) -> None:
         me["phone"] == "+998901234567"
         and me["phone_verified"]
         and me["telegram_linked"]
-        and not me["show_telegram_prompt"]
+        and not me["telegram_required"]
     )
     async with SessionLocal() as db:
         res, _ = await tg.link(db, token, from_id=777, contact_user_id=777, phone="901234567", username="x")
@@ -50,7 +49,7 @@ async def test_link_flow_verifies_contact_ownership(client: Client) -> None:
 
 async def test_link_token_expiry_rate_limit_and_conflicts(client: Client) -> None:
     other = await make_user(phone="+998901111111", telegram_id=42)
-    user = await make_user()
+    user = await make_user(verified=False)
     await login(client, user)
     token = await link_token(client)
     async with SessionLocal() as db:
@@ -72,23 +71,26 @@ async def test_link_token_expiry_rate_limit_and_conflicts(client: Client) -> Non
     assert other.telegram_id == 42
 
 
-async def test_notifications_go_to_telegram_with_email_fallback(client: Client, monkeypatch) -> None:  # type: ignore[no-untyped-def]
-    sent: list[int] = []
+async def test_notifications_go_to_telegram_otherwise_stay_in_app(client: Client, monkeypatch) -> None:  # type: ignore[no-untyped-def]
+    sent: list[tuple[int, str]] = []
 
     async def fake_send(chat_id: int, text: str) -> None:
         if chat_id == 2:
             raise delivery.TelegramBlocked("blocked")
-        sent.append(chat_id)
+        sent.append((chat_id, text))
 
     monkeypatch.setattr(delivery, "send_telegram", fake_send)
-    linked = await make_user(name="Linked", telegram_id=1, phone="+998900000011")
-    blocked = await make_user(name="Blocked", telegram_id=2, phone="+998900000012")
-    plain = await make_user(name="Plain")
+    linked = await make_user(name="Linked", telegram_id=1)
+    blocked = await make_user(name="Blocked", telegram_id=2)
+    muted = await make_user(name="Muted", telegram_id=3)
+    async with SessionLocal() as db:
+        await db.execute(update(User).where(User.id == muted.id).values(telegram_notifications=False))
+        await db.commit()
     listing = await make_listing(await make_user(name="Owner"))
     async with SessionLocal() as db:
         from app.modules.notifications.service import notify
 
-        for u in (linked, blocked, plain):
+        for u in (linked, blocked, muted):
             await notify(
                 db,
                 u.id,
@@ -99,21 +101,22 @@ async def test_notifications_go_to_telegram_with_email_fallback(client: Client, 
             assert await notify(db, u.id, "request_approved", {}, dedupe_key=f"t:{u.id}") is None  # deduped
         await db.commit()
     await run_outbox()
-    assert sent == [1]
-    assert sorted(m.to for m in provider.OUTBOX) == sorted([blocked.email, plain.email])
-    assert "15.10.2026 – 17.10.2026" in provider.OUTBOX[0].body or "Oct 15, 2026" in provider.OUTBOX[0].body
+    assert [chat for chat, _ in sent] == [1]
+    assert "15.10.2026 – 17.10.2026" in sent[0][1] or "Oct 15, 2026" in sent[0][1]
     async with SessionLocal() as db:
         assert (await db.get(User, blocked.id)).telegram_blocked_at is not None  # type: ignore[union-attr]
+        # everyone still has the in-app notification
+        assert await db.scalar(select(func.count()).select_from(Notification)) == 3
         assert (
             await db.scalar(select(func.count()).select_from(TaskOutbox).where(TaskOutbox.processed_at.is_(None))) == 0
         )
     await run_outbox()
-    assert len(provider.OUTBOX) == 2  # idempotent: nothing re-sent
+    assert len(sent) == 1  # idempotent: nothing re-sent
 
 
 async def test_outbox_retries_with_backoff(monkeypatch) -> None:  # type: ignore[no-untyped-def]
     async def boom(db, payload):  # type: ignore[no-untyped-def]
-        raise RuntimeError("smtp down")
+        raise RuntimeError("telegram down")
 
     monkeypatch.setitem(delivery.HANDLERS, "otp.deliver", boom)
     user = await make_user()
@@ -125,7 +128,9 @@ async def test_outbox_retries_with_backoff(monkeypatch) -> None:  # type: ignore
     assert await run_outbox() == 0
     async with SessionLocal() as db:
         row = await db.scalar(select(TaskOutbox))
-        assert row and row.attempts == 1 and row.next_attempt_at > now_utc() and "smtp down" in (row.last_error or "")
+        assert (
+            row and row.attempts == 1 and row.next_attempt_at > now_utc() and "telegram down" in (row.last_error or "")
+        )
     assert await run_outbox() == 0  # not yet due
 
 
@@ -167,4 +172,8 @@ async def test_unlink_clears_verification(client: Client) -> None:
     assert (await client.get("/telegram/status")).json()["linked"] is True
     await client.delete("/telegram/link")
     me = (await client.get("/auth/me")).json()
-    assert me["telegram_linked"] is False and me["phone_verified"] is False and me["show_telegram_prompt"] is True
+    assert me["telegram_linked"] is False and me["phone_verified"] is False and me["telegram_required"] is True
+    # limited again until a Telegram account is linked, but never deleted (it was verified once)
+    res = await client.get("/users/me")
+    assert res.status_code == 403 and res.json()["error"]["code"] == "TELEGRAM_REQUIRED"
+    assert me["delete_unverified_at"] is None

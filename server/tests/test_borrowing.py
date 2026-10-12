@@ -219,7 +219,7 @@ async def test_pickup_return_rating_and_hidden_from_explore(client: Client) -> N
         assert (await cb.post(f"/loans/{loan_id}/rating", json={"score": 4})).json()["error"]["code"] == "ALREADY_RATED"
         assert (await client.post(f"/loans/{loan_id}/rating", json={"score": 4})).status_code == 201
         profile = (await cb.get(f"/users/{owner.id}")).json()
-        assert profile["rating"] == 5.0 and profile["completed_loans"] == 1 and profile["email_verified"] is True
+        assert profile["rating"] == 5.0 and profile["completed_loans"] == 1 and profile["phone_verified"] is True
 
 
 async def test_delete_listing_blocked_by_open_loan(client: Client) -> None:

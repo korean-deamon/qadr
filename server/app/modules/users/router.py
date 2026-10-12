@@ -9,7 +9,6 @@ from app.core.cookies import REFRESH_COOKIE, clear_session_cookies
 from app.core.deps import DB, CurrentUser, csrf_protect
 from app.core.errors import AppError, not_found
 from app.core.security import verify_password
-from app.core.time import now_utc
 from app.modules.auth import service as auth_service
 from app.modules.auth.models import User
 from app.modules.auth.schemas import MeOut
@@ -75,13 +74,6 @@ async def delete_me(body: DeleteIn, request: Request, response: Response, db: DB
     await db.commit()
     clear_session_cookies(response)
     _ = request.cookies.get(REFRESH_COOKIE)
-    return {"ok": True}
-
-
-@router.post("/me/telegram-prompt/dismiss", dependencies=[Depends(csrf_protect)])
-async def dismiss_prompt(db: DB, user: CurrentUser) -> dict[str, bool]:
-    user.telegram_prompt_dismissed_at = now_utc()
-    await db.commit()
     return {"ok": True}
 
 

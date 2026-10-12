@@ -36,15 +36,19 @@ Fill in `POSTGRES_PASSWORD`, `SECRET_KEY` and `TELEGRAM_WEBHOOK_SECRET` with ran
 values (`python -c "import secrets;print(secrets.token_urlsafe(32))"`), and use the same
 password inside `DATABASE_URL` and `TEST_DATABASE_URL`. `.env` is gitignored. Never commit it.
 
-**Telegram bot.** Create a bot with [@BotFather](https://t.me/BotFather), then set:
+**Telegram bot (required).** Qadr sends no email. Telegram is how accounts are verified:
+after sign-up a user can only see `/connect-telegram` until they link it, password-reset
+codes arrive in the bot, and accounts that never link are deleted after 24 hours.
+Create a bot with [@BotFather](https://t.me/BotFather), then set:
 
 ```
 TELEGRAM_BOT_TOKEN=123456:ABC...     # from BotFather
 TELEGRAM_BOT_USERNAME=qadr_bot       # without @
 ```
 
-If no token is set, the bot container only serves its health check, the dashboard does not
-ask users to link Telegram, and Settings says linking isn't available yet.
+If no token is set, the bot container only serves its health check and the connect page
+says linking is temporarily unavailable, so new accounts cannot be completed. The demo
+accounts below already count as verified.
 
 **Cloudinary (optional).** Set `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY` and
 `CLOUDINARY_API_SECRET` to store photos on Cloudinary. If they are empty, photos go to
@@ -59,7 +63,6 @@ docker compose up --build
 | What                        | Where                    |
 |-----------------------------|--------------------------|
 | Website (via Caddy)         | http://localhost:8080    |
-| Emails (OTP codes) in Mailpit | http://localhost:8025  |
 | Postgres / Redis (host)     | `localhost:5433` / `localhost:6380` |
 
 The one-off `migrate` service applies migrations and seeds demo data before the API,
@@ -70,15 +73,15 @@ does not clash with other local databases.
 ## 2b. Run on the host (hot reload)
 
 ```bash
-docker compose up -d db redis mailpit      # infrastructure only
+docker compose up -d db redis              # infrastructure only
 
 cd server
 uv sync --group dev
 uv run alembic upgrade head
 uv run python -m app.seed
 uv run uvicorn app.main:app --reload --port 8000
-uv run celery -A app.tasks.celery_app worker -B --loglevel=INFO   # second terminal: emails, reminders
-uv run python -m app.bot.main                                     # optional third terminal: Telegram bot
+uv run celery -A app.tasks.celery_app worker -B --loglevel=INFO   # second terminal: Telegram delivery, reminders, cleanup
+uv run python -m app.bot.main                                     # third terminal: Telegram bot (needed to sign up)
 
 cd client
 npm install
@@ -104,7 +107,6 @@ E2E_PORT=8080 npx playwright test                                     # or again
    - `FRONTEND_URL`, `CORS_ORIGINS` and `NEXT_PUBLIC_SITE_URL` to `https://qadr.uz`
    - `COOKIE_SECURE=true`
    - strong values for `POSTGRES_PASSWORD`, `REDIS_PASSWORD`, `SECRET_KEY` and `TELEGRAM_WEBHOOK_SECRET`
-   - email: `EMAIL_PROVIDER=smtp`, plus `SMTP_HOST`, `SMTP_PORT=587`, `SMTP_USERNAME` and `EMAIL_API_KEY` from your relay
    - Telegram: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_BOT_USERNAME`, `TELEGRAM_MODE=webhook`, `TELEGRAM_WEBHOOK_URL=https://qadr.uz`
    - Cloudinary keys (recommended), otherwise photos stay in the `media` volume.
 2. Point the domain's DNS at the server, then open ports 80 and 443.

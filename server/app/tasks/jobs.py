@@ -1,4 +1,4 @@
-"""Scheduled jobs: return reminders, stale-request expiry, cleanup."""
+"""Scheduled jobs: return reminders, stale-request expiry, unverified-account and data cleanup."""
 
 from datetime import datetime, timedelta
 
@@ -7,7 +7,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.outbox import TaskOutbox
 from app.core.time import TASHKENT, now_utc, today_tashkent
-from app.modules.auth.models import EmailOtp, RefreshToken
+from app.modules.auth.models import EmailOtp, RefreshToken, User
+from app.modules.auth.service import UNVERIFIED_TTL
 from app.modules.borrowing.service import expire_stale
 from app.modules.listings.models import Listing
 from app.modules.loans.models import Loan
@@ -37,6 +38,21 @@ async def return_reminders(db: AsyncSession, *, force: bool = False) -> int:
 
 async def expire_requests(db: AsyncSession) -> int:
     return await expire_stale(db)
+
+
+async def delete_unverified(db: AsyncSession) -> int:
+    """Remove accounts that never linked Telegram within UNVERIFIED_TTL (SPEC §11).
+    Frees the email address. Such accounts cannot own listings, requests or
+    messages (every write needs a linked Telegram), so the cascade only takes
+    their sessions, link tokens and codes."""
+    result = await db.execute(
+        delete(User)
+        .where(User.verified_at.is_(None), User.is_admin.is_(False), User.created_at < now_utc() - UNVERIFIED_TTL)
+        .returning(User.id)
+    )
+    removed = len(result.all())
+    await db.commit()
+    return removed
 
 
 async def cleanup(db: AsyncSession) -> None:

@@ -32,9 +32,10 @@ class User(UUIDPk, Timestamps, Base):
     telegram_linked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     telegram_blocked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     telegram_notifications: Mapped[bool] = mapped_column(Boolean, default=True, server_default="true")
-    telegram_prompt_dismissed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     preferred_locale: Mapped[str] = mapped_column(String(5), default="uz", server_default="uz")
-    email_verified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    # First successful Telegram link (SPEC §11). Never cleared: unlinking later only clears
+    # phone_verified_at, so a once-verified account is never removed by the unverified cleanup.
+    verified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, server_default="true")
     is_admin: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
     restricted_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
@@ -45,6 +46,8 @@ class User(UUIDPk, Timestamps, Base):
     __table_args__ = (
         # one verified phone per account
         Index("uq_users_verified_phone", "phone", unique=True, postgresql_where="phone_verified_at IS NOT NULL"),
+        # hourly cleanup of accounts that never linked Telegram
+        Index("ix_users_unverified_created", "created_at", postgresql_where="verified_at IS NULL"),
         CheckConstraint("preferred_locale IN ('uz','ru','en')", name="locale"),
     )
 

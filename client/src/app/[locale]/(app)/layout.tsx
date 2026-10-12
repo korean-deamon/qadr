@@ -14,7 +14,10 @@ export default async function AppLayout({ children }: LayoutProps<"/[locale]">) 
     const path = (await headers()).get("x-qadr-path") ?? `/${locale}/dashboard`
     redirect({ href: { pathname: "/login", query: { next: path } }, locale })
   }
-  if (!me!.email_verified) redirect({ href: { pathname: "/verify", query: { email: me!.email } }, locale })
+  if (me!.telegram_required) {
+    const path = (await headers()).get("x-qadr-path") ?? `/${locale}/dashboard`
+    redirect({ href: { pathname: "/connect-telegram", query: { next: path } }, locale })
+  }
   return (
     <main id="main" className="flex min-h-dvh flex-col pt-[var(--header-height)] pb-bottom-nav md:pb-0">
       {children}

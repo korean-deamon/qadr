@@ -26,6 +26,11 @@ def return_reminders() -> int:
     return run(jobs.return_reminders)
 
 
+@celery.task(name="qadr.delete_unverified", **RETRY)
+def delete_unverified() -> int:
+    return run(jobs.delete_unverified)
+
+
 @celery.task(name="qadr.cleanup", **RETRY)
 def cleanup() -> None:
     run(jobs.cleanup)

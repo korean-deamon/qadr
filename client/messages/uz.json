@@ -248,7 +248,6 @@
       "location": "Olib ketish hududi",
       "locationNote": "Aniq manzil egasi soʻrovingizni tasdiqlagach ulashiladi.",
       "owner": "Egasi",
-      "verified": "Email tasdiqlangan",
       "completed": "{count} marta muvaffaqiyatli ulashgan",
       "reviews": "{count} ta baho",
       "memberSince": "{date} dan beri aʼzo",
@@ -445,7 +444,7 @@
       "agree": "Hisob yaratish orqali jamiyat qoidalariga rozilik bildirasiz.",
       "submit": "Hisob yaratish",
       "haveAccount": "Hisobingiz bormi?",
-      "done": "Hisob yaratildi. Emailingizdagi kodni kiriting."
+      "done": "Hisob yaratildi. Yana bir qadam: Telegramni ulang."
     },
     "strength": {
       "label": "Parol mustahkamligi: {level}",
@@ -454,34 +453,39 @@
       "good": "Yaxshi",
       "strong": "Kuchli"
     },
-    "verify": {
-      "title": "Emailingizni tekshiring",
-      "lead": "{email} manziliga 6 xonali kod yubordik. Kod 10 daqiqa amal qiladi.",
-      "codeLabel": "Tasdiqlash kodi",
-      "digit": "{n}-raqam",
-      "submit": "Tasdiqlash",
-      "resendIn": "Kodni {seconds} soniyadan keyin qayta yuborish mumkin",
-      "resend": "Kodni qayta yuborish",
-      "wrong": "Kod notoʻgʻri. Qayta urinib koʻring.",
-      "resent": "Yangi kod yuborildi",
-      "done": "Email tasdiqlandi. Qadrga xush kelibsiz!",
-      "sentTelegram": "Kodni Telegramingizga yubordik."
-    },
     "forgot": {
       "title": "Parolni tiklash",
-      "lead": "Emailingizni kiriting, sizga kod yuboramiz.",
+      "lead": "Emailingizni kiriting. Kodni Telegramdagi Qadr botiga yuboramiz.",
       "submit": "Kod yuborish",
       "back": "Kirishga qaytish",
-      "done": "Agar hisob mavjud boʻlsa, uning emaili yoki Telegramiga kod yubordik."
+      "done": "Agar bu hisobga Telegram ulangan boʻlsa, kod Qadr botida sizni kutmoqda."
     },
     "reset": {
       "title": "Yangi parol oʻylab toping",
-      "lead": "Emaildagi kodni va yangi parolni kiriting.",
-      "code": "Emaildagi kod",
+      "lead": "Telegramdagi Qadr botidan kelgan kodni kiriting va yangi parol tanlang.",
+      "code": "Telegramdan kelgan kod",
       "newPassword": "Yangi parol",
       "confirm": "Parolni takrorlang",
       "submit": "Parolni saqlash",
       "done": "Parol oʻzgartirildi. Endi kirishingiz mumkin."
+    },
+    "connect": {
+      "title": "Telegramni ulang",
+      "lead": "Soʻnggi qadam. Qadr har bir qoʻshnini Telegram orqali tasdiqlaydi, shunda kimga ishonib berayotganingizni bilasiz.",
+      "steps": {
+        "open": "Botimizni oching va Start tugmasini bosing",
+        "share": "“Kontaktni yuborish” tugmasini bosing",
+        "back": "Shu yerga qayting: hisobingiz oʻzi ochiladi"
+      },
+      "why": "Raqamingiz faqat soʻrovi tasdiqlangan odamlarga koʻrinadi. Parolni tiklash kodlari botga keladi.",
+      "open": "Telegramni ochish",
+      "openAgain": "Botni qayta ochish",
+      "waiting": "Telegramda kontaktingizni yuborishingizni kutyapmiz…",
+      "expires": "Havola {minutes} daqiqa amal qiladi.",
+      "done": "Telegram ulandi. Qadrga xush kelibsiz!",
+      "deleteNotice": "Ulanmagan hisoblar {hours} soatdan keyin oʻchiriladi.",
+      "otherAccount": "Bu siz emasmi? Chiqish",
+      "unavailable": "Telegramni ulash vaqtincha ishlamayapti. Birozdan keyin qayta urinib koʻring."
     }
   },
   "notifications": {
@@ -552,7 +556,6 @@
   },
   "apiErrors": {
     "INVALID_CREDENTIALS": "Email yoki parol notoʻgʻri.",
-    "EMAIL_NOT_VERIFIED": "Avval emailingizni tasdiqlang. Yangi kod yubordik.",
     "ACCOUNT_BANNED": "Bu hisob bloklangan. Xato deb hisoblasangiz, biz bilan bogʻlaning.",
     "ACCOUNT_RESTRICTED": "Hisobingiz vaqtincha cheklangan, hozir buni qila olmaysiz.",
     "RATE_LIMITED": "Juda koʻp urinish. {seconds} soniyadan keyin qayta urinib koʻring.",
@@ -560,7 +563,6 @@
     "OTP_EXPIRED": "Kod muddati tugadi. Yangisini soʻrang.",
     "OTP_ATTEMPTS_EXCEEDED": "Notoʻgʻri kodlar juda koʻp. Yangi kod soʻrang.",
     "EMAIL_TAKEN": "Bu email bilan hisob mavjud. Tizimga kiring.",
-    "ALREADY_VERIFIED": "Bu email allaqachon tasdiqlangan. Tizimga kirishingiz mumkin.",
     "DATES_UNAVAILABLE": "Bu kunlarning baʼzilari band. Boshqa sanalarni tanlang.",
     "DATES_IN_PAST": "Bugundan boshlab sanalarni tanlang.",
     "DATES_INVALID": "Tugash sanasi boshlanish sanasidan keyin boʻlishi kerak.",
@@ -594,7 +596,8 @@
     "CANNOT_MODERATE_ADMIN": "Administratorlarni bu yerda cheklab boʻlmaydi.",
     "SERVER": "Bizda nimadir xato ketdi. Qayta urinib koʻring.",
     "GENERIC": "Bajarilmadi. Qayta urinib koʻring.",
-    "NETWORK": "Internet aloqasi yoʻq. Tekshirib, qayta urinib koʻring."
+    "NETWORK": "Internet aloqasi yoʻq. Tekshirib, qayta urinib koʻring.",
+    "TELEGRAM_REQUIRED": "Davom etish uchun Telegramni ulang."
   },
   "account": {
     "menu": "Hisob",
@@ -608,10 +611,7 @@
     "notifications": "Bildirishnomalar"
   },
   "telegram": {
-    "promptTitle": "Telefoningizni Telegram orqali ulang",
-    "promptBody": "Egalar raqamingizni faqat soʻrovni tasdiqlagach koʻradi. Ulansangiz, kodlar va eslatmalar ham Telegramga keladi.",
     "promptAction": "Telegramni ulash",
-    "promptLater": "Keyinroq",
     "title": "Telegram va telefon",
     "lead": "Raqamingizni Telegram botimiz orqali tasdiqlaymiz. U faqat tasdiqlangan kelishuvdagi odamga koʻrinadi.",
     "linked": "{username} sifatida ulangan",
@@ -626,9 +626,12 @@
     "unlinked": "Telegram uzildi",
     "linkedToast": "Telegram ulandi. Telefoningiz tasdiqlandi.",
     "notifications": "Bildirishnomalarni Telegramga yuborish",
-    "notificationsHint": "Ulangandan soʻng kodlar doim oʻsha yerga keladi.",
+    "notificationsHint": "Parolni tiklash kodlari doim shu yerga keladi.",
     "blocked": "Botimiz sizga yoza olmayapti. Telegramni ochib, “Start”ni qayta bosing.",
-    "unavailable": "Telegramni ulash tez orada ishga tushadi."
+    "unavailable": "Telegramni ulash tez orada ishga tushadi.",
+    "unlinkConfirm": "Uzganingizdan keyin Telegramni qayta ulamaguningizcha Qadrdan foydalana olmaysiz.",
+    "unlinkAnyway": "Baribir uzish",
+    "keep": "Ulangan qolsin"
   },
   "settings": {
     "title": "Sozlamalar",
@@ -639,11 +642,11 @@
     "save": "Saqlash",
     "saved": "Saqlandi",
     "language": "Til",
-    "languageHint": "Email va Telegram xabarlari ham shu tilda boʻladi.",
+    "languageHint": "Telegram xabarlari ham shu tilda keladi.",
     "email": "Email",
     "password": "Parol",
     "changePassword": "Parolni oʻzgartirish",
-    "changePasswordHint": "Emailingiz yoki Telegramingizga kod yuboramiz.",
+    "changePasswordHint": "Kodni Telegramingizga yuboramiz.",
     "danger": "Hisobni oʻchirish",
     "dangerBody": "Buyumlaringiz olib tashlanadi va shaxsiy maʼlumotlaringiz oʻchiriladi. Yakunlangan kelishuvlar va baholar oʻchirilgan hisob nomidan qoladi.",
     "deleteConfirm": "Tasdiqlash uchun parolingizni kiriting",
@@ -791,7 +794,6 @@
   },
   "profile": {
     "memberSince": "{date} dan beri aʼzo",
-    "emailVerified": "Email tasdiqlangan",
     "phoneVerified": "Telefon tasdiqlangan",
     "rating": "Reyting",
     "reviews": "{count, plural, other {# ta baho}}",
@@ -874,7 +876,7 @@
       "restricted": "Cheklangan",
       "banned": "Bloklangan",
       "admins": "Administratorlar",
-      "unverified": "Tasdiqlanmagan"
+      "unverified": "Telegram ulanmagan"
     },
     "listingStatus": {
       "active": "Faol",
@@ -989,8 +991,6 @@
       "warnings": "Ogohlantirishlar",
       "asTarget": "Unga shikoyatlar",
       "asReporter": "Uning shikoyatlari",
-      "emailVerified": "Email tasdiqlangan",
-      "emailUnverified": "Email tasdiqlanmagan",
       "noPhone": "Telefon yoʻq",
       "telegram": "Telegram ulangan",
       "noTelegram": "Telegram yoʻq",
@@ -999,7 +999,9 @@
       "listings": "Eʼlonlari",
       "loans": "Ijaralari",
       "warningsTitle": "Ogohlantirishlar",
-      "adminProtected": "Administratorlarga bu yerdan chora koʻrilmaydi."
+      "adminProtected": "Administratorlarga bu yerdan chora koʻrilmaydi.",
+      "telegramLinked": "Telegram ulangan",
+      "telegramMissing": "Telegram ulanmagan"
     },
     "listings": {
       "title": "Eʼlonlar",

@@ -25,14 +25,10 @@ class LoginIn(BaseModel):
     password: str = Field(min_length=1, max_length=128)
 
 
-class VerifyIn(BaseModel):
-    email: EmailStr
-    code: str = Field(pattern=r"^\d{6}$")
-
-
 class ResendIn(BaseModel):
+    """Resends a password-reset code to the account's Telegram."""
+
     email: EmailStr
-    purpose: Literal["verify", "reset"] = "verify"
 
 
 class ForgotIn(BaseModel):
@@ -52,13 +48,13 @@ class MeOut(BaseModel):
     avatar_url: str | None
     area: str | None
     preferred_locale: str
-    email_verified: bool
     phone: str | None
     phone_verified: bool
     telegram_linked: bool
     telegram_username: str | None
     telegram_notifications: bool
-    show_telegram_prompt: bool
+    telegram_required: bool
+    delete_unverified_at: datetime | None
     is_admin: bool
     restricted_until: datetime | None
     created_at: datetime

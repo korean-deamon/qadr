@@ -2,51 +2,33 @@
 
 import { Check, ExternalLink, Phone, Send } from "lucide-react"
 import { useTranslations } from "next-intl"
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useState } from "react"
 import { useSession } from "@/components/session/session-provider"
 import { Button } from "@/components/ui/button"
-import { api } from "@/lib/api/client"
+import { useRouter } from "@/i18n/navigation"
+import { api, refreshSession } from "@/lib/api/client"
 import { useApiError } from "@/lib/api/errors"
 import { notify } from "@/lib/notify"
-
-type Status = { enabled: boolean; linked: boolean; username: string | null; phone: string | null; notifications: boolean; blocked: boolean }
+import { useTelegramLink, type TelegramStatus } from "./use-telegram-link"
 
 /** Telegram phone linking (SPEC §22): one-time deep link, then wait for the bot. */
-export function TelegramCard({ initial }: { initial: Status }) {
+export function TelegramCard({ initial }: { initial: TelegramStatus }) {
   const t = useTranslations("telegram")
   const apiError = useApiError()
+  const router = useRouter()
   const { refreshMe } = useSession()
-  const [status, setStatus] = useState(initial)
-  const [link, setLink] = useState<{ url: string; minutes: number } | null>(null)
+  const onLinked = useCallback(() => {
+    notify(t("linkedToast"))
+    void refreshMe()
+  }, [t, refreshMe])
+  const { status, setStatus, link, start: open } = useTelegramLink(initial, onLinked)
   const [busy, setBusy] = useState(false)
-  const poll = useRef<number | null>(null)
-
-  useEffect(() => {
-    if (!link || status.linked) return
-    const started = Date.now()
-    poll.current = window.setInterval(async () => {
-      try {
-        const s = await api<Status>("/telegram/status")
-        if (s.linked) {
-          setStatus(s)
-          setLink(null)
-          notify(t("linkedToast"))
-          void refreshMe()
-        }
-      } catch {}
-      if (Date.now() - started > link.minutes * 60_000) setLink(null)
-    }, 3000)
-    return () => {
-      if (poll.current) window.clearInterval(poll.current)
-    }
-  }, [link, status.linked, t, refreshMe])
+  const [confirming, setConfirming] = useState(false)
 
   const start = async () => {
     setBusy(true)
     try {
-      const res = await api<{ url: string; expires_in: number }>("/telegram/link-token", { method: "POST" })
-      setLink({ url: res.url, minutes: Math.round(res.expires_in / 60) })
-      window.open(res.url, "_blank", "noopener")
+      await open()
     } catch (e) {
       notify(apiError(e))
     } finally {
@@ -54,16 +36,17 @@ export function TelegramCard({ initial }: { initial: Status }) {
     }
   }
 
+  /** Unlinking locks the account until Telegram is linked again (SPEC §11). */
   const unlink = async () => {
     setBusy(true)
     try {
       await api("/telegram/link", { method: "DELETE" })
       setStatus((s) => ({ ...s, linked: false, username: null, phone: null }))
       notify(t("unlinked"))
-      void refreshMe()
+      await refreshSession() // new token carries the "not linked" hint for the proxy
+      router.push("/connect-telegram")
     } catch (e) {
       notify(apiError(e))
-    } finally {
       setBusy(false)
     }
   }
@@ -114,7 +97,17 @@ export function TelegramCard({ initial }: { initial: Status }) {
             <input type="checkbox" checked={status.notifications} onChange={(e) => toggleNotifications(e.target.checked)} className="peer sr-only" />
             <span aria-hidden="true" className="relative h-6 w-11 shrink-0 rounded-full bg-line transition-colors peer-checked:bg-forest peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-forest after:absolute after:top-0.5 after:left-0.5 after:size-5 after:rounded-full after:bg-white after:shadow-soft after:transition-transform after:duration-300 peer-checked:after:translate-x-5" />
           </label>
-          <Button variant="ghost" size="sm" onClick={unlink} disabled={busy}>{t("unlink")}</Button>
+          {confirming ? (
+            <div role="alert" className="space-y-3 rounded-2xl border border-destructive/30 bg-ivory px-5 py-4">
+              <p className="text-caption text-charcoal">{t("unlinkConfirm")}</p>
+              <div className="flex flex-wrap gap-2">
+                <Button variant="destructive" size="sm" onClick={unlink} disabled={busy}>{t("unlinkAnyway")}</Button>
+                <Button variant="ghost" size="sm" onClick={() => setConfirming(false)} disabled={busy}>{t("keep")}</Button>
+              </div>
+            </div>
+          ) : (
+            <Button variant="ghost" size="sm" onClick={() => setConfirming(true)}>{t("unlink")}</Button>
+          )}
         </div>
       ) : !status.enabled ? (
         <p className="mt-6 rounded-2xl bg-ivory px-5 py-4 text-caption text-ink-soft">{t("unavailable")}</p>

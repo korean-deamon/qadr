@@ -66,7 +66,8 @@ async def optional_user(request: Request, db: DB) -> User | None:
 
 
 async def current_user_any(request: Request, db: DB) -> User:
-    """Authenticated (verified or not). Used by /auth/me and verification flows."""
+    """Authenticated, Telegram linked or not. Only /auth/me, logout and the
+    Telegram linking routes accept unlinked users (SPEC §11)."""
     claims = _claims(request)
     if not claims:
         raise AppError("NOT_AUTHENTICATED", 401)
@@ -80,8 +81,9 @@ async def current_user_any(request: Request, db: DB) -> User:
 
 
 async def current_user(user: Annotated[User, Depends(current_user_any)]) -> User:
-    if not user.email_verified_at:
-        raise AppError("EMAIL_NOT_VERIFIED", 403)
+    """Verified user: Telegram is linked, which verified their phone number."""
+    if not user.phone_verified_at:
+        raise AppError("TELEGRAM_REQUIRED", 403)
     return user
 
 
@@ -124,6 +126,7 @@ async def csrf_protect(request: Request) -> None:
         raise AppError("CSRF_FAILED", 403)
 
 
+AnyUser = Annotated[User, Depends(current_user_any)]
 CurrentUser = Annotated[User, Depends(current_user)]
 Writer = Annotated[User, Depends(active_writer)]
 Admin = Annotated[User, Depends(require_admin)]

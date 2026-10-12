@@ -6,7 +6,6 @@ import { RevealText } from "@/components/motion/reveal-text"
 import { LoanCard } from "@/features/borrowing/loan-card"
 import { Activity, IncomingRequests, MyItems, Section } from "@/features/dashboard/sections"
 import { DashboardShell } from "@/features/dashboard/shell"
-import { TelegramPrompt } from "@/features/settings/telegram-prompt"
 import { apiServer, getMe } from "@/lib/api/server"
 import type { BorrowRequestView, ListingCardData, LoanView, NotificationItem, PublicUser } from "@/lib/api/types"
 import { todayTashkent } from "@/lib/dates"
@@ -44,7 +43,6 @@ export default async function DashboardPage() {
 
   return (
     <DashboardShell ns={["notifications", "telegram"]} aside={<Activity items={activity.items} />}>
-      <TelegramPrompt />
       <header className="relative isolate overflow-hidden rounded-[1.75rem] bg-forest px-6 py-8 text-ivory md:px-10 md:py-10">
         <GirihPattern className="absolute inset-0 -z-10 h-full w-full text-ivory opacity-[0.07]" size={88} />
         <RevealText as="h1" trigger="load" text={t(`greetings.${greetingKey()}`, { name: first })} className="text-title text-ivory" />

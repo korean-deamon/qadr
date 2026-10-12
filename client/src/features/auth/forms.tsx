@@ -9,7 +9,7 @@ import { notify as toast } from "@/lib/notify"
 import { z } from "zod/mini"
 import { useSession } from "@/components/session/session-provider"
 import { Link, useRouter } from "@/i18n/navigation"
-import { api, ApiError } from "@/lib/api/client"
+import { api } from "@/lib/api/client"
 import { useApiError } from "@/lib/api/errors"
 import type { Me } from "@/lib/api/types"
 import { safeNext } from "@/lib/routes"
@@ -49,14 +49,11 @@ export function LoginForm() {
             const me = await api<Me>("/auth/login", { json: data, redirectOn401: false, retry: false })
             setMe(me)
             toast(t("login.done"))
+            const target = safeNext(next, me.preferred_locale ?? locale)
             // replace + refresh so every server component renders with the new session
-            nav.replace(safeNext(next, me.preferred_locale ?? locale))
+            nav.replace(me.telegram_required ? connectUrl(me.preferred_locale ?? locale, target) : target)
             nav.refresh()
           } catch (e) {
-            if (e instanceof ApiError && e.code === "EMAIL_NOT_VERIFIED") {
-              nav.push(`/${locale}/verify?email=${encodeURIComponent(data.email)}${next ? `&next=${encodeURIComponent(next)}` : ""}`)
-              return
-            }
             setError(apiError(e))
           }
         })}
@@ -113,10 +110,16 @@ function StrengthMeter({ value }: { value: string }) {
   )
 }
 
+/** Unlinked accounts finish signing in on the Telegram step (SPEC §11). */
+function connectUrl(locale: string, next: string) {
+  return `/${locale}/connect-telegram?next=${encodeURIComponent(next)}`
+}
+
 export function RegisterForm() {
   const t = useTranslations("auth")
   const locale = useLocale()
-  const router = useRouter()
+  const nav = useNextRouter()
+  const { setMe } = useSession()
   const next = useSearchParams().get("next")
   const apiError = useApiError()
   const [error, setError] = useState<string>()
@@ -134,12 +137,14 @@ export function RegisterForm() {
         onSubmit={handleSubmit(async (data) => {
           setError(undefined)
           try {
-            await api("/auth/register", {
+            const me = await api<Me>("/auth/register", {
               json: { email: data.email, password: data.password, display_name: data.name, locale },
               redirectOn401: false,
             })
+            setMe(me)
             toast(t("register.done"))
-            router.push({ pathname: "/verify", query: { email: data.email.trim().toLowerCase(), ...(next ? { next } : {}) } })
+            nav.replace(connectUrl(locale, safeNext(next, locale)))
+            nav.refresh()
           } catch (e) {
             setError(apiError(e))
           }

@@ -32,11 +32,14 @@ def needs_rehash(hashed: str) -> bool:
     return _hasher.check_needs_rehash(hashed)
 
 
-def create_access_token(user_id: uuid.UUID, *, is_admin: bool, auth_time: datetime) -> str:
+def create_access_token(user_id: uuid.UUID, *, is_admin: bool, auth_time: datetime, linked: bool = False) -> str:
+    """`tg` (Telegram linked) is a routing hint for the web proxy only; the API
+    always re-checks the user row before granting access."""
     now = datetime.now(UTC)
     payload: dict[str, Any] = {
         "sub": str(user_id),
         "adm": is_admin,
+        "tg": linked,
         "iat": int(now.timestamp()),
         "exp": int((now + timedelta(minutes=settings.jwt_access_ttl_minutes)).timestamp()),
         "auth_time": int(auth_time.timestamp()),

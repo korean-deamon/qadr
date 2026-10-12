@@ -5,34 +5,27 @@ from app.core.deps import DB, csrf_protect, current_user_any
 from app.core.rate_limit import client_ip
 from app.modules.auth import service
 from app.modules.auth.models import User
-from app.modules.auth.schemas import ForgotIn, LoginIn, MeOut, RegisterIn, ResendIn, ResetIn, VerifyIn
+from app.modules.auth.schemas import ForgotIn, LoginIn, MeOut, RegisterIn, ResendIn, ResetIn
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
 @router.post("/register", status_code=status.HTTP_201_CREATED)
-async def register(body: RegisterIn, request: Request, db: DB) -> dict[str, str]:
+async def register(body: RegisterIn, request: Request, response: Response, db: DB) -> MeOut:
+    """Creates the account and signs in. Next step for the client: link Telegram."""
     from app.core import rate_limit as rl
 
     await rl.hit(rl.REGISTER_IP, client_ip(request))
-    user = await service.register(db, body.email, body.password, body.display_name, body.locale)
-    return {"email": user.email, "next": "verify"}
-
-
-@router.post("/verify-email")
-async def verify_email(body: VerifyIn, request: Request, response: Response, db: DB) -> MeOut:
-    from app.core import rate_limit as rl
-
-    await rl.hit(rl.OTP_VERIFY_IP, client_ip(request))
-    session = await service.verify_email(db, body.email, body.code)
+    session = await service.register(db, body.email, body.password, body.display_name, body.locale)
     set_session_cookies(response, session.access, session.refresh)
     return MeOut.model_validate(service.me(session.user))
 
 
 @router.post("/resend-otp")
-async def resend_otp(body: ResendIn, db: DB) -> dict[str, str]:
-    channel = await service.resend(db, body.email, body.purpose)
-    return {"channel": channel}
+async def resend_otp(body: ResendIn, db: DB) -> dict[str, bool]:
+    # Same response whether or not the account exists or has Telegram linked.
+    await service.resend(db, body.email)
+    return {"ok": True}
 
 
 @router.post("/login")

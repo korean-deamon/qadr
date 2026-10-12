@@ -2,21 +2,27 @@ import { hasLocale } from "next-intl"
 import createMiddleware from "next-intl/middleware"
 import { NextResponse, type NextRequest } from "next/server"
 import { LOCALE_COOKIE, routing } from "./i18n/routing"
-import { isGuestRoute, isProtectedRoute, safeNext } from "./lib/routes"
+import { CONNECT_TELEGRAM, isConnectRoute, isGuestRoute, isProtectedRoute, safeNext } from "./lib/routes"
 
 const intl = createMiddleware(routing)
 const API = process.env.API_INTERNAL_URL ?? "http://localhost:8000"
 const ORIGIN = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"
 
-/** Reads `exp` only (no trust decision): the backend verifies signatures. */
-function accessValid(token: string | undefined): boolean {
-  if (!token) return false
+type Claims = { exp?: number; tg?: boolean }
+
+/** Unverified read of the access token. Routing hints only: the API checks every request. */
+function claims(token: string | undefined): Claims | null {
+  if (!token) return null
   try {
-    const payload = JSON.parse(atob(token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")))
-    return typeof payload.exp === "number" && payload.exp * 1000 > Date.now() + 5000
+    return JSON.parse(atob(token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/"))) as Claims
   } catch {
-    return false
+    return null
   }
+}
+
+function accessValid(token: string | undefined): boolean {
+  const exp = claims(token)?.exp
+  return typeof exp === "number" && exp * 1000 > Date.now() + 5000
 }
 
 /** Refresh server-to-server and return the rotated Set-Cookie headers (or null). */
@@ -68,17 +74,32 @@ export default async function proxy(request: NextRequest) {
   let signedIn = accessValid(access)
   let rotated: string[] | null = null
 
-  if (!signedIn && hasRefresh && (isProtectedRoute(path) || isGuestRoute(path))) {
+  // Refresh on any page (not just protected ones): a signed-in user without
+  // Telegram must be sent to connect it wherever they land.
+  if (!signedIn && hasRefresh) {
     rotated = await refresh(request)
     signedIn = rotated !== null
   }
+  const deadRefresh = hasRefresh && !signedIn
 
-  if (isProtectedRoute(path) && !signedIn) {
+  const needsRedirectToLogin = (isProtectedRoute(path) || isConnectRoute(path)) && !signedIn
+  if (needsRedirectToLogin) {
     const url = request.nextUrl.clone()
     url.pathname = `/${locale}/login`
     url.search = `?next=${encodeURIComponent(pathname + search)}`
     const res = NextResponse.redirect(url)
-    if (hasRefresh) res.cookies.delete("qadr_refresh") // dead refresh token
+    if (deadRefresh) res.cookies.delete("qadr_refresh")
+    return res
+  }
+
+  // Signed in without Telegram: nothing but the connect page until it is linked.
+  const fresh = rotated ? parseSetCookie(rotated)["qadr_access"] : access
+  if (signedIn && claims(fresh)?.tg === false && !isConnectRoute(path)) {
+    const url = request.nextUrl.clone()
+    url.pathname = `/${locale}${CONNECT_TELEGRAM}`
+    url.search = isProtectedRoute(path) || path === "/" ? `?next=${encodeURIComponent(pathname + search)}` : ""
+    const res = NextResponse.redirect(url)
+    rotated?.forEach((c) => res.headers.append("set-cookie", c))
     return res
   }
 
@@ -105,7 +126,9 @@ export default async function proxy(request: NextRequest) {
   }
   const headers = new Headers(request.headers)
   headers.set("x-qadr-path", pathname + search)
-  return NextResponse.next({ request: { headers } })
+  const res = NextResponse.next({ request: { headers } })
+  if (deadRefresh) res.cookies.delete("qadr_refresh") // stop retrying a revoked/expired session
+  return res
 }
 
 export const config = {

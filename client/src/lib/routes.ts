@@ -1,5 +1,7 @@
 /** Route families that change the chrome around a page. Paths are locale-less. */
-export const AUTH_ROUTES = ["/login", "/register", "/verify", "/forgot-password", "/reset-password"]
+export const AUTH_ROUTES = ["/login", "/register", "/connect-telegram", "/forgot-password", "/reset-password"]
+/** The only page a signed-in user without Telegram may open (SPEC §11) */
+export const CONNECT_TELEGRAM = "/connect-telegram"
 /** Guest-only: signed-in users are redirected away (SPEC §11.1) */
 export const GUEST_ROUTES = ["/login", "/register", "/forgot-password", "/reset-password"]
 export const APP_ROUTES = ["/dashboard", "/messages", "/my-items", "/requests", "/borrowings", "/saved", "/notifications", "/settings"]
@@ -14,6 +16,7 @@ export const isGuestRoute = (pathname: string) => matches(pathname, GUEST_ROUTES
 export const isProtectedRoute = (pathname: string) =>
   matches(pathname, PROTECTED_ROUTES) || /^\/items\/[^/]+\/edit$/.test(pathname)
 export const isAdminRoute = (pathname: string) => matches(pathname, ["/admin"])
+export const isConnectRoute = (pathname: string) => matches(pathname, [CONNECT_TELEGRAM])
 
 const LOCALES = ["uz", "ru", "en"]
 

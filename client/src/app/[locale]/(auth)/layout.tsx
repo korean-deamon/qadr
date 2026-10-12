@@ -20,7 +20,7 @@ export default async function AuthLayout({ children }: LayoutProps<"/[locale]">)
           <LocaleSwitcher />
         </div>
         <main id="main" className="mx-auto flex w-full max-w-[26rem] flex-1 flex-col justify-center py-10">
-          <ClientMessages ns={["auth", "validation"]}>{children}</ClientMessages>
+          <ClientMessages ns={["auth", "validation", "telegram"]}>{children}</ClientMessages>
         </main>
       </div>
 

@@ -23,7 +23,7 @@ export function SessionProvider({ initialMe, children }: { initialMe: Me | null;
   const [counters, setCounters] = useState<Counters>(ZERO)
 
   const refreshCounters = useCallback(async () => {
-    if (!me) return
+    if (!me || me.telegram_required) return // nothing to count until Telegram is linked
     try {
       setCounters(await api<Counters>("/me/counters", { redirectOn401: false }))
     } catch {}

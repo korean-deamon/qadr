@@ -25,7 +25,6 @@ export type UserSummary = {
   name: string
   email: string
   phone: string | null
-  email_verified: boolean
   phone_verified: boolean
   telegram_linked: boolean
   member_since: string
