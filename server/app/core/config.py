@@ -1,10 +1,12 @@
 """Application settings, loaded from the environment (see .env.example)."""
 
 from functools import lru_cache
-from typing import Literal
+from typing import Literal, Self
 
-from pydantic import Field, computed_field
+from pydantic import Field, computed_field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+INSECURE_SECRET_KEY = "dev-insecure-secret-change-me"  # noqa: S105 (sentinel, not a real secret)
 
 
 class Settings(BaseSettings):
@@ -18,7 +20,7 @@ class Settings(BaseSettings):
     redis_url: str = "redis://localhost:6380/0"
     celery_broker_url: str = "redis://localhost:6380/1"
 
-    secret_key: str = Field(default="dev-insecure-secret-change-me", min_length=16)
+    secret_key: str = Field(default=INSECURE_SECRET_KEY, min_length=16)
     jwt_access_ttl_minutes: int = 15
     jwt_refresh_ttl_days: int = 30
 
@@ -74,6 +76,28 @@ class Settings(BaseSettings):
     @property
     def is_production(self) -> bool:
         return self.app_env == "production"
+
+    @model_validator(mode="after")
+    def _guard_production(self) -> Self:
+        """Fail fast (every process: api, bot, worker, beat, migrate) rather than
+        silently serve production traffic with a known-insecure or half-configured
+        setup. A misconfigured deploy should crash-loop and show up in `docker compose
+        ps`/logs immediately, not leak a forgeable session signing key."""
+        if not self.is_production:
+            return self
+        problems = []
+        if self.secret_key == INSECURE_SECRET_KEY:
+            problems.append("SECRET_KEY is still the insecure default — set a real random value")
+        if not self.cookie_secure:
+            problems.append("COOKIE_SECURE must be true in production (cookies would be sent over plain HTTP)")
+        if self.telegram_mode == "webhook":
+            if not self.telegram_webhook_secret:
+                problems.append("TELEGRAM_WEBHOOK_SECRET is required when TELEGRAM_MODE=webhook")
+            if not self.telegram_webhook_url.startswith("https://"):
+                problems.append("TELEGRAM_WEBHOOK_URL must be an https:// URL when TELEGRAM_MODE=webhook")
+        if problems:
+            raise ValueError("Refusing to start with APP_ENV=production:\n- " + "\n- ".join(problems))
+        return self
 
 
 @lru_cache

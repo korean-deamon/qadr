@@ -3,9 +3,25 @@
 #   cp .env.example .env.production   # fill in real values (see README)
 #   docker compose -f docker-compose.prod.yml --env-file .env.production up -d --build
 #
-# Only the proxy publishes ports (80/443). Postgres, Redis, the API, workers
-# and the bot are reachable only on the compose network. Secrets come from the env file
-# at runtime and are never baked into images.
+# The `proxy` service (Caddy, automatic HTTPS) publishes 80/443 by default. If
+# something else on the box already owns those ports (another reverse proxy,
+# e.g. nginx/aaPanel), skip `proxy` when starting the stack and point that
+# existing proxy at api/bot/frontend's 127.0.0.1 ports instead (API_HOST_PORT/
+# BOT_HOST_PORT/WEB_HOST_PORT below, same routing the Caddyfile defines:
+# /api/* -> api, /tg/* -> bot, else -> frontend). Postgres, Redis and the
+# worker/beat are never exposed either way. Secrets come from the env file at
+# runtime and are never baked into images.
+#
+# `IMAGE_PREFIX` can be a registry path (e.g. ghcr.io/you/qadr) instead of the local
+# default "qadr" — set that and `docker compose pull && up -d` uses pre-built images
+# from CI instead of building on the box (see README → "Deploying").
+#
+# Resource floor this is tuned for: 2 vCPU / 4 GB RAM. `deploy.resources.limits.cpus`
+# is a per-container burst ceiling, not a reservation — the figures below sum to well
+# above 2 vCPU on purpose (idle containers don't use their ceiling; this just stops
+# any single one, e.g. a stuck Celery task, from starving the others). Memory limits
+# are real ceilings and sum to ~2.8 GB, leaving headroom for the OS and Postgres's own
+# buffers. On a bigger box, raise `CELERY_CONCURRENCY` and the limits below.
 name: qadr-prod
 
 x-server-env: &server-env
@@ -47,6 +63,10 @@ services:
       retries: 10
     restart: unless-stopped
     logging: *logging
+    deploy:
+      resources:
+        limits: { cpus: "1.0", memory: 768M }
+        reservations: { memory: 256M }
 
   redis:
     image: redis:7.4-alpine
@@ -61,6 +81,10 @@ services:
       retries: 10
     restart: unless-stopped
     logging: *logging
+    deploy:
+      resources:
+        limits: { cpus: "0.5", memory: 256M }
+        reservations: { memory: 64M }
 
   # One-off: apply migrations before anything else starts. Set SEED_DEMO=true
   # to load demo data (idempotent) — for staging, not for a real launch.
@@ -76,20 +100,36 @@ services:
       redis: { condition: service_healthy }
     restart: "no"
     logging: *logging
+    deploy:
+      resources:
+        limits: { cpus: "1.0", memory: 512M }
 
   api:
     <<: *server
     volumes: [media:/app/media]
+    # Bound to 127.0.0.1 only — reachable from the host's own reverse proxy,
+    # never directly from the internet. Override the host port with
+    # API_HOST_PORT if 8000 is already taken by something else on the box.
+    ports: ["127.0.0.1:${API_HOST_PORT:-8000}:8000"]
+    deploy:
+      resources:
+        limits: { cpus: "1.0", memory: 512M }
+        reservations: { memory: 256M }
 
   worker:
     <<: *server
-    command: ["celery", "-A", "app.tasks.celery_app", "worker", "--loglevel=INFO", "--concurrency=4"]
+    # 2 fits a 2 vCPU floor; raise CELERY_CONCURRENCY in .env.production on a bigger box.
+    command: ["sh", "-c", "exec celery -A app.tasks.celery_app worker --loglevel=INFO --concurrency=${CELERY_CONCURRENCY:-2}"]
     healthcheck:
       test: ["CMD-SHELL", "celery -A app.tasks.celery_app inspect ping -d celery@$$HOSTNAME --timeout 5 | grep -q pong"]
       interval: 30s
       timeout: 15s
       start_period: 20s
       retries: 5
+    deploy:
+      resources:
+        limits: { cpus: "1.0", memory: 512M }
+        reservations: { memory: 192M }
 
   beat:
     <<: *server
@@ -100,11 +140,19 @@ services:
       timeout: 5s
       start_period: 30s
       retries: 3
+    deploy:
+      resources:
+        limits: { cpus: "0.25", memory: 128M }
 
   bot:
     <<: *server
     image: ${IMAGE_PREFIX:-qadr}-bot:${IMAGE_TAG:-latest}
     build: { context: ./server, target: bot }
+    # /tg/webhook (Telegram) and /tg/health. Same 127.0.0.1-only note as api.
+    ports: ["127.0.0.1:${BOT_HOST_PORT:-8082}:8081"]
+    deploy:
+      resources:
+        limits: { cpus: "0.25", memory: 160M }
 
   frontend:
     image: ${IMAGE_PREFIX:-qadr}-web:${IMAGE_TAG:-latest}
@@ -119,6 +167,12 @@ services:
       api: { condition: service_healthy }
     restart: unless-stopped
     logging: *logging
+    # Same 127.0.0.1-only note as api.
+    ports: ["127.0.0.1:${WEB_HOST_PORT:-3000}:3000"]
+    deploy:
+      resources:
+        limits: { cpus: "0.5", memory: 384M }
+        reservations: { memory: 192M }
 
   proxy:
     image: caddy:2.10-alpine
@@ -142,6 +196,9 @@ services:
       retries: 5
     restart: unless-stopped
     logging: *logging
+    deploy:
+      resources:
+        limits: { cpus: "0.5", memory: 128M }
 
 volumes:
   pgdata:
